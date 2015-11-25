@@ -582,10 +582,6 @@ public:
         
         // 指の座標を表示する
         stringstream ss;
-        //ss << normalizedPosition.x << ", " << normalizedPosition.y << "\n";//0~1の値で表示
-        //ss << x << ", " << y << "\n";//ウィンドウサイズの値で表示
-        //ss << messageNumber << "\n";
-        
         auto tbox = TextBox().font( Font( "游ゴシック体", 20 ) ).text ( ss.str() );
         auto texture = gl::Texture( tbox.render() );//テクスチャをつくる
         
@@ -1062,19 +1058,9 @@ public:
             error("ERROR connecting");
         printf("Please enter the message: ");
         bzero(buffer,256);
-        
-        //std::string str = std::to_string(mLastFrame.fingers().count());//string型に変換
-        //std::string str2 = std::to_string(mLastFrame.hands().count());//string型に変換
-        
-        //strcpy(buffer,str.c_str());
-        //strcpy(buffer,str2.c_str());
-        //strcpy(buffer,str);
-        //fgets(buffer,255,stdin);
-        n = write(sockfd,messageList[messageNumber].message,strlen(messageList[messageNumber].message));//メッセージの発信
-        
-        //n = write(sockfd,str.c_str(),strlen(buffer));//データの発信
-        //n = write(sockfd,str2.c_str(),strlen(buffer));
-        //n = write(sockfd, str, strlen(str));
+        std::string str = std::to_string(mLastFrame.hands().count());//string型に変換
+        strcpy(buffer,str.c_str());
+        n = write(sockfd,str.c_str(),strlen(buffer));//データの発信
         if (n < 0)
             error("ERROR writing to socket");
         bzero(buffer,256);
