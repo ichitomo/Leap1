@@ -635,47 +635,47 @@ public:
         gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 80, 100 ) );//実体
         gl::popMatrices();
         
-        //右目
-        gl::pushMatrices();
-        //setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x-defEyeTransX,
-                     mTotalMotionTranslation.y+defEyeTransY,
-                     mTotalMotionTranslation.z+defEyeTransZ);//位置
-        glRotatef(rightEyeAngle, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale2/5, mTotalMotionScale2/10, mTotalMotionScale2/10 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
-        gl::popMatrices();
-        
-        //左目
-        gl::pushMatrices();
-        //setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defEyeTransX,
-                     mTotalMotionTranslation.y+defEyeTransY,
-                     mTotalMotionTranslation.z+defEyeTransZ);//位置
-        glRotatef(leftEyeAngle, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale2/5, mTotalMotionScale2/10, mTotalMotionScale2/10 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
-        gl::popMatrices();
-        
-        //元に戻す
-        rightEyeAngle = 0.0;//右目の角度
-        leftEyeAngle = 0.0;//左目の角度
-        defEyeTransX = 20.0;//右目の角度
-        defEyeTransY = 20.0;//右目の角度
-        defEyeTransZ = 100.0;//左目の角度
+//        //右目
+//        gl::pushMatrices();
+//        //setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+//        glTranslatef( mTotalMotionTranslation.x-defEyeTransX,
+//                     mTotalMotionTranslation.y+defEyeTransY,
+//                     mTotalMotionTranslation.z+defEyeTransZ);//位置
+//        glRotatef(rightEyeAngle, 1.0f, 0.0f, 0.0f);//回転
+//        glScalef( mTotalMotionScale2/5, mTotalMotionScale2/10, mTotalMotionScale2/10 );//大きさ
+//        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+//        gl::popMatrices();
+//        
+//        //左目
+//        gl::pushMatrices();
+//        //setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+//        glTranslatef( mTotalMotionTranslation.x+defEyeTransX,
+//                     mTotalMotionTranslation.y+defEyeTransY,
+//                     mTotalMotionTranslation.z+defEyeTransZ);//位置
+//        glRotatef(leftEyeAngle, 1.0f, 0.0f, 0.0f);//回転
+//        glScalef( mTotalMotionScale2/5, mTotalMotionScale2/10, mTotalMotionScale2/10 );//大きさ
+//        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+//        gl::popMatrices();
+//        
+//        //元に戻す
+//        rightEyeAngle = 0.0;//右目の角度
+//        leftEyeAngle = 0.0;//左目の角度
+//        defEyeTransX = 20.0;//右目の角度
+//        defEyeTransY = 20.0;//右目の角度
+//        defEyeTransZ = 100.0;//左目の角度
         
         //口を描く
-        gl::pushMatrices();
-        glPointSize(10);
-        glLineWidth(10);
-        glBegin(GL_LINE_STRIP);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glVertex3d(mTotalMotionTranslation.x-20, mTotalMotionTranslation.y + 0, mTotalMotionTranslation.z +defMouseTransZ);
-        glVertex3d(mTotalMotionTranslation.x + 0, mTotalMotionTranslation.y-30, mTotalMotionTranslation.z +defMouseTransZ);
-        glVertex3d(mTotalMotionTranslation.x + 20, mTotalMotionTranslation.y + 0, mTotalMotionTranslation.z +defMouseTransZ);
-        glEnd();
-        gl::popMatrices();
-        
+//        gl::pushMatrices();
+//        glPointSize(10);
+//        glLineWidth(10);
+//        glBegin(GL_LINE_STRIP);
+//        glColor3f(1.0f, 1.0f, 1.0f);
+//        glVertex3d(mTotalMotionTranslation.x-20, mTotalMotionTranslation.y + 0, mTotalMotionTranslation.z +defMouseTransZ);
+//        glVertex3d(mTotalMotionTranslation.x + 0, mTotalMotionTranslation.y-30, mTotalMotionTranslation.z +defMouseTransZ);
+//        glVertex3d(mTotalMotionTranslation.x + 20, mTotalMotionTranslation.y + 0, mTotalMotionTranslation.z +defMouseTransZ);
+//        glEnd();
+//        gl::popMatrices();
+//        
         //胴体を描く
         gl::pushMatrices();
         setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
@@ -1014,18 +1014,28 @@ public:
     float mTotalMotionScale = 1.0f;//拡大縮小（顔）
     float mTotalMotionScale2 = 1.0f;//拡大縮小（表情）
     
-    float defFaceTransX = 0.0;//顔のx座標の位置
-    float defFaceTransY = 0.0;//顔のy座標の位置
-    float defFaceTransZ = 50.0;//顔のz座標の位置
+    //ci::Vec3f defFaceTrans(new Point3D(0.0, 120.0, 50.0));
+    float defFaceTransX = 1080.0;//顔のx座標の位置
+    float defFaceTransY = 675+110.0;//顔のy座標の位置
+    float defFaceTransZ = 0.0;//顔のz座標の位置
+    
+    float defBodyTransX = 1080.0;//体のx座標の位置
+    float defBodyTransY = 675.0;//体のy座標の位置
+    float defBodyTransZ = 0.0;//体のz座標の位置
+    
+    float defLeftArmTransX=1080.0+75.0;
+    float defRightArmTransX=1080.0-75.0;
+    float defArmTransY=675+20.0;
+    float defArmTransZ=0.0;
+    
     float rightEyeAngle = 0.0;//右目の角度
     float leftEyeAngle = 0.0;//左目の角度
     float defEyeTransX = 20.0;//右目のx座標の位置
-    float defEyeTransY = 20.0;//右目のy座標の位置
+    float defEyeTransY = 120.0;//右目のy座標の位置
     float defEyeTransZ = 0.0;//左目のz座標の位置
-    float defBodyTransX = 0.0;//体のx座標の位置
-    float defBodyTransY = -100.0;//体のy座標の位置
-    float defBodyTransZ = 50.0;//体のz座標の位置
-    float defMouseTransZ = 110.0;//口のz座標の位置
+    
+    float defMouseTransZ = 0.0;//口のz座標の位置
+    //ci::Vec3f mTotalMotionTranslation;//移動
     
     //bool flag = false;//テキストの文字表示フラグ
     
