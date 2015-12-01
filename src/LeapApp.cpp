@@ -116,6 +116,12 @@ public:
         // Leap Motion関連のセットアップ
         setupLeapObject();
         
+        // SETUP PARAMS
+        mParams = params::InterfaceGl( "LearnHow", Vec2i( 200, 160 ) );
+        mParams.addParam( "Scene Rotation", &mSceneRotation, "opened=1" );
+        mParams.addSeparator();
+        mParams.addParam( "Eye Distance", &mCameraDistance, "min=50.0 max=1500.0 step=50.0 keyIncr=s keyDecr=w" );
+        
     }
     // マウスのクリック
     void mouseDown( MouseEvent event ){
@@ -258,7 +264,16 @@ public:
 
         gl::popMatrices();
         // パラメーター設定UIを描画する
-        //mParams.draw();
+        // パラメーター設定UIを描画する
+        mParams.draw();
+        if( imgTexture ) {
+            //バックグラウンドイメージを追加
+            gl::draw( backgroundImage, getWindowBounds());
+        }else{
+            //ロードする間にコメント
+            gl::drawString("Loading image please wait..",getWindowCenter());
+            
+        }
         
         
     }
@@ -438,22 +453,6 @@ public:
         //----- TextBoxを使って文字やパラメーターを表示する -----
         
         stringstream ss;//確認用変数
-        // 説明
-        
-        //        ss << "左手で体の操作を行う\n";
-        //        ss << "親指で右足の回転を行う\n";
-        //        ss << "人さし指で右腕の回転を行う\n";
-        //        ss << "薬指で左腕の回転を行う\n";
-        //        ss << "小指で左足の回転を行う\n\n";
-        //        ss << "右手で顔の表情の操作を行う\n";
-        //        ss << "人さし指を曲げて喜び感情\n";
-        //        ss << "中指を曲げて怒りの感情\n";
-        //        ss << "薬指を曲げて哀しみの表情\n";
-        //        ss << "小指を曲げて楽しみの表情\n";
-        //        ss << "拡大縮小の追加\n";
-        //        ss << "flag\n" << flag;
-        
-        
         // フレームレート
         ss << "FPS : "<< mCurrentFrame.currentFramesPerSecond() << "\n";
         //検出した指の数
@@ -699,15 +698,6 @@ public:
                      0.0f);//移動
         glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
         gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100,  50, 50 ) );//実体
-        
-        //二個目
-        glTranslatef( defBodyTransX+85,0.0f,0.0f);//移動
-        glRotatef(mRotateMatrix2, 1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( mTotalMotionTranslation.x/10.0,
-                     mTotalMotionTranslation.y/10.0,
-                     0.0f);//移動
-        // glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 50,  50, 50 ) );//実体
         gl::popMatrices();
         
         //左腕を描く
@@ -722,13 +712,6 @@ public:
                      0.0f);//移動
         glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
         gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 50, 50 ) );//実体
-        //二個目
-        glTranslatef(defBodyTransX-85,0.0f,0.0f);//移動
-        glRotatef(-mRotateMatrix4, -1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( -mTotalMotionTranslation.x/10.0,
-                     mTotalMotionTranslation.y/10.0,
-                     0.0f);//移動
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 50, 50, 50 ) );//実体
         gl::popMatrices();
         
         //右足を描く
@@ -813,9 +796,6 @@ public:
     void drawBone(Leap::Bone bone){
         
         // InteractionBoxの座標に変換する
-        Leap::InteractionBox iBox = mLeap.frame().interactionBox();
-        Leap::Vector normalizedPosition = iBox.normalizePoint( bone.prevJoint() );//指の先端の座標
-        
         // ウィンドウの座標に変換する
        // float x = normalizedPosition.x * WindowWidth;
        // float y = WindowHeight - (normalizedPosition.y * WindowHeight);
