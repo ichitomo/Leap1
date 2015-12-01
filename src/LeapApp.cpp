@@ -11,6 +11,11 @@
 #include "cinder/ObjLoader.h"//
 #include "cinder/Utilities.h"
 
+#include <math.h>
+#include "cinder/Capture.h"
+#include "cinder/params/Params.h"
+#include "time.h"
+
 //ソケット通信
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,11 +81,24 @@ public:
         mFont = Font( "YuGothic", 20 );
         
         // カメラ(視点)の設定
-        mCam.setEyePoint( Vec3f( 0.0f, 150.0f, 500.0f ) );//カメラの位置
-        mCam.setCenterOfInterestPoint( Vec3f( 0.0f, 0.0f, 1.0f ) );//カメラの中心座標
-        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 50.0f, 3000.0f );//カメラから見える視界の設定
+        mCapture = Capture(getWindowWidth(), getWindowHeight());
+        mCapture.start();
         
+        mCameraDistance = 1500.0f;//カメラの距離（z座標）
+        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance );//位置
+        mCenter			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, 0.0f);//カメラのみる先
+        
+        mCam.setEyePoint( mEye );//カメラの位置
+        mCam.setCenterOfInterestPoint( mCenter );//カメラのみる先
+        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 50.0f, 3000.0f );//カメラから見える視界の設定
+        //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+        //fozyはカメラの画角、値が大きいほど透視が強くなり、絵が小さくなる
+        //getWindowAspectRatio()はアスペクト比
+        //nNearは奥行きの範囲：手前（全方面）
+        //zFarは奥行きの範囲：後方（後方面）
+        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
         mMayaCam.setCurrentCam(mCam);
+        
         
         // アルファブレンディングを有効にする
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -102,6 +120,9 @@ public:
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
+        //        if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
+        //            drawPrintBinInfo( event.getX() );
+
     }
     
     // マウスのドラッグ
@@ -213,6 +234,16 @@ public:
         
         updateLeapObject();
         renderFrameParameter();
+
+        //カメラのアップデート処理
+        mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
+        mCamPrep.lookAt( mEye, mCenter, mUp);//カメラの位置、m詰めている先の位置、カメラの頭の方向を表すベクトル
+        gl::setMatrices( mCamPrep );
+        gl::rotate( mSceneRotation );//カメラの回転
+        
+        if( mCapture.checkNewFrame() ) {
+            imgTexture = gl::Texture(mCapture.getSurface() );
+        }
         socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
@@ -223,17 +254,7 @@ public:
         drawLeapObject();//マリオネットの描写
         drawInteractionBox3();//インタラクションボックス
         drawListArea();//メッセージリストの表示
-        //gl::draw(backgroundImage, getWindowBounds());//backgroundImageの描写
-        
-        //----- オブジェファイルの読み込み -----//
-//        gl::Texture sTexture;
-//        sTexture = gl::Texture(loadImage(loadAsset("texture.jpg")));
-//        sTexture.enableAndBind();
-//        cinder::TriMesh mySphere;
-//        ObjLoader loader( loadFile( "android_arm.obj" ) );
-//        loader.load( &mySphere );
-//        gl::draw( mySphere );
-//        sTexture.unbind();
+
 
         gl::popMatrices();
         // パラメーター設定UIを描画する
@@ -1048,6 +1069,15 @@ public:
     struct hostent *server;
     
     char buffer[256];
+    
+    //カメラをコントロールする
+    Capture	        mCapture;
+    gl::Texture		imgTexture;
+    
+    CameraPersp mCamPrep;
+    Quatf				mSceneRotation;
+    float				mCameraDistance;
+    Vec3f				mEye, mCenter, mUp;
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
