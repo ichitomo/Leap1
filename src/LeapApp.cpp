@@ -271,6 +271,7 @@ public:
 //        drawInteractionBox3();//インタラクションボックス
 //        drawListArea();//メッセージリストの表示
         drawCircle();//値によって球体を拡大縮小させる描写の追加
+        drawSinGraph();//sin関数を描く
         gl::popMatrices();
         // パラメーター設定UIを描画する
         mParams.draw();
@@ -532,7 +533,42 @@ public:
         //        gl::drawSolidCircle( Vec2f( -100,100 ), eSize, eSize );//指の位置
         //        popMatrices();
     }
-    
+    //sinグラフを描く
+    void drawSinGraph(){
+        
+        glPushMatrix();
+        gl::setMatrices( mMayaCam.getCamera() );
+        drawGrid();  //基準線
+        //サイン波を点で静止画として描画///////////////////////////
+        for (t1 = 0.0; t1 < WindowWidth; t1 += speed) {
+            y = A*sin(w*(t1 * PI / 180.0) - p);
+            drawSolidCircle(Vec2f(t1, y + WindowHeight/2), 1);  //円を描く
+        }
+        
+        //点のアニメーションを描画////////////////////////////////
+        y = A*sin(w*(t2 * PI / 180.0) - p);
+        drawSolidCircle(Vec2f(t2, y + WindowHeight/2), 10);  //円を描く
+        
+        t2 += speed;    //時間を進める
+        if (t2 > WindowWidth) t2 = 0.0;    //点が右端まで行ったらになったら原点に戻る
+        glPopMatrix();
+        
+    }
+    void drawGrid(){
+        glPushMatrix();
+        gl::setMatrices( mMayaCam.getCamera() );
+        //横線
+        glBegin(GL_LINES);
+        glVertex2d(WindowWidth/2, 0);
+        glVertex2d(WindowWidth/2, WindowHeight);
+        glEnd();
+        //横線
+        glBegin(GL_LINES);
+        glVertex2d(0, WindowHeight/2);
+        glVertex2d(WindowWidth, WindowHeight/2);
+        glEnd();
+        glPopMatrix();
+    }
     //インタラクションボックスの作成
     void drawInteractionBox3(){
         
