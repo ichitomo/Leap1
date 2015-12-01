@@ -146,4 +146,5 @@ dependencies: /Users/ichinosetomohiro/Desktop/Leap/src/LeapApp.cpp \
   ../../cinder_0.8.6_mac/boost/boost/predef/os/bsd/net.h \
   ../../cinder_0.8.6_mac/boost/boost/math/special_functions/fpclassify.hpp \
   ../../cinder_0.8.6_mac/boost/boost/math/tools/real_cast.hpp \
-  ../../cinder_0.8.6_mac/boost/boost/container/container_fwd.hpp
+  ../../cinder_0.8.6_mac/boost/boost/container/container_fwd.hpp \
+  ../../cinder_0.8.6_mac/include/cinder/Capture.h

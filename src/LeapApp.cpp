@@ -11,6 +11,11 @@
 #include "cinder/ObjLoader.h"//
 #include "cinder/Utilities.h"
 
+#include <math.h>
+#include "cinder/Capture.h"
+#include "cinder/params/Params.h"
+#include "time.h"
+
 //ソケット通信
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,11 +81,24 @@ public:
         mFont = Font( "YuGothic", 20 );
         
         // カメラ(視点)の設定
-        mCam.setEyePoint( Vec3f( 0.0f, 150.0f, 500.0f ) );//カメラの位置
-        mCam.setCenterOfInterestPoint( Vec3f( 0.0f, 0.0f, 1.0f ) );//カメラの中心座標
-        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 50.0f, 3000.0f );//カメラから見える視界の設定
+        mCapture = Capture(getWindowWidth(), getWindowHeight());
+        mCapture.start();
         
+        mCameraDistance = 1500.0f;//カメラの距離（z座標）
+        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance );//位置
+        mCenter			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, 0.0f);//カメラのみる先
+        
+        mCam.setEyePoint( mEye );//カメラの位置
+        mCam.setCenterOfInterestPoint( mCenter );//カメラのみる先
+        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 50.0f, 3000.0f );//カメラから見える視界の設定
+        //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+        //fozyはカメラの画角、値が大きいほど透視が強くなり、絵が小さくなる
+        //getWindowAspectRatio()はアスペクト比
+        //nNearは奥行きの範囲：手前（全方面）
+        //zFarは奥行きの範囲：後方（後方面）
+        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
         mMayaCam.setCurrentCam(mCam);
+        
         
         // アルファブレンディングを有効にする
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -98,10 +116,19 @@ public:
         // Leap Motion関連のセットアップ
         setupLeapObject();
         
+        // SETUP PARAMS
+        mParams = params::InterfaceGl( "LearnHow", Vec2i( 200, 160 ) );
+        mParams.addParam( "Scene Rotation", &mSceneRotation, "opened=1" );
+        mParams.addSeparator();
+        mParams.addParam( "Eye Distance", &mCameraDistance, "min=50.0 max=1500.0 step=50.0 keyIncr=s keyDecr=w" );
+        
     }
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
+        //        if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
+        //            drawPrintBinInfo( event.getX() );
+
     }
     
     // マウスのドラッグ
@@ -213,6 +240,16 @@ public:
         
         updateLeapObject();
         renderFrameParameter();
+
+        //カメラのアップデート処理
+        mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
+        mCamPrep.lookAt( mEye, mCenter, mUp);//カメラの位置、m詰めている先の位置、カメラの頭の方向を表すベクトル
+        gl::setMatrices( mCamPrep );
+        gl::rotate( mSceneRotation );//カメラの回転
+        
+        if( mCapture.checkNewFrame() ) {
+            imgTexture = gl::Texture(mCapture.getSurface() );
+        }
         socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
@@ -223,21 +260,20 @@ public:
         drawLeapObject();//マリオネットの描写
         drawInteractionBox3();//インタラクションボックス
         drawListArea();//メッセージリストの表示
-        //gl::draw(backgroundImage, getWindowBounds());//backgroundImageの描写
-        
-        //----- オブジェファイルの読み込み -----//
-//        gl::Texture sTexture;
-//        sTexture = gl::Texture(loadImage(loadAsset("texture.jpg")));
-//        sTexture.enableAndBind();
-//        cinder::TriMesh mySphere;
-//        ObjLoader loader( loadFile( "android_arm.obj" ) );
-//        loader.load( &mySphere );
-//        gl::draw( mySphere );
-//        sTexture.unbind();
+
 
         gl::popMatrices();
         // パラメーター設定UIを描画する
-        //mParams.draw();
+        // パラメーター設定UIを描画する
+        mParams.draw();
+        if( imgTexture ) {
+            //バックグラウンドイメージを追加
+            gl::draw( backgroundImage, getWindowBounds());
+        }else{
+            //ロードする間にコメント
+            gl::drawString("Loading image please wait..",getWindowCenter());
+            
+        }
         
         
     }
@@ -417,22 +453,6 @@ public:
         //----- TextBoxを使って文字やパラメーターを表示する -----
         
         stringstream ss;//確認用変数
-        // 説明
-        
-        //        ss << "左手で体の操作を行う\n";
-        //        ss << "親指で右足の回転を行う\n";
-        //        ss << "人さし指で右腕の回転を行う\n";
-        //        ss << "薬指で左腕の回転を行う\n";
-        //        ss << "小指で左足の回転を行う\n\n";
-        //        ss << "右手で顔の表情の操作を行う\n";
-        //        ss << "人さし指を曲げて喜び感情\n";
-        //        ss << "中指を曲げて怒りの感情\n";
-        //        ss << "薬指を曲げて哀しみの表情\n";
-        //        ss << "小指を曲げて楽しみの表情\n";
-        //        ss << "拡大縮小の追加\n";
-        //        ss << "flag\n" << flag;
-        
-        
         // フレームレート
         ss << "FPS : "<< mCurrentFrame.currentFramesPerSecond() << "\n";
         //検出した指の数
@@ -678,15 +698,6 @@ public:
                      0.0f);//移動
         glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
         gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100,  50, 50 ) );//実体
-        
-        //二個目
-        glTranslatef( defBodyTransX+85,0.0f,0.0f);//移動
-        glRotatef(mRotateMatrix2, 1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( mTotalMotionTranslation.x/10.0,
-                     mTotalMotionTranslation.y/10.0,
-                     0.0f);//移動
-        // glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 50,  50, 50 ) );//実体
         gl::popMatrices();
         
         //左腕を描く
@@ -701,13 +712,6 @@ public:
                      0.0f);//移動
         glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
         gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 50, 50 ) );//実体
-        //二個目
-        glTranslatef(defBodyTransX-85,0.0f,0.0f);//移動
-        glRotatef(-mRotateMatrix4, -1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( -mTotalMotionTranslation.x/10.0,
-                     mTotalMotionTranslation.y/10.0,
-                     0.0f);//移動
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 50, 50, 50 ) );//実体
         gl::popMatrices();
         
         //右足を描く
@@ -792,9 +796,6 @@ public:
     void drawBone(Leap::Bone bone){
         
         // InteractionBoxの座標に変換する
-        Leap::InteractionBox iBox = mLeap.frame().interactionBox();
-        Leap::Vector normalizedPosition = iBox.normalizePoint( bone.prevJoint() );//指の先端の座標
-        
         // ウィンドウの座標に変換する
        // float x = normalizedPosition.x * WindowWidth;
        // float y = WindowHeight - (normalizedPosition.y * WindowHeight);
@@ -1048,6 +1049,15 @@ public:
     struct hostent *server;
     
     char buffer[256];
+    
+    //カメラをコントロールする
+    Capture	        mCapture;
+    gl::Texture		imgTexture;
+    
+    CameraPersp mCamPrep;
+    Quatf				mSceneRotation;
+    float				mCameraDistance;
+    Vec3f				mEye, mCenter, mUp;
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
