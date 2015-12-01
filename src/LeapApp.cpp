@@ -33,6 +33,8 @@ using namespace std;
 using namespace cinder::gl;
 
 #define PI 3.141592653589793
+#define MAXPOINTS 100//記録できる点の限度
+GLint point[MAXPOINTS][2];//点の座標の入れ物
 
 struct Messages_base{
     char message[40];
@@ -272,6 +274,7 @@ public:
 //        drawListArea();//メッセージリストの表示
         drawCircle();//値によって球体を拡大縮小させる描写の追加
         drawSinGraph();//sin関数を描く
+        drawBarGraph();//検知した手の数を棒グラフとして描写していく
         gl::popMatrices();
         // パラメーター設定UIを描画する
         mParams.draw();
@@ -568,6 +571,34 @@ public:
         glVertex2d(WindowWidth, WindowHeight/2);
         glEnd();
         glPopMatrix();
+    }
+    //時間ごとに座標を記録する関数
+    void graphUpdate(){
+        //時間が１秒経つごとに座標を配列に記録していく
+        if (time(&next) != last){
+            last = next;
+            pastSec++;
+            printf("%d 秒経過\n", pastSec);
+            point[pastSec][0]=pastSec;
+            point[pastSec][1]=mCurrentFrame.hands().count();
+            pointt.x=pastSec;
+            pointt.y=mCurrentFrame.hands().count();
+        }
+    }
+    //棒グラフを描く
+    void drawBarGraph(){
+        for (int i = 0; i < pastSec; i++) {
+            //棒グラフを描写していく
+            glPushMatrix();
+            glBegin(GL_LINE_STRIP);
+            glColor3d(1.0, 0.0, 0.0);
+            glLineWidth(10);
+            glVertex2d(point[i][0]*10, 0);//x座標
+            glVertex2d(point[i][0]*10 , point[i][1]*100);//y座標
+            glEnd();
+            glPopMatrix();
+            
+        }
     }
     //インタラクションボックスの作成
     void drawInteractionBox3(){
@@ -1148,6 +1179,12 @@ public:
     float t1;  //静止画用経過時間（X座標）
     float t2;  //アニメーション用経過時間（X座標）
     float speed = 1.0;    //アニメーションのスピード
+    //タイマー
+    time_t last = time(0);
+    time_t next;
+    int pastSec = 0;
+    //グラフを描写するための座標
+    Vec2i pointt;
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
