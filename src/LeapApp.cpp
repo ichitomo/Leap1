@@ -32,6 +32,8 @@ using namespace ci::app;
 using namespace std;
 using namespace cinder::gl;
 
+#define PI 3.141592653589793
+
 struct Messages_base{
     char message[40];
     //int num;
@@ -116,11 +118,18 @@ public:
         // Leap Motion関連のセットアップ
         setupLeapObject();
         
-        // SETUP PARAMS
+        // カメラのパラメータを描写するためのセッティング
         mParams = params::InterfaceGl( "LearnHow", Vec2i( 200, 160 ) );
         mParams.addParam( "Scene Rotation", &mSceneRotation, "opened=1" );
         mParams.addSeparator();
         mParams.addParam( "Eye Distance", &mCameraDistance, "min=50.0 max=1500.0 step=50.0 keyIncr=s keyDecr=w" );
+        
+        //球体の拡大縮小とsin関数のセッティング
+        A = 100.0;    //振幅を設定
+        w = 1.0;    //角周波数を設定
+        p = 0.0;    //初期位相を設定
+        t = 0.0;    //経過時間を初期化
+        t2 = 0.0;    //経過時間を初期化
         
     }
     // マウスのクリック
@@ -255,15 +264,14 @@ public:
     //描写処理
     void draw(){
         gl::clear();
-        //gl::draw(backgroundImage, getWindowBounds());//backgroundImageの描写
+        gl::enableDepthRead();
+        gl::enableDepthWrite();
         gl::pushMatrices();
         drawLeapObject();//マリオネットの描写
-        drawInteractionBox3();//インタラクションボックス
-        drawListArea();//メッセージリストの表示
-
-
+//        drawInteractionBox3();//インタラクションボックス
+//        drawListArea();//メッセージリストの表示
+        drawCircle();//値によって球体を拡大縮小させる描写の追加
         gl::popMatrices();
-        // パラメーター設定UIを描画する
         // パラメーター設定UIを描画する
         mParams.draw();
         if( imgTexture ) {
@@ -501,6 +509,28 @@ public:
         //色をデフォルトに戻す
         //setDiffuseColor( ci::ColorA( 0.8f, 0.8f, 0.8f, 1.0f ) );
         gl::popMatrices();// 表示座標系を戻す
+    }
+    
+    //サークル（手の数によって大きくなる球体の描写）
+    void drawCircle(){
+        //sine, cosineを使った曲線的な拡大縮小///////////////////////////
+        //この場合-A*sin(w*radians(t) - p)の計算結果は100.0~-100.0なので、
+        //100を足すことによって、0~200にしている。
+        
+        y = A*sin(w*(t * PI / 180.0) - p) + 100;
+        
+        gl::pushMatrices();
+        gl::drawSphere(Vec3f( 360, 675, -300 ), y, y );//指の位置
+        gl::popMatrices();
+        t += speed1;    //時間を進める
+        if(t > 360.0) t = 0.0;
+        
+        //sine, cosineを使わない直線的な拡大縮小(2D)///////////////////////////
+        //        eSize += speed2;
+        //        if(eSize > 100 || eSize < 0) speed2 = -speed2;
+        //        pushMatrices();
+        //        gl::drawSolidCircle( Vec2f( -100,100 ), eSize, eSize );//指の位置
+        //        popMatrices();
     }
     
     //インタラクションボックスの作成
@@ -1068,6 +1098,20 @@ public:
     Quatf				mSceneRotation;
     float				mCameraDistance;
     Vec3f				mEye, mCenter, mUp;
+    
+    //球体の拡大縮小
+    float x, y;  //x, y座標
+    float A;  //振幅
+    float w;  //角周波数
+    float p;  //初期位相
+    float t;  //経過時間
+    float speed1 = 1.0;    //アニメーションの基準となるスピード
+    float speed2 = 1.0;
+    float eSize = 0.0;
+    //sinグラフ
+    float t1;  //静止画用経過時間（X座標）
+    float t2;  //アニメーション用経過時間（X座標）
+    float speed = 1.0;    //アニメーションのスピード
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
