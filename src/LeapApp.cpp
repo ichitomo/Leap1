@@ -241,14 +241,6 @@ public:
         
         iBox = mCurrentFrame.interactionBox();
         
-        mLeft = iBox.center().x - (iBox.width() / 2);
-        mRight = iBox.center().x + (iBox.width() / 2);
-        mTop = iBox.center().y + (iBox.height() / 2);
-        mBaottom = iBox.center().y - (iBox.height() / 2);
-        mBackSide = iBox.center().z - (iBox.depth() / 2);
-        mFrontSide = iBox.center().z + (iBox.depth() / 2);
-        
-        
         updateLeapObject();
         renderFrameParameter();
 
@@ -275,6 +267,7 @@ public:
         drawCircle();//値によって球体を拡大縮小させる描写の追加
         drawSinGraph();//sin関数を描く
         drawBarGraph();//検知した手の数を棒グラフとして描写していく
+        drawBox();//枠と軸になる線を描写する
         gl::popMatrices();
         // パラメーター設定UIを描画する
         mParams.draw();
@@ -889,6 +882,86 @@ public:
         gl::popMatrices();
         //}
     }
+    //枠としてのBoxを描く
+    void drawBox(){
+        // 上面
+        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),
+                     Vec3f( mRight, mTop, mBackSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),
+                     Vec3f( mRight, mTop, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),
+                     Vec3f( mLeft, mTop, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),
+                     Vec3f( mLeft, mTop, mBackSide ) );
+        
+        //        //2/3面
+        //        gl::drawLine( Vec3f( mLeft, mTop*2/3, mBackSide ),
+        //                     Vec3f( mRight, mTop*2/3, mBackSide ) );
+        //
+        //        gl::drawLine( Vec3f( mRight, mTop*2/3, mBackSide ),
+        //                     Vec3f( mRight, mTop*2/3, mFrontSide ) );
+        //
+        //        gl::drawLine( Vec3f( mRight, mTop*2/3, mFrontSide ),
+        //                     Vec3f( mLeft, mTop*2/3, mFrontSide ) );
+        //
+        //        gl::drawLine( Vec3f( mLeft, mTop*2/3, mFrontSide ),
+        //                     Vec3f( mLeft, mTop*2/3, mBackSide ) );
+        //
+        // 中面
+        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),
+                     Vec3f( mRight, mTop/2, mBackSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),
+                     Vec3f( mRight, mTop/2, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),
+                     Vec3f( mLeft, mTop/2, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),
+                     Vec3f( mLeft, mTop/2, mBackSide ) );
+        
+        
+        //中心線
+        gl::drawLine( Vec3f( mLeft, mTop/2, 0 ),
+                     Vec3f( mRight, mTop/2, 0 ) );
+        
+        gl::drawLine( Vec3f( 0, mTop/2, mBackSide ),
+                     Vec3f( 0, mTop/2, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mRight/2, 0, 0 ),
+                     Vec3f( mRight/2, mTop, 0 ) );
+        
+        
+        // 下面
+        gl::drawLine( Vec3f( mLeft, mBottom, mBackSide ),
+                     Vec3f( mRight, mBottom, mBackSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mBottom, mBackSide ),
+                     Vec3f( mRight, mBottom, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mBottom, mFrontSide ),
+                     Vec3f( mLeft, mBottom, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mLeft, mBottom, mFrontSide ),
+                     Vec3f( mLeft, mBottom, mBackSide ) );
+        
+        // 側面
+        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),
+                     Vec3f( mLeft, mBottom, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),
+                     Vec3f( mLeft, mBottom, mBackSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),
+                     Vec3f( mRight, mBottom, mFrontSide ) );
+        
+        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),
+                     Vec3f( mRight, mBottom, mBackSide ) );
+        
+    }
     //骨（手）の形を作る
     void drawBone(Leap::Bone bone){
         
@@ -1139,13 +1212,6 @@ public:
     //InteractionBoxの実装
     Leap::InteractionBox iBox;
     
-    float mLeft;//左の壁
-    float mRight;//右の壁
-    float mTop;//雲
-    float mBaottom;//底
-    float mBackSide;//背面
-    float mFrontSide;//正面
-    
     //メッセージを取得する時に使う
     int messageNumber = -1;
 
@@ -1185,6 +1251,13 @@ public:
     int pastSec = 0;
     //グラフを描写するための座標
     Vec2i pointt;
+    //Boxのための変数
+    float mLeft = 0.0;//左角のx座標
+    float mRight = 1440.0;//右角のx座標
+    float mTop = 900.0;//上面のy座標
+    float mBottom = 0.0;//下面のy座標
+    float mBackSide = 500.0;//前面のz座標
+    float mFrontSide = -500.0;//後面のz座標
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
