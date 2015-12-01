@@ -582,10 +582,6 @@ public:
         
         // 指の座標を表示する
         stringstream ss;
-        //ss << normalizedPosition.x << ", " << normalizedPosition.y << "\n";//0~1の値で表示
-        //ss << x << ", " << y << "\n";//ウィンドウサイズの値で表示
-        //ss << messageNumber << "\n";
-        
         auto tbox = TextBox().font( Font( "游ゴシック体", 20 ) ).text ( ss.str() );
         auto texture = gl::Texture( tbox.render() );//テクスチャをつくる
         
@@ -603,130 +599,6 @@ public:
         
     }
     //マリオネット
-    void drawFace(){
-        
-        // 顔を描く、顔の色・位置、角度のパラメーターの調整を行う関数
-        
-        auto index = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_INDEX);
-        auto middle = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_MIDDLE);
-        auto ring = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_RING);
-        auto pinky = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_PINKY);
-        
-        //人さし指
-        for (auto finger : index) {
-            if (finger.hand().isRight()){
-                if(finger.isExtended()==false) {//曲げた時
-                    //嬉
-                    //口を描く
-                    
-                    setDiffuseColor( ci::ColorA( 1.0f, 1.0f, 0 ) );//顔の色をオレンジ色に変更
-                    
-                    //拡大・縮小のパラメーターの調整
-                    /*
-                     if ( mCurrentFrame.scaleProbability( mLastFrame ) > 0.4 ) {
-                     mTotalMotionScale *= mCurrentFrame.scaleFactor( mLastFrame );
-                     mTotalMotionScale2 *= mCurrentFrame.scaleFactor( mLastFrame );
-                     if ( mTotalMotionScale < 0.1f ) {
-                     mTotalMotionScale = 0.1f;
-                     mTotalMotionScale2 = 0.1f;
-                     }
-                     }
-                     *///うざいので一時的に消す
-                }else if(finger.isExtended()==true){//広げている時
-                    mTotalMotionScale = 1.0f;//大きさを元に戻す
-                    mTotalMotionScale2 = 1.0f;//大きさを元に戻す
-                }
-            }
-        }
-        
-        //中指
-        
-        for (auto finger : middle) {
-            if (finger.hand().isRight()){
-                if(finger.isExtended()==false) {//曲げた時
-                    
-                    //怒
-                    //口を描く
-                    setDiffuseColor( ci::ColorA( 1.0f, 0, 0 ) );//顔の色を赤に変更
-                    
-                    //位置、角度のパラメーターの調整
-                    rightEyeAngle = -45.0;
-                    leftEyeAngle = 45.0;
-                    
-                    //拡大・縮小のパラメーター調整
-                    /*
-                     if ( mCurrentFrame.scaleProbability( mLastFrame ) > 0.4 ) {
-                     mTotalMotionScale *= mCurrentFrame.scaleFactor( mLastFrame );
-                     mTotalMotionScale2 *= mCurrentFrame.scaleFactor( mLastFrame );
-                     if ( mTotalMotionScale < 0.1f ) {
-                     mTotalMotionScale = 0.1f;
-                     mTotalMotionScale2 = 0.1f;
-                     }
-                     }*///うざいので一時的に消す
-                }else if(finger.isExtended()==true){//広げている時
-                    mTotalMotionScale = 1.0f;//大きさを元に戻す
-                    mTotalMotionScale2 = 1.0f;//大きさを元に戻す
-                }
-            }
-        }
-        
-        //薬指
-        for (auto finger : ring) {
-            if (finger.hand().isRight()){//右手の
-                if(finger.isExtended()==false) {//曲げた時
-                    
-                    //哀
-                    //口を描く
-                    setDiffuseColor( ci::ColorA( 0, 0, 1.0f ) );//顔の色を青に変更
-                    
-                    //位置、角度のパラメーターの調整
-                    rightEyeAngle = 45.0;
-                    leftEyeAngle = -45.0;
-                    
-                    
-                    //拡大・縮小のパラメーター調整
-                    /*
-                     if ( mCurrentFrame.scaleProbability( mLastFrame ) > 0.4 ) {
-                     mTotalMotionScale *= mCurrentFrame.scaleFactor( mLastFrame );
-                     mTotalMotionScale2 *= mCurrentFrame.scaleFactor( mLastFrame );
-                     if ( mTotalMotionScale < 0.1f ) {
-                     mTotalMotionScale = 0.1f;
-                     mTotalMotionScale2 = 0.1f;
-                     }
-                     }*///うざいので一時的に消す
-                }else if(finger.isExtended()==true){//広げている時
-                    mTotalMotionScale = 1.0f;//大きさを元に戻す
-                    mTotalMotionScale2 = 1.0f;//大きさを元に戻す
-                }
-            }
-        }
-        
-        //小指
-        for (auto finger : pinky) {
-            if (finger.hand().isRight()){//右手の
-                if(finger.isExtended()==false) {//曲げた時
-                    
-                    //楽
-                    //口を描く
-                    setDiffuseColor( ci::ColorA( 1.0f, 0, 1.0f ) );//顔の色を紫に変更
-                    
-                    //拡大・縮小のパラメーター調整
-                    /*
-                     if ( mCurrentFrame.scaleProbability( mLastFrame ) > 0.4 ) {
-                     mTotalMotionScale *= mCurrentFrame.scaleFactor( mLastFrame );
-                     mTotalMotionScale2 *= mCurrentFrame.scaleFactor( mLastFrame );
-                     if ( mTotalMotionScale < 0.1f ) {
-                     mTotalMotionScale = 0.1f;
-                     mTotalMotionScale2 = 0.1f;
-                     }
-                     }*///うざいので一時的に消す
-                }else if(finger.isExtended()==true){//広げている時
-                    mTotalMotionScale = 1.0f;//大きさを元に戻す
-                    mTotalMotionScale2 = 1.0f;//大きさを元に戻す
-                }
-            }
-        }
-    }
     void drawMarionette(){
         
         //マリオネットを描く関数
@@ -865,8 +737,6 @@ public:
     void drawGestureAction(int messageNumber, int x, int y, float textX, float textY){
         stringstream aa;
         
-        
-        //auto index = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_INDEX);//人さし指を持ってくる
         //---------------　　各ジェスチャーのアクション　　---------------
         
         //サークル
@@ -1062,19 +932,9 @@ public:
             error("ERROR connecting");
         printf("Please enter the message: ");
         bzero(buffer,256);
-        
-        //std::string str = std::to_string(mLastFrame.fingers().count());//string型に変換
-        //std::string str2 = std::to_string(mLastFrame.hands().count());//string型に変換
-        
-        //strcpy(buffer,str.c_str());
-        //strcpy(buffer,str2.c_str());
-        //strcpy(buffer,str);
-        //fgets(buffer,255,stdin);
-        n = write(sockfd,messageList[messageNumber].message,strlen(messageList[messageNumber].message));//メッセージの発信
-        
-        //n = write(sockfd,str.c_str(),strlen(buffer));//データの発信
-        //n = write(sockfd,str2.c_str(),strlen(buffer));
-        //n = write(sockfd, str, strlen(str));
+        std::string str = std::to_string(mLastFrame.hands().count());//string型に変換
+        strcpy(buffer,str.c_str());
+        n = write(sockfd,str.c_str(),strlen(buffer));//データの発信
         if (n < 0)
             error("ERROR writing to socket");
         bzero(buffer,256);
@@ -1178,19 +1038,9 @@ public:
     float mBackSide;//背面
     float mFrontSide;//正面
     
-    //int count = 0;
     //メッセージを取得する時に使う
     int messageNumber = -1;
 
-    //int xPosition,yPosition;
-    
-    //cinder::ObjLoader androidArm;
-    //cinder::ObjLoader androidFoot;
-    
-    //ObjLoader::Face androidHead;
-    //ObjLoader androidArm;
-    //ObjLoader androidFoot;
-    //TriMesh mMesh;//objファイルの読み込み
     
     //ソケット通信
     int sockfd, portno, n;
