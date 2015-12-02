@@ -80,15 +80,15 @@ void CenterState::draw()
 	const float squareSide = sqrtf( ( radius * radius ) / 2.0f );
 	
 	float pixelScale = std::min( squareSide / mWordPixelLength, squareSide / 140 ) * 2.0f;
-	gl::TextureFont::DrawOptions options = gl::TextureFont::DrawOptions().scale( pixelScale ).pixelSnap( false );
+	//gl::TextureFont::DrawOptions options = gl::TextureFont::DrawOptions().scale( pixelScale ).pixelSnap( false );
 		
 	const Vec2f offset = Vec2f( -radius + ( radius * 2 - mWordPixelLength * pixelScale ) / 2, radius - (radius * 2.0f - 60 * pixelScale ) / 2 );
 		
-	gl::color( ColorA( Color::black(), mTextAlpha * 0.5f ) );
-	sFont->drawString( mWord, mTextPos() + offset + Vec2f( pixelScale, pixelScale ) * 1.5f, options );
-		
-	gl::color( ColorA( Color::white(), mTextAlpha ) );
-	sFont->drawString( mWord, mTextPos() + offset, options );
+//	gl::color( ColorA( Color::black(), mTextAlpha * 0.5f ) );
+//	sFont->drawString( mWord, mTextPos() + offset + Vec2f( pixelScale, pixelScale ) * 1.5f, options );
+//		
+//	gl::color( ColorA( Color::white(), mTextAlpha ) );
+//	sFont->drawString( mWord, mTextPos() + offset, options );
 }
 
 void CenterState::setFont( gl::TextureFontRef font )
