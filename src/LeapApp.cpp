@@ -83,9 +83,11 @@ void error(const char *msg){
 
 class LeapApp : public AppNative {
 public:
+    //ウインドウサイズを設定し、渡すためのもの
     void prepareSettings( Settings *settings ){
         settings->setWindowSize( WindowWidth, WindowHeight);
     }
+    //レイアウトを決める
     void layoutWords( vector<string> words, float radius ){
         int radiusDivisor = 26;//std::max<int>( 10, words.size() ); // don't let the circles get too small
         mCurrentCircleRadius = radius / radiusDivisor * M_PI;
@@ -170,6 +172,27 @@ public:
         p = 0.0;    //初期位相を設定
         t = 0.0;    //経過時間を初期化
         t2 = 0.0;    //経過時間を初期化
+        
+        //messageUIの設定
+        mCenterState = CenterState( 140.0f );
+        
+        // load textures
+        mBgTex = gl::Texture( loadImage( loadResource( RES_BACKGROUND_IMAGE ) ) );//backgroundImage
+        gl::Texture::Format fmt;
+        fmt.enableMipmapping();
+        mCircleTex = gl::Texture( loadImage( loadResource( RES_CIRCLE_IMAGE ) ), fmt );//中心の円
+        mSmallCircleTex = gl::Texture( loadImage( loadResource( RES_SMALL_CIRCLE_IMAGE ) ), fmt ); //周りの円
+        
+        // load the dictionary
+        //mDictionary = shared_ptr<Dictionary>( new Dictionary( loadResource( RES_DICTIONARY ) ) );
+        
+        // give the WordNodes their font
+        //WordNode::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 34 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
+        
+        // give CenterState its font
+        //CenterState::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 150 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
+        
+        //initialize();
         
     }
     // マウスのクリック
