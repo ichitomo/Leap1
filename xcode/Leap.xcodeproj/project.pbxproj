@@ -23,6 +23,11 @@
 		8948FFC61BD8D929001C42F1 /* android_head.obj in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFC01BD8D929001C42F1 /* android_head.obj */; settings = {ASSET_TAGS = (); }; };
 		898680971B37A3360007A942 /* libLeap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; };
 		898680991B37A36C0007A942 /* libLeap.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		89CA2D011C0EA5B500B9CA0F /* CenterState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89CA2D001C0EA5B500B9CA0F /* CenterState.cpp */; settings = {ASSET_TAGS = (); }; };
+		89CA2D031C0EA5C600B9CA0F /* WordNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89CA2D021C0EA5C600B9CA0F /* WordNode.cpp */; settings = {ASSET_TAGS = (); }; };
+		89CA2D071C0EA9F900B9CA0F /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D041C0EA9F900B9CA0F /* background.png */; settings = {ASSET_TAGS = (); }; };
+		89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D051C0EA9F900B9CA0F /* circle.png */; settings = {ASSET_TAGS = (); }; };
+		89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D061C0EA9F900B9CA0F /* smallCircle.png */; settings = {ASSET_TAGS = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		90137A2B51414E919CBC3A5C /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = 84BB2BF7371E4767863296E4 /* CinderApp.icns */; };
 		D0B15304848C4A48BF51AD81 /* LeapApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB1E88BC784C44E5B798C665 /* LeapApp.cpp */; };
@@ -66,6 +71,13 @@
 		898680941B37A2F90007A942 /* Leap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Leap.h; path = ../include/Leap.h; sourceTree = "<group>"; };
 		898680951B37A2F90007A942 /* LeapMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeapMath.h; path = ../include/LeapMath.h; sourceTree = "<group>"; };
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
+		89CA2CFE1C0EA59700B9CA0F /* WordNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordNode.h; path = ../include/WordNode.h; sourceTree = "<group>"; };
+		89CA2CFF1C0EA5A400B9CA0F /* CenterState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CenterState.h; path = ../include/CenterState.h; sourceTree = "<group>"; };
+		89CA2D001C0EA5B500B9CA0F /* CenterState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CenterState.cpp; path = ../src/CenterState.cpp; sourceTree = "<group>"; };
+		89CA2D021C0EA5C600B9CA0F /* WordNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WordNode.cpp; path = ../src/WordNode.cpp; sourceTree = "<group>"; };
+		89CA2D041C0EA9F900B9CA0F /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background.png; path = ../resources/background.png; sourceTree = "<group>"; };
+		89CA2D051C0EA9F900B9CA0F /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = circle.png; path = ../resources/circle.png; sourceTree = "<group>"; };
+		89CA2D061C0EA9F900B9CA0F /* smallCircle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = smallCircle.png; path = ../resources/smallCircle.png; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Leap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Leap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB1E88BC784C44E5B798C665 /* LeapApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.cpp; name = LeapApp.cpp; path = ../src/LeapApp.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -101,6 +113,8 @@
 			isa = PBXGroup;
 			children = (
 				BB1E88BC784C44E5B798C665 /* LeapApp.cpp */,
+				89CA2D021C0EA5C600B9CA0F /* WordNode.cpp */,
+				89CA2D001C0EA5B500B9CA0F /* CenterState.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -158,6 +172,8 @@
 				898680941B37A2F90007A942 /* Leap.h */,
 				898680951B37A2F90007A942 /* LeapMath.h */,
 				395CA7F11B4C49E08A01BA06 /* Leap_Prefix.pch */,
+				89CA2CFF1C0EA5A400B9CA0F /* CenterState.h */,
+				89CA2CFE1C0EA59700B9CA0F /* WordNode.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -166,6 +182,9 @@
 			isa = PBXGroup;
 			children = (
 				8929D8AC1BD072D30016BF57 /* image.jpg */,
+				89CA2D041C0EA9F900B9CA0F /* background.png */,
+				89CA2D051C0EA9F900B9CA0F /* circle.png */,
+				89CA2D061C0EA9F900B9CA0F /* smallCircle.png */,
 				8948FFBB1BD8D929001C42F1 /* android_arm.mtl */,
 				8948FFBC1BD8D929001C42F1 /* android_arm.obj */,
 				8948FFBD1BD8D929001C42F1 /* android_foot.mtl */,
@@ -241,12 +260,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				8948FFC21BD8D929001C42F1 /* android_arm.obj in Resources */,
+				89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */,
 				8948FFC31BD8D929001C42F1 /* android_foot.mtl in Resources */,
 				90137A2B51414E919CBC3A5C /* CinderApp.icns in Resources */,
 				8948FFC61BD8D929001C42F1 /* android_head.obj in Resources */,
 				8948FFC51BD8D929001C42F1 /* android_head.mtl in Resources */,
 				8929D8AD1BD072D30016BF57 /* image.jpg in Resources */,
 				8948FFC11BD8D929001C42F1 /* android_arm.mtl in Resources */,
+				89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */,
+				89CA2D071C0EA9F900B9CA0F /* background.png in Resources */,
 				8948FFC41BD8D929001C42F1 /* android_foot.obj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -258,6 +280,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89CA2D031C0EA5C600B9CA0F /* WordNode.cpp in Sources */,
+				89CA2D011C0EA5B500B9CA0F /* CenterState.cpp in Sources */,
 				D0B15304848C4A48BF51AD81 /* LeapApp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

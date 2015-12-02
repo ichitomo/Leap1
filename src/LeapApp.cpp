@@ -1,4 +1,5 @@
 #include "cinder/app/AppNative.h"
+#include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 
 
@@ -10,11 +11,22 @@
 #include "cinder/ImageIo.h"//画像を描画させたいときに使う
 #include "cinder/ObjLoader.h"//
 #include "cinder/Utilities.h"
+#include "cinder/Rand.h"
+
+
+#include <list>
+#include <algorithm>
 
 #include <math.h>
+
+
 #include "cinder/Capture.h"
 #include "cinder/params/Params.h"
 #include "time.h"
+
+#include "Resources.h"
+#include "WordNode.h"
+#include "CenterState.h"
 
 //ソケット通信
 #include <stdio.h>
@@ -36,12 +48,12 @@ using namespace cinder::gl;
 #define MAXPOINTS 100//記録できる点の限度
 GLint point[MAXPOINTS][2];//点の座標の入れ物
 
-struct Messages_base{
-    char message[40];
-    //int num;
-};
+//struct Messages_base{
+//    string message[40];
+//    //int num;
+//};
 
-Messages_base messageList[] = {
+string messageList[] = {
     
     {"わかった"},
     {"わからない"},
@@ -71,6 +83,34 @@ void error(const char *msg){
 
 class LeapApp : public AppNative {
 public:
+    //ウインドウサイズを設定し、渡すためのもの
+    void prepareSettings( Settings *settings ){
+        settings->setWindowSize( WindowWidth, WindowHeight);
+    }
+    //レイアウトを決める
+    void layoutWords( vector<string> words, float radius ){
+        int radiusDivisor = 26;//std::max<int>( 10, words.size() ); // don't let the circles get too small
+        mCurrentCircleRadius = radius / radiusDivisor * M_PI;
+        for( size_t w = 0; w < words.size(); ++w ) {
+            int wordLength	= words[w].length();
+            string s		= words[w];
+            int charIndex	= (int)s[wordLength-1] - 97;
+            float charPer	= charIndex/26.0f;
+            float angle		= charPer * 2.0f * M_PI;
+            //float angle = w / (float)words.size() * 2 * M_PI;
+            Vec2f pos = getWindowCenter() + radius * Vec2f( cos( angle ), sin( angle ) );
+            Color col(  CM_HSV, charPer, 0.875f, 1 );
+            mNodes.push_back( WordNode( words[w] ) );
+            mNodes.back().mPos = getWindowCenter() + radius * 0.5f * Vec2f( cos( angle ), sin( angle ) );
+            mNodes.back().mColor = ColorA( col, 0.0f );
+            mNodes.back().mRadiusDest = mCurrentCircleRadius;
+            mNodes.back().mRadius = 0;
+            
+            timeline().apply( &mNodes.back().mRadius, mNodes.back().mRadiusDest, 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
+            timeline().apply( &mNodes.back().mPos, pos, 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
+            timeline().apply( &mNodes.back().mColor, ColorA( col, 1.0f ), 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
+        }
+    }
 
     void setup(){
         // ウィンドウの位置とサイズを設定
@@ -133,12 +173,72 @@ public:
         t = 0.0;    //経過時間を初期化
         t2 = 0.0;    //経過時間を初期化
         
+        //messageUIの設定
+        mCenterState = CenterState( 140.0f );
+        
+        // load textures
+        mBgTex = gl::Texture( loadImage( loadResource( RES_BACKGROUND_IMAGE ) ) );//backgroundImage
+        gl::Texture::Format fmt;
+        fmt.enableMipmapping();
+        mCircleTex = gl::Texture( loadImage( loadResource( RES_CIRCLE_IMAGE ) ), fmt );//中心の円
+        mSmallCircleTex = gl::Texture( loadImage( loadResource( RES_SMALL_CIRCLE_IMAGE ) ), fmt ); //周りの円
+        
+        // load the dictionary
+        //mDictionary = shared_ptr<Dictionary>( new Dictionary( loadResource( RES_DICTIONARY ) ) );
+        
+        // give the WordNodes their font
+        //WordNode::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 34 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
+        
+        // give CenterState its font
+        //CenterState::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 150 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
+        
+        initialize();
+        
     }
+    void initialize(){
+        mNodes.clear();
+        // make the first 26 nodes, one for each letter
+        //１つのメッセージにつき、メッセージぶんのnodeを作る
+        vector<string> initialWords;
+        for( int c = 0; c < 18; ++c )
+            //initialWords.push_back( string( 1, (char)('a' + c) ) );
+            initialWords.push_back( messageList[c] );
+        
+        layoutWords( initialWords, getLayoutRadius() );
+        
+        mCenterState.mCircles.clear();
+        mCenterState.setWord( "" );
+        
+        // mark our currently highlighted node as "none"
+        mMouseOverNode = mNodes.end();
+        
+        mEnableSelections = true;
+    }
+    
+    list<WordNode>::iterator getNodeAtPoint( const Vec2f &point ){
+        for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
+            if( nodeIt->isPointInside( point ) )
+                return nodeIt;
+        }
+        
+        return mNodes.end();
+    }
+    
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
         //        if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
         //            drawPrintBinInfo( event.getX() );
+
+        
+        //messageUI
+        list<WordNode>::iterator clickedNode = getNodeAtPoint( event.getPos() );
+        if( clickedNode != mNodes.end() ){
+            selectNode( clickedNode );
+        } else {
+            if( ( event.getPos() - getWindowCenter() ).length() < 180.0f )
+                initialize();
+        }
 
     }
     
@@ -147,6 +247,87 @@ public:
         mMayaCam.mouseDrag( event.getPos(), event.isLeftDown(),
                            event.isMiddleDown(), event.isRightDown() );
     }
+    
+    // マウスの動き
+    void mouseMove( MouseEvent event ){
+        if( ! mEnableSelections )
+            return;
+        
+        list<WordNode>::iterator currentMouseOver = getNodeAtPoint( event.getPos() );
+        
+        if( currentMouseOver != mMouseOverNode ) {
+            mMouseOverNode = currentMouseOver;
+            
+            // make all the circles not moused-over normal size, and the mouse-over big
+            for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
+                if( mMouseOverNode == nodeIt ){
+                    timeline().apply( &nodeIt->mRadius, mCurrentCircleRadius * 1.35f, 0.25f, EaseOutElastic( 2.0f, 1.2f ) );
+                } else {
+                    timeline().apply( &nodeIt->mRadius, mCurrentCircleRadius, 0.5f, EaseOutAtan( 10 ) );
+                }
+            }
+        }
+    }
+    
+    void keyDown( KeyEvent event ){
+        //messageUI
+        if( ! mEnableSelections )
+            return;
+        
+        if( isalpha( event.getChar() ) ){
+            // see if we can find a word that ends with this letter
+            list<WordNode>::iterator foundWord = mNodes.end();
+            for( foundWord = mNodes.begin(); foundWord != mNodes.end(); ++foundWord ) {
+                if( foundWord->getWord()[foundWord->getWord().size()-1] == event.getChar() )
+                    break;
+            }
+            
+            if( foundWord != mNodes.end() )
+                selectNode( foundWord );
+        } else {
+            if( event.getCode() == KeyEvent::KEY_BACKSPACE ){
+                initialize();
+            }
+        }
+    }
+    
+    void selectNode( list<WordNode>::iterator selectedNode ){
+        // have all the nodes but this one disappear
+        for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
+            if( nodeIt != selectedNode ) {
+                // copy this node to dying nodes and erase it from the current
+                mDyingNodes.push_back( *nodeIt );
+                timeline().apply( &mDyingNodes.back().mRadius, 0.0f, 0.5f, EaseInQuint() )
+                .finishFn( bind( &WordNode::setShouldBeDeleted, &(mDyingNodes.back()) ) ); // when you're done, mark yourself for deletion
+            }
+        }
+        mCurrentNode = *selectedNode;
+        mCurrentNode.setSelected();
+        mNodes.clear();
+        
+        Color c = Color( mCurrentNode.mColor().r, mCurrentNode.mColor().g, mCurrentNode.mColor().b );
+        Vec2f dirToCenter = ( mCurrentNode.mPos() - getWindowCenter() ) * 0.5f;
+        
+        timeline().add( bind( &CenterState::addCircle, &mCenterState, mCurrentNode.getWord(), c, dirToCenter * 0.2f ), timeline().getCurrentTime() + 0.25f );
+        
+        // move the selected node towards the center
+        
+        timeline().apply( &mCurrentNode.mPos, getWindowCenter() + dirToCenter, 0.3f, EaseInQuint() );
+        timeline().apply( &mCurrentNode.mColor, ColorA( mCurrentNode.mColor().r, mCurrentNode.mColor().g, mCurrentNode.mColor().b, 0.0f ), 0.3f, EaseInAtan( 10 ) );
+        
+        // now add all the descendants of the clicked node
+//        vector<string> children( mDictionary->getDescendants( mCurrentNode.getWord() ) );
+//        layoutWords( children, getLayoutRadius() );
+        
+        // mark our currently highlighted node as "none"
+        mMouseOverNode = mNodes.end();
+        
+        // once everything is done animating, then we can allow selections, but for now, disable them
+        mEnableSelections = false;
+//        std::function<void()> cueAction = bind( &VisualDictionaryApp::enableSelections, this );
+//        timeline().add( cueAction, timeline().getEndTime() - 2.0f );
+    }
+
     
     //更新処理
     void update(){
@@ -253,6 +434,16 @@ public:
         if( mCapture.checkNewFrame() ) {
             imgTexture = gl::Texture(mCapture.getSurface() );
         }
+        
+        //messageUI
+//        if( mDictionary->isCompleteWord( mCurrentNode.getWord() ) ){
+//            //Dictionaryに言葉が存在したら
+//            mCenterState.update( mCurrentNode );
+//        }
+        
+        // erase any nodes which have been marked as ready to be deleted
+        mDyingNodes.remove_if( bind( &WordNode::shouldBeDeleted, std::placeholders::_1 ) );
+        
         socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
@@ -268,6 +459,7 @@ public:
         drawSinGraph();//sin関数を描く
         drawBarGraph();//検知した手の数を棒グラフとして描写していく
         drawBox();//枠と軸になる線を描写する
+        //drawMessageUI();//MessageUIの描写
         gl::popMatrices();
         // パラメーター設定UIを描画する
         mParams.draw();
@@ -279,8 +471,6 @@ public:
             gl::drawString("Loading image please wait..",getWindowCenter());
             
         }
-        
-        
     }
     
     // Leap Motion関連のセットアップ
@@ -836,7 +1026,7 @@ public:
         //サークル
         for(auto gesture : circle){
             gl::pushMatrices();
-            aa << messageList[messageNumber].message << std::endl;//メッセージリストから対象のメッセージをとってくる
+            aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
             auto mbox = TextBox()
             .font( Font( "游ゴシック体", gesture.radius() * 2 ) )
             .text ( aa.str() )
@@ -1011,6 +1201,47 @@ public:
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
+    void drawMessageUI(){
+        gl::clear( Color( 0, 0, 0 ) );
+        gl::enableAlphaBlending();
+        
+        // draw background image
+        gl::color( Color::white() );
+        mBgTex.enableAndBind();
+        gl::drawSolidRect( getWindowBounds() );
+        
+        
+        mCircleTex.bind();
+        
+        // draw the center circles
+        mCenterState.draw();
+        
+        // draw the dying nodes
+        mSmallCircleTex.bind();
+        for( list<WordNode>::const_iterator nodeIt = mDyingNodes.begin(); nodeIt != mDyingNodes.end(); ++nodeIt )
+            nodeIt->draw();
+        
+        // draw all the non-mouseOver nodes
+        for( list<WordNode>::const_iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ){
+            if( nodeIt != mMouseOverNode )
+                nodeIt->draw();
+        }
+        
+        // if there is a mouseOverNode, draw it last so it is 'above' the non-mouseOver nodes
+        if( mMouseOverNode != mNodes.end() )
+            mMouseOverNode->draw();
+        
+        // if there is a currentNode (previously selected), draw it
+        if( ! mCurrentNode.getWord().empty() )
+            mCurrentNode.draw();
+        
+        mSmallCircleTex.disable();
+    }
+    
+    
+    //
+    void enableSelections() { mEnableSelections = true; }
+    
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
         return Vec3f( vec.x, vec.y, vec.z );
@@ -1080,6 +1311,8 @@ public:
         return "invalid";
     }
 
+    //半径を返す
+    float getLayoutRadius(){ return getWindowHeight() * 0.415f; }
     
     void socketCl(){
         //ソケット通信クライアント側
@@ -1258,6 +1491,23 @@ public:
     float mBottom = 0.0;//下面のy座標
     float mBackSide = 500.0;//前面のz座標
     float mFrontSide = -500.0;//後面のz座標
+    
+    //メッセージUIのためのもの
+    //list<WordNode>::iterator	getNodeAtPoint( const Vec2f &point );
+    
+    //shared_ptr<Dictionary>		mDictionary;
+    list<WordNode>				mNodes, mDyingNodes;
+    list<WordNode>::iterator	mMouseOverNode;
+    
+    CenterState					mCenterState;
+    
+    gl::Texture					mBgTex;
+    gl::Texture					mCircleTex;
+    gl::Texture					mSmallCircleTex;
+    
+    bool						mEnableSelections;
+    WordNode					mCurrentNode;
+    float						mCurrentCircleRadius;
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
