@@ -83,6 +83,9 @@ void error(const char *msg){
 
 class LeapApp : public AppNative {
 public:
+    void prepareSettings( Settings *settings ){
+        settings->setWindowSize( WindowWidth, WindowHeight);
+    }
 
     void setup(){
         // ウィンドウの位置とサイズを設定
