@@ -86,6 +86,29 @@ public:
     void prepareSettings( Settings *settings ){
         settings->setWindowSize( WindowWidth, WindowHeight);
     }
+    void layoutWords( vector<string> words, float radius ){
+        int radiusDivisor = 26;//std::max<int>( 10, words.size() ); // don't let the circles get too small
+        mCurrentCircleRadius = radius / radiusDivisor * M_PI;
+        for( size_t w = 0; w < words.size(); ++w ) {
+            int wordLength	= words[w].length();
+            string s		= words[w];
+            int charIndex	= (int)s[wordLength-1] - 97;
+            float charPer	= charIndex/26.0f;
+            float angle		= charPer * 2.0f * M_PI;
+            //float angle = w / (float)words.size() * 2 * M_PI;
+            Vec2f pos = getWindowCenter() + radius * Vec2f( cos( angle ), sin( angle ) );
+            Color col(  CM_HSV, charPer, 0.875f, 1 );
+            mNodes.push_back( WordNode( words[w] ) );
+            mNodes.back().mPos = getWindowCenter() + radius * 0.5f * Vec2f( cos( angle ), sin( angle ) );
+            mNodes.back().mColor = ColorA( col, 0.0f );
+            mNodes.back().mRadiusDest = mCurrentCircleRadius;
+            mNodes.back().mRadius = 0;
+            
+            timeline().apply( &mNodes.back().mRadius, mNodes.back().mRadiusDest, 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
+            timeline().apply( &mNodes.back().mPos, pos, 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
+            timeline().apply( &mNodes.back().mColor, ColorA( col, 1.0f ), 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
+        }
+    }
 
     void setup(){
         // ウィンドウの位置とサイズを設定
