@@ -192,9 +192,36 @@ public:
         // give CenterState its font
         //CenterState::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 150 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
         
-        //initialize();
+        initialize();
         
     }
+    void initialize(){
+        mNodes.clear();
+        // make the first 26 nodes, one for each letter
+        vector<string> initialWords;
+        for( char c = 0; c < 26; ++c )
+            initialWords.push_back( string( 1, (char)('a' + c) ) );
+        
+        layoutWords( initialWords, getLayoutRadius() );
+        
+        mCenterState.mCircles.clear();
+        mCenterState.setWord( "" );
+        
+        // mark our currently highlighted node as "none"
+        mMouseOverNode = mNodes.end();
+        
+        mEnableSelections = true;
+    }
+    
+    list<WordNode>::iterator getNodeAtPoint( const Vec2f &point ){
+        for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
+            if( nodeIt->isPointInside( point ) )
+                return nodeIt;
+        }
+        
+        return mNodes.end();
+    }
+    
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
@@ -208,6 +235,9 @@ public:
         mMayaCam.mouseDrag( event.getPos(), event.isLeftDown(),
                            event.isMiddleDown(), event.isRightDown() );
     }
+    
+    // マウスの動き
+    void mouseMove( MouseEvent event );
     
     //更新処理
     void update(){
@@ -1072,6 +1102,9 @@ public:
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
+    //
+    void enableSelections() { mEnableSelections = true; }
+    
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
         return Vec3f( vec.x, vec.y, vec.z );
@@ -1141,6 +1174,8 @@ public:
         return "invalid";
     }
 
+    //半径を返す
+    float getLayoutRadius(){ return getWindowHeight() * 0.415f; }
     
     void socketCl(){
         //ソケット通信クライアント側
@@ -1321,7 +1356,7 @@ public:
     float mFrontSide = -500.0;//後面のz座標
     
     //メッセージUIのためのもの
-    list<WordNode>::iterator	getNodeAtPoint( const Vec2f &point );
+    //list<WordNode>::iterator	getNodeAtPoint( const Vec2f &point );
     
     //shared_ptr<Dictionary>		mDictionary;
     list<WordNode>				mNodes, mDyingNodes;
