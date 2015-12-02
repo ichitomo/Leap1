@@ -1,4 +1,5 @@
 #include "cinder/app/AppNative.h"
+#include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 
 
@@ -10,11 +11,22 @@
 #include "cinder/ImageIo.h"//画像を描画させたいときに使う
 #include "cinder/ObjLoader.h"//
 #include "cinder/Utilities.h"
+#include "cinder/Rand.h"
+
+
+#include <list>
+#include <algorithm>
 
 #include <math.h>
+
+
 #include "cinder/Capture.h"
 #include "cinder/params/Params.h"
 #include "time.h"
+
+#include "Resources.h"
+#include "WordNode.h"
+#include "CenterState.h"
 
 //ソケット通信
 #include <stdio.h>
@@ -1258,6 +1270,23 @@ public:
     float mBottom = 0.0;//下面のy座標
     float mBackSide = 500.0;//前面のz座標
     float mFrontSide = -500.0;//後面のz座標
+    
+    //メッセージUIのためのもの
+    list<WordNode>::iterator	getNodeAtPoint( const Vec2f &point );
+    
+    //shared_ptr<Dictionary>		mDictionary;
+    list<WordNode>				mNodes, mDyingNodes;
+    list<WordNode>::iterator	mMouseOverNode;
+    
+    CenterState					mCenterState;
+    
+    gl::Texture					mBgTex;
+    gl::Texture					mCircleTex;
+    gl::Texture					mSmallCircleTex;
+    
+    bool						mEnableSelections;
+    WordNode					mCurrentNode;
+    float						mCurrentCircleRadius;
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
