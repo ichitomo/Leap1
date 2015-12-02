@@ -198,6 +198,7 @@ public:
     void initialize(){
         mNodes.clear();
         // make the first 26 nodes, one for each letter
+        //１つのメッセージにつき、メッセージぶんのnodeを作る
         vector<string> initialWords;
         for( int c = 0; c < 18; ++c )
             //initialWords.push_back( string( 1, (char)('a' + c) ) );
@@ -458,7 +459,7 @@ public:
         drawSinGraph();//sin関数を描く
         drawBarGraph();//検知した手の数を棒グラフとして描写していく
         drawBox();//枠と軸になる線を描写する
-        drawMessageUI();//MessageUIの描写
+        //drawMessageUI();//MessageUIの描写
         gl::popMatrices();
         // パラメーター設定UIを描画する
         mParams.draw();
@@ -470,8 +471,6 @@ public:
             gl::drawString("Loading image please wait..",getWindowCenter());
             
         }
-        
-        
     }
     
     // Leap Motion関連のセットアップ
