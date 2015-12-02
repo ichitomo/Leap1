@@ -48,12 +48,12 @@ using namespace cinder::gl;
 #define MAXPOINTS 100//記録できる点の限度
 GLint point[MAXPOINTS][2];//点の座標の入れ物
 
-struct Messages_base{
-    char message[40];
-    //int num;
-};
+//struct Messages_base{
+//    string message[40];
+//    //int num;
+//};
 
-Messages_base messageList[] = {
+string messageList[] = {
     
     {"わかった"},
     {"わからない"},
@@ -199,8 +199,9 @@ public:
         mNodes.clear();
         // make the first 26 nodes, one for each letter
         vector<string> initialWords;
-        for( char c = 0; c < 26; ++c )
-            initialWords.push_back( string( 1, (char)('a' + c) ) );
+        for( int c = 0; c < 18; ++c )
+            //initialWords.push_back( string( 1, (char)('a' + c) ) );
+            initialWords.push_back( messageList[c] );
         
         layoutWords( initialWords, getLayoutRadius() );
         
@@ -228,6 +229,16 @@ public:
         //        if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
         //            drawPrintBinInfo( event.getX() );
 
+        
+        //messageUI
+        list<WordNode>::iterator clickedNode = getNodeAtPoint( event.getPos() );
+        if( clickedNode != mNodes.end() ){
+            selectNode( clickedNode );
+        } else {
+            if( ( event.getPos() - getWindowCenter() ).length() < 180.0f )
+                initialize();
+        }
+
     }
     
     // マウスのドラッグ
@@ -237,7 +248,85 @@ public:
     }
     
     // マウスの動き
-    void mouseMove( MouseEvent event );
+    void mouseMove( MouseEvent event ){
+        if( ! mEnableSelections )
+            return;
+        
+        list<WordNode>::iterator currentMouseOver = getNodeAtPoint( event.getPos() );
+        
+        if( currentMouseOver != mMouseOverNode ) {
+            mMouseOverNode = currentMouseOver;
+            
+            // make all the circles not moused-over normal size, and the mouse-over big
+            for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
+                if( mMouseOverNode == nodeIt ){
+                    timeline().apply( &nodeIt->mRadius, mCurrentCircleRadius * 1.35f, 0.25f, EaseOutElastic( 2.0f, 1.2f ) );
+                } else {
+                    timeline().apply( &nodeIt->mRadius, mCurrentCircleRadius, 0.5f, EaseOutAtan( 10 ) );
+                }
+            }
+        }
+    }
+    
+    void keyDown( KeyEvent event ){
+        //messageUI
+        if( ! mEnableSelections )
+            return;
+        
+        if( isalpha( event.getChar() ) ){
+            // see if we can find a word that ends with this letter
+            list<WordNode>::iterator foundWord = mNodes.end();
+            for( foundWord = mNodes.begin(); foundWord != mNodes.end(); ++foundWord ) {
+                if( foundWord->getWord()[foundWord->getWord().size()-1] == event.getChar() )
+                    break;
+            }
+            
+            if( foundWord != mNodes.end() )
+                selectNode( foundWord );
+        } else {
+            if( event.getCode() == KeyEvent::KEY_BACKSPACE ){
+                initialize();
+            }
+        }
+    }
+    
+    void selectNode( list<WordNode>::iterator selectedNode ){
+        // have all the nodes but this one disappear
+        for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
+            if( nodeIt != selectedNode ) {
+                // copy this node to dying nodes and erase it from the current
+                mDyingNodes.push_back( *nodeIt );
+                timeline().apply( &mDyingNodes.back().mRadius, 0.0f, 0.5f, EaseInQuint() )
+                .finishFn( bind( &WordNode::setShouldBeDeleted, &(mDyingNodes.back()) ) ); // when you're done, mark yourself for deletion
+            }
+        }
+        mCurrentNode = *selectedNode;
+        mCurrentNode.setSelected();
+        mNodes.clear();
+        
+        Color c = Color( mCurrentNode.mColor().r, mCurrentNode.mColor().g, mCurrentNode.mColor().b );
+        Vec2f dirToCenter = ( mCurrentNode.mPos() - getWindowCenter() ) * 0.5f;
+        
+        timeline().add( bind( &CenterState::addCircle, &mCenterState, mCurrentNode.getWord(), c, dirToCenter * 0.2f ), timeline().getCurrentTime() + 0.25f );
+        
+        // move the selected node towards the center
+        
+        timeline().apply( &mCurrentNode.mPos, getWindowCenter() + dirToCenter, 0.3f, EaseInQuint() );
+        timeline().apply( &mCurrentNode.mColor, ColorA( mCurrentNode.mColor().r, mCurrentNode.mColor().g, mCurrentNode.mColor().b, 0.0f ), 0.3f, EaseInAtan( 10 ) );
+        
+        // now add all the descendants of the clicked node
+//        vector<string> children( mDictionary->getDescendants( mCurrentNode.getWord() ) );
+//        layoutWords( children, getLayoutRadius() );
+        
+        // mark our currently highlighted node as "none"
+        mMouseOverNode = mNodes.end();
+        
+        // once everything is done animating, then we can allow selections, but for now, disable them
+        mEnableSelections = false;
+//        std::function<void()> cueAction = bind( &VisualDictionaryApp::enableSelections, this );
+//        timeline().add( cueAction, timeline().getEndTime() - 2.0f );
+    }
+
     
     //更新処理
     void update(){
@@ -344,6 +433,16 @@ public:
         if( mCapture.checkNewFrame() ) {
             imgTexture = gl::Texture(mCapture.getSurface() );
         }
+        
+        //messageUI
+//        if( mDictionary->isCompleteWord( mCurrentNode.getWord() ) ){
+//            //Dictionaryに言葉が存在したら
+//            mCenterState.update( mCurrentNode );
+//        }
+        
+        // erase any nodes which have been marked as ready to be deleted
+        mDyingNodes.remove_if( bind( &WordNode::shouldBeDeleted, std::placeholders::_1 ) );
+        
         socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
@@ -359,6 +458,7 @@ public:
         drawSinGraph();//sin関数を描く
         drawBarGraph();//検知した手の数を棒グラフとして描写していく
         drawBox();//枠と軸になる線を描写する
+        drawMessageUI();//MessageUIの描写
         gl::popMatrices();
         // パラメーター設定UIを描画する
         mParams.draw();
@@ -927,7 +1027,7 @@ public:
         //サークル
         for(auto gesture : circle){
             gl::pushMatrices();
-            aa << messageList[messageNumber].message << std::endl;//メッセージリストから対象のメッセージをとってくる
+            aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
             auto mbox = TextBox()
             .font( Font( "游ゴシック体", gesture.radius() * 2 ) )
             .text ( aa.str() )
@@ -1101,6 +1201,44 @@ public:
         gl::color( diffuseColor );
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
+    
+    void drawMessageUI(){
+        gl::clear( Color( 0, 0, 0 ) );
+        gl::enableAlphaBlending();
+        
+        // draw background image
+        gl::color( Color::white() );
+        mBgTex.enableAndBind();
+        gl::drawSolidRect( getWindowBounds() );
+        
+        
+        mCircleTex.bind();
+        
+        // draw the center circles
+        mCenterState.draw();
+        
+        // draw the dying nodes
+        mSmallCircleTex.bind();
+        for( list<WordNode>::const_iterator nodeIt = mDyingNodes.begin(); nodeIt != mDyingNodes.end(); ++nodeIt )
+            nodeIt->draw();
+        
+        // draw all the non-mouseOver nodes
+        for( list<WordNode>::const_iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ){
+            if( nodeIt != mMouseOverNode )
+                nodeIt->draw();
+        }
+        
+        // if there is a mouseOverNode, draw it last so it is 'above' the non-mouseOver nodes
+        if( mMouseOverNode != mNodes.end() )
+            mMouseOverNode->draw();
+        
+        // if there is a currentNode (previously selected), draw it
+        if( ! mCurrentNode.getWord().empty() )
+            mCurrentNode.draw();
+        
+        mSmallCircleTex.disable();
+    }
+    
     
     //
     void enableSelections() { mEnableSelections = true; }
