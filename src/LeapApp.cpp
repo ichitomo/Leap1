@@ -157,7 +157,7 @@ public:
         gl::enable(GL_BLEND);
         
         //backgroundImageの読み込み
-        //backgroundImage = gl::Texture(loadImage(loadResource("../resources/image.jpg")));
+        backgroundImage = gl::Texture(loadImage(loadResource("../resources/image.jpg")));
         
         
         // 描画時に奥行きの考慮を有効にする
@@ -229,8 +229,8 @@ public:
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
-        //        if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
-        //            drawPrintBinInfo( event.getX() );
+//                if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
+//                    drawPrintBinInfo( event.getX() );
 
         
         //messageUI
@@ -387,6 +387,7 @@ public:
             }
             else {
                 circle.push_back( gesture );
+                cirCount++;
             }
             //キータップ
             if ( it_keytap != keytap.end() ) {
@@ -401,6 +402,7 @@ public:
             }
             else {
                 screentap.push_back( gesture );
+                tapCount++;
             }
         }
         
@@ -446,7 +448,7 @@ public:
         // erase any nodes which have been marked as ready to be deleted
         mDyingNodes.remove_if( bind( &WordNode::shouldBeDeleted, std::placeholders::_1 ) );
         
-        //socketCl();//ソケット通信（クライアント側）
+        socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
     void draw(){
@@ -455,17 +457,18 @@ public:
         gl::enableDepthWrite();
         gl::pushMatrices();
         gl::setMatrices( mMayaCam.getCamera() );
-        drawLeapObject();//マリオネットの描写
-        //drawInteractionBox3();//インタラクションボックス
-        drawListArea();//メッセージリストの表示
-        drawCircle();//値によって球体を拡大縮小させる描写の追加
-        drawSinGraph();//sin関数を描く
-        drawBarGraph();//検知した手の数を棒グラフとして描写していく
-        drawBox();//枠と軸になる線を描写する
-        //drawMessageUI();//MessageUIの描写
+            drawMessageUI();//MessageUIの描写
+            drawLeapObject();//マリオネットの描写
+            //drawInteractionBox3();//インタラクションボックス
+            drawListArea();//メッセージリストの表示
+            drawCircle();//値によって球体を拡大縮小させる描写の追加
+            drawSinGraph();//sin関数を描く
+            drawBarGraph();//検知した手の数を棒グラフとして描写していく
+            drawBox();//枠と軸になる線を描写する
         gl::popMatrices();
         // パラメーター設定UIを描画する
-        /*mParams.draw();
+        mParams.draw();
+        /*
         if( imgTexture ) {
             //バックグラウンドイメージを追加
             gl::draw( backgroundImage, getWindowBounds());
@@ -956,11 +959,11 @@ public:
         //この場合-A*sin(w*radians(t) - p)の計算結果は100.0~-100.0なので、
         //100を足すことによって、0~200にしている。
         
-        y = A*sin(w*(t * PI / 180.0) - p) + 100;
+        //y = A*sin(w*(t * PI / 180.0) - p) + 100;
         
         gl::pushMatrices();
         gl::setMatrices( mMayaCam.getCamera() );
-        gl::drawSphere(Vec3f( 360, 675, -300 ), y, y );//指の位置
+        gl::drawSphere(Vec3f( 360, 675, -300 ), cirCount, cirCount );//指の位置
         gl::popMatrices();
         t += speed1;    //時間を進める
         if(t > 360.0) t = 0.0;
@@ -1288,6 +1291,7 @@ public:
             error("ERROR opening socket");
         server = gethostbyname("localhost");//サーバーの作成
         if (server == NULL) {
+            //サーバーにアクセスできない
             fprintf(stderr,"ERROR, no such host\n");
             exit(0);
         }
@@ -1302,24 +1306,40 @@ public:
             error("ERROR connecting");
         //printf("Please enter the message: ");
         bzero(buffer,256);
+        bzero(buffer2, 256);
+        bzero(buffer3, 256);
         
-        std::string str = std::to_string(mLastFrame.hands().count());//string型に変換
+        std::string hansCount = std::to_string(mLastFrame.hands().count());//string型に変換
+        std::string cirCountLength = std::to_string(cirCount);//string型に変換
+        std::string tapCountLength = std::to_string(tapCount);//string型に変換
         
-        strcpy(buffer,str.c_str());
-        n = write(sockfd,str.c_str(),strlen(buffer));//データの発信
+        strcpy(buffer,hansCount.c_str());
+        strcpy(buffer2, cirCountLength.c_str());
+        strcpy(buffer3, tapCountLength.c_str());
+        l = write(sockfd,buffer,strlen(buffer));//データの発信
+        m = write(sockfd,buffer2,strlen(buffer2));//データの発信
+        n = write(sockfd,buffer3,strlen(buffer3));//データの発信
         
-        if (n < 0)
+        if (l < 0 || m < 0 || n < 0){
             error("ERROR writing to socket");
+        }
         
         bzero(buffer,256);
+        bzero(buffer2,256);
+        bzero(buffer3,256);
         
-        n = read(sockfd,buffer,255);//データの受信
+        l = read(sockfd,buffer,255);//データの受信
+        m = read(sockfd,buffer2,255);//データの受信
+        n = read(sockfd,buffer3,255);//データの受信
         
-        if (n < 0)
+        if (l < 0 || m < 0 || n < 0){
             error("ERROR reading from socket");
+        }
         printf("%s\n",buffer);
-        close(sockfd);
+        printf("%s\n",buffer2);
+        printf("%s\n",buffer3);
         
+        close(sockfd);
     }
     
     //ウィンドウサイズ
@@ -1382,7 +1402,7 @@ public:
     //サークル
     float mMinRadius;//半径
     float mMinArc;//弧
-    
+
     //キータップ、スクリーンタップ
     float mMinDownVelocity;//速さ
     float mHistorySeconds;//秒数
@@ -1415,21 +1435,24 @@ public:
     float defMouseTransZ = 0.0;//口のz座標の位置
     //ci::Vec3f mTotalMotionTranslation;//移動
     
-    //bool flag = false;//テキストの文字表示フラグ
-    
     //InteractionBoxの実装
     Leap::InteractionBox iBox;
     
     //メッセージを取得する時に使う
     int messageNumber = -1;
-
     
     //ソケット通信
-    int sockfd, portno, n;
+    int sockfd, portno, l,m,n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
     
     char buffer[256];
+    char buffer2[256];
+    char buffer3[256];
+    int cirCount = 0;
+    int tapCount = 0;
+    
+    
     
     //カメラをコントロールする
     Capture	        mCapture;
