@@ -157,7 +157,7 @@ public:
         gl::enable(GL_BLEND);
         
         //backgroundImageの読み込み
-        backgroundImage = gl::Texture(loadImage(loadResource("../resources/image.jpg")));
+        //backgroundImage = gl::Texture(loadImage(loadResource("../resources/image.jpg")));
         
         
         // 描画時に奥行きの考慮を有効にする
@@ -454,17 +454,18 @@ public:
         gl::enableDepthRead();
         gl::enableDepthWrite();
         gl::pushMatrices();
-        //drawLeapObject();//マリオネットの描写
-//        drawInteractionBox3();//インタラクションボックス
-//        drawListArea();//メッセージリストの表示
+        gl::setMatrices( mMayaCam.getCamera() );
+        drawLeapObject();//マリオネットの描写
+        //drawInteractionBox3();//インタラクションボックス
+        drawListArea();//メッセージリストの表示
         drawCircle();//値によって球体を拡大縮小させる描写の追加
-        //drawSinGraph();//sin関数を描く
+        drawSinGraph();//sin関数を描く
         drawBarGraph();//検知した手の数を棒グラフとして描写していく
         drawBox();//枠と軸になる線を描写する
         //drawMessageUI();//MessageUIの描写
         gl::popMatrices();
         // パラメーター設定UIを描画する
-        mParams.draw();
+        /*mParams.draw();
         if( imgTexture ) {
             //バックグラウンドイメージを追加
             gl::draw( backgroundImage, getWindowBounds());
@@ -472,9 +473,9 @@ public:
             //ロードする間にコメント
             gl::drawString("Loading image please wait..",getWindowCenter());
             
-        }
+        }*/
     }
-    /*
+    
     // Leap Motion関連のセットアップ
     void setupLeapObject(){
         
@@ -699,10 +700,9 @@ public:
         //setDiffuseColor( ci::ColorA( 0.8f, 0.8f, 0.8f, 1.0f ) );
         gl::popMatrices();// 表示座標系を戻す
     }
-    */
    
     //インタラクションボックスの作成
-    /*void drawInteractionBox3(){
+    void drawInteractionBox3(){
         
         gl::pushMatrices();
         //gl::draw(backgroundImage, getWindowBounds());//backgroundImageの描写
@@ -815,7 +815,7 @@ public:
         gl::popMatrices();
         
         
-    }*/
+    }
     
     //マリオネット
     void drawMarionette(){
@@ -1026,6 +1026,7 @@ public:
         for (int i = 0; i < pastSec; i++) {
             //棒グラフを描写していく
             glPushMatrix();
+            gl::setMatrices( mMayaCam.getCamera() );
             glBegin(GL_LINE_STRIP);
             glColor3d(1.0, 0.0, 0.0);
             glLineWidth(10);
@@ -1039,6 +1040,7 @@ public:
     //枠としてのBoxを描く
     void drawBox(){
         gl::pushMatrices();
+        gl::setMatrices( mMayaCam.getCamera() );
         // 上面
         gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),
                      Vec3f( mRight, mTop, mBackSide ) );
