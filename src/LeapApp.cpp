@@ -134,7 +134,7 @@ public:
         
         mCam.setEyePoint( mEye );//カメラの位置
         mCam.setCenterOfInterestPoint( mCenter );//カメラのみる先
-        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 50.0f, 3000.0f );//カメラから見える視界の設定
+        //mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
         //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
         //fozyはカメラの画角、値が大きいほど透視が強くなり、絵が小さくなる
         //getWindowAspectRatio()はアスペクト比
@@ -145,6 +145,14 @@ public:
         
         
         // アルファブレンディングを有効にする
+        gl::enableAlphaBlending();
+        
+        // カメラのパラメータを描写するためのセッティング
+        mParams = params::InterfaceGl( "LearnHow", Vec2i( 200, 160 ) );
+        mParams.addParam( "Scene Rotation", &mSceneRotation, "opened=1" );
+        mParams.addSeparator();
+        mParams.addParam( "Eye Distance", &mCameraDistance, "min=50.0 max=1500.0 step=50.0 keyIncr=s keyDecr=w" );
+        
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl::enable(GL_BLEND);
         
@@ -158,13 +166,7 @@ public:
 
         
         // Leap Motion関連のセットアップ
-        setupLeapObject();
-        
-        // カメラのパラメータを描写するためのセッティング
-        mParams = params::InterfaceGl( "LearnHow", Vec2i( 200, 160 ) );
-        mParams.addParam( "Scene Rotation", &mSceneRotation, "opened=1" );
-        mParams.addSeparator();
-        mParams.addParam( "Eye Distance", &mCameraDistance, "min=50.0 max=1500.0 step=50.0 keyIncr=s keyDecr=w" );
+        //setupLeapObject();
         
         //球体の拡大縮小とsin関数のセッティング
         A = 100.0;    //振幅を設定
@@ -422,8 +424,8 @@ public:
         
         iBox = mCurrentFrame.interactionBox();
         
-        updateLeapObject();
-        renderFrameParameter();
+        //updateLeapObject();
+        //renderFrameParameter();
 
         //カメラのアップデート処理
         mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
@@ -444,7 +446,7 @@ public:
         // erase any nodes which have been marked as ready to be deleted
         mDyingNodes.remove_if( bind( &WordNode::shouldBeDeleted, std::placeholders::_1 ) );
         
-        socketCl();//ソケット通信（クライアント側）
+        //socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
     void draw(){
@@ -452,11 +454,11 @@ public:
         gl::enableDepthRead();
         gl::enableDepthWrite();
         gl::pushMatrices();
-        drawLeapObject();//マリオネットの描写
+        //drawLeapObject();//マリオネットの描写
 //        drawInteractionBox3();//インタラクションボックス
 //        drawListArea();//メッセージリストの表示
         drawCircle();//値によって球体を拡大縮小させる描写の追加
-        drawSinGraph();//sin関数を描く
+        //drawSinGraph();//sin関数を描く
         drawBarGraph();//検知した手の数を棒グラフとして描写していく
         drawBox();//枠と軸になる線を描写する
         //drawMessageUI();//MessageUIの描写
@@ -472,7 +474,7 @@ public:
             
         }
     }
-    
+    /*
     // Leap Motion関連のセットアップ
     void setupLeapObject(){
         
@@ -697,94 +699,10 @@ public:
         //setDiffuseColor( ci::ColorA( 0.8f, 0.8f, 0.8f, 1.0f ) );
         gl::popMatrices();// 表示座標系を戻す
     }
-    
-    //サークル（手の数によって大きくなる球体の描写）
-    void drawCircle(){
-        //sine, cosineを使った曲線的な拡大縮小///////////////////////////
-        //この場合-A*sin(w*radians(t) - p)の計算結果は100.0~-100.0なので、
-        //100を足すことによって、0~200にしている。
-        
-        y = A*sin(w*(t * PI / 180.0) - p) + 100;
-        
-        gl::pushMatrices();
-        gl::drawSphere(Vec3f( 360, 675, -300 ), y, y );//指の位置
-        gl::popMatrices();
-        t += speed1;    //時間を進める
-        if(t > 360.0) t = 0.0;
-        
-        //sine, cosineを使わない直線的な拡大縮小(2D)///////////////////////////
-        //        eSize += speed2;
-        //        if(eSize > 100 || eSize < 0) speed2 = -speed2;
-        //        pushMatrices();
-        //        gl::drawSolidCircle( Vec2f( -100,100 ), eSize, eSize );//指の位置
-        //        popMatrices();
-    }
-    //sinグラフを描く
-    void drawSinGraph(){
-        
-        glPushMatrix();
-        gl::setMatrices( mMayaCam.getCamera() );
-        drawGrid();  //基準線
-        //サイン波を点で静止画として描画///////////////////////////
-        for (t1 = 0.0; t1 < WindowWidth; t1 += speed) {
-            y = A*sin(w*(t1 * PI / 180.0) - p);
-            drawSolidCircle(Vec2f(t1, y + WindowHeight/2), 1);  //円を描く
-        }
-        
-        //点のアニメーションを描画////////////////////////////////
-        y = A*sin(w*(t2 * PI / 180.0) - p);
-        drawSolidCircle(Vec2f(t2, y + WindowHeight/2), 10);  //円を描く
-        
-        t2 += speed;    //時間を進める
-        if (t2 > WindowWidth) t2 = 0.0;    //点が右端まで行ったらになったら原点に戻る
-        glPopMatrix();
-        
-    }
-    void drawGrid(){
-        glPushMatrix();
-        gl::setMatrices( mMayaCam.getCamera() );
-        //横線
-        glBegin(GL_LINES);
-        glVertex2d(WindowWidth/2, 0);
-        glVertex2d(WindowWidth/2, WindowHeight);
-        glEnd();
-        //横線
-        glBegin(GL_LINES);
-        glVertex2d(0, WindowHeight/2);
-        glVertex2d(WindowWidth, WindowHeight/2);
-        glEnd();
-        glPopMatrix();
-    }
-    //時間ごとに座標を記録する関数
-    void graphUpdate(){
-        //時間が１秒経つごとに座標を配列に記録していく
-        if (time(&next) != last){
-            last = next;
-            pastSec++;
-            printf("%d 秒経過\n", pastSec);
-            point[pastSec][0]=pastSec;
-            point[pastSec][1]=mCurrentFrame.hands().count();
-            pointt.x=pastSec;
-            pointt.y=mCurrentFrame.hands().count();
-        }
-    }
-    //棒グラフを描く
-    void drawBarGraph(){
-        for (int i = 0; i < pastSec; i++) {
-            //棒グラフを描写していく
-            glPushMatrix();
-            glBegin(GL_LINE_STRIP);
-            glColor3d(1.0, 0.0, 0.0);
-            glLineWidth(10);
-            glVertex2d(point[i][0]*10, 0);//x座標
-            glVertex2d(point[i][0]*10 , point[i][1]*100);//y座標
-            glEnd();
-            glPopMatrix();
-            
-        }
-    }
+    */
+   
     //インタラクションボックスの作成
-    void drawInteractionBox3(){
+    /*void drawInteractionBox3(){
         
         gl::pushMatrices();
         //gl::draw(backgroundImage, getWindowBounds());//backgroundImageの描写
@@ -897,7 +815,8 @@ public:
         gl::popMatrices();
         
         
-    }
+    }*/
+    
     //マリオネット
     void drawMarionette(){
         
@@ -915,47 +834,7 @@ public:
         gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 80, 100 ) );//実体
         gl::popMatrices();
         
-//        //右目
-//        gl::pushMatrices();
-//        //setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-//        glTranslatef( mTotalMotionTranslation.x-defEyeTransX,
-//                     mTotalMotionTranslation.y+defEyeTransY,
-//                     mTotalMotionTranslation.z+defEyeTransZ);//位置
-//        glRotatef(rightEyeAngle, 1.0f, 0.0f, 0.0f);//回転
-//        glScalef( mTotalMotionScale2/5, mTotalMotionScale2/10, mTotalMotionScale2/10 );//大きさ
-//        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
-//        gl::popMatrices();
-//        
-//        //左目
-//        gl::pushMatrices();
-//        //setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-//        glTranslatef( mTotalMotionTranslation.x+defEyeTransX,
-//                     mTotalMotionTranslation.y+defEyeTransY,
-//                     mTotalMotionTranslation.z+defEyeTransZ);//位置
-//        glRotatef(leftEyeAngle, 1.0f, 0.0f, 0.0f);//回転
-//        glScalef( mTotalMotionScale2/5, mTotalMotionScale2/10, mTotalMotionScale2/10 );//大きさ
-//        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
-//        gl::popMatrices();
-//        
-//        //元に戻す
-//        rightEyeAngle = 0.0;//右目の角度
-//        leftEyeAngle = 0.0;//左目の角度
-//        defEyeTransX = 20.0;//右目の角度
-//        defEyeTransY = 20.0;//右目の角度
-//        defEyeTransZ = 100.0;//左目の角度
-        
-        //口を描く
-//        gl::pushMatrices();
-//        glPointSize(10);
-//        glLineWidth(10);
-//        glBegin(GL_LINE_STRIP);
-//        glColor3f(1.0f, 1.0f, 1.0f);
-//        glVertex3d(mTotalMotionTranslation.x-20, mTotalMotionTranslation.y + 0, mTotalMotionTranslation.z +defMouseTransZ);
-//        glVertex3d(mTotalMotionTranslation.x + 0, mTotalMotionTranslation.y-30, mTotalMotionTranslation.z +defMouseTransZ);
-//        glVertex3d(mTotalMotionTranslation.x + 20, mTotalMotionTranslation.y + 0, mTotalMotionTranslation.z +defMouseTransZ);
-//        glEnd();
-//        gl::popMatrices();
-//        
+
         //胴体を描く
         gl::pushMatrices();
         setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
@@ -1072,8 +951,94 @@ public:
         gl::popMatrices();
         //}
     }
+    //サークル（手の数によって大きくなる球体の描写）
+    void drawCircle(){
+        //sine, cosineを使った曲線的な拡大縮小///////////////////////////
+        //この場合-A*sin(w*radians(t) - p)の計算結果は100.0~-100.0なので、
+        //100を足すことによって、0~200にしている。
+        
+        y = A*sin(w*(t * PI / 180.0) - p) + 100;
+        
+        gl::pushMatrices();
+        gl::drawSphere(Vec3f( 360, 675, -300 ), y, y );//指の位置
+        gl::popMatrices();
+        t += speed1;    //時間を進める
+        if(t > 360.0) t = 0.0;
+        
+        //sine, cosineを使わない直線的な拡大縮小(2D)///////////////////////////
+        //        eSize += speed2;
+        //        if(eSize > 100 || eSize < 0) speed2 = -speed2;
+        //        pushMatrices();
+        //        gl::drawSolidCircle( Vec2f( -100,100 ), eSize, eSize );//指の位置
+        //        popMatrices();
+    }
+    //sinグラフを描く
+    void drawSinGraph(){
+        
+        glPushMatrix();
+        gl::setMatrices( mMayaCam.getCamera() );
+        drawGrid();  //基準線
+        //サイン波を点で静止画として描画///////////////////////////
+        for (t1 = 0.0; t1 < WindowWidth; t1 += speed) {
+            y = A*sin(w*(t1 * PI / 180.0) - p);
+            drawSolidCircle(Vec2f(t1, y + WindowHeight/2), 1);  //円を描く
+        }
+        
+        //点のアニメーションを描画////////////////////////////////
+        y = A*sin(w*(t2 * PI / 180.0) - p);
+        drawSolidCircle(Vec2f(t2, y + WindowHeight/2), 10);  //円を描く
+        
+        t2 += speed;    //時間を進める
+        if (t2 > WindowWidth) t2 = 0.0;    //点が右端まで行ったらになったら原点に戻る
+        glPopMatrix();
+        
+    }
+    void drawGrid(){
+        glPushMatrix();
+        gl::setMatrices( mMayaCam.getCamera() );
+        //横線
+        glBegin(GL_LINES);
+        glVertex2d(WindowWidth/2, 0);
+        glVertex2d(WindowWidth/2, WindowHeight);
+        glEnd();
+        //横線
+        glBegin(GL_LINES);
+        glVertex2d(0, WindowHeight/2);
+        glVertex2d(WindowWidth, WindowHeight/2);
+        glEnd();
+        glPopMatrix();
+    }
+    //時間ごとに座標を記録する関数
+    void graphUpdate(){
+        //時間が１秒経つごとに座標を配列に記録していく
+        if (time(&next) != last){
+            last = next;
+            pastSec++;
+            printf("%d 秒経過\n", pastSec);
+            point[pastSec][0]=pastSec;
+            point[pastSec][1]=mCurrentFrame.hands().count();
+            pointt.x=pastSec;
+            pointt.y=mCurrentFrame.hands().count();
+        }
+    }
+    //棒グラフを描く
+    void drawBarGraph(){
+        for (int i = 0; i < pastSec; i++) {
+            //棒グラフを描写していく
+            glPushMatrix();
+            glBegin(GL_LINE_STRIP);
+            glColor3d(1.0, 0.0, 0.0);
+            glLineWidth(10);
+            glVertex2d(point[i][0]*10, 0);//x座標
+            glVertex2d(point[i][0]*10 , point[i][1]*100);//y座標
+            glEnd();
+            glPopMatrix();
+            
+        }
+    }
     //枠としてのBoxを描く
     void drawBox(){
+        gl::pushMatrices();
         // 上面
         gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),
                      Vec3f( mRight, mTop, mBackSide ) );
@@ -1150,7 +1115,7 @@ public:
         
         gl::drawLine( Vec3f( mRight, mTop, mBackSide ),
                      Vec3f( mRight, mBottom, mBackSide ) );
-        
+        gl::popMatrices();
     }
     //骨（手）の形を作る
     void drawBone(Leap::Bone bone){
@@ -1201,6 +1166,7 @@ public:
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
+    //新しいメッセージUI
     void drawMessageUI(){
         gl::clear( Color( 0, 0, 0 ) );
         gl::enableAlphaBlending();
@@ -1238,8 +1204,6 @@ public:
         mSmallCircleTex.disable();
     }
     
-    
-    //
     void enableSelections() { mEnableSelections = true; }
     
     // Leap SDKのVectorをCinderのVec3fに変換する
@@ -1314,7 +1278,7 @@ public:
     //半径を返す
     float getLayoutRadius(){ return getWindowHeight() * 0.415f; }
     
-    void socketCl(){
+    /*void socketCl(){
         //ソケット通信クライアント側
         portno = 9999;//ポート番号
         sockfd = ::socket(AF_INET, SOCK_STREAM, 0);//ソケットの生成
@@ -1348,7 +1312,7 @@ public:
         printf("%s\n",buffer);
         close(sockfd);
         
-    }
+    }*/
     
     //ウィンドウサイズ
     static const int WindowWidth = 1440;
