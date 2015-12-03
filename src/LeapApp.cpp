@@ -824,75 +824,74 @@ public:
         
         //頭
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defFaceTransX,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defFaceTransX,
                      mTotalMotionTranslation.y+defFaceTransY,
                      mTotalMotionTranslation.z+defFaceTransZ );//位置
-        glRotatef(-mRotateMatrix3, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
-        glTranslatef( mTotalMotionTranslation.x/10.0,0.0f,0.0f);//移動
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 80, 100 ) );//実体
+            glRotatef(-mRotateMatrix3, 1.0f, 0.0f, 0.0f);//回転
+            glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
+            glTranslatef( mTotalMotionTranslation.x/10.0,0.0f,0.0f);//移動
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 80, 100 ) );//実体
         gl::popMatrices();
         
 
         //胴体を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX,
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX,
                      mTotalMotionTranslation.y+defBodyTransY,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+            glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
         gl::popMatrices();
         
         //右腕を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX+75,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX+75,
                      mTotalMotionTranslation.y+defBodyTransY,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(mRotateMatrix2, 1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( mTotalMotionTranslation.x/10.0,
+            glRotatef(mRotateMatrix2, 1.0f, 1.0f, 0.0f);//回転
+            glTranslatef( mTotalMotionTranslation.x/10.0,
                      mTotalMotionTranslation.y/10.0,
                      0.0f);//移動
-        glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100,  50, 50 ) );//実体
+            glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100,  50, 50 ) );//実体
         gl::popMatrices();
         
         //左腕を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX-75,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX-75,
                      mTotalMotionTranslation.y+defBodyTransY,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(-mRotateMatrix4, -1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( -mTotalMotionTranslation.x/10.0,
+            glRotatef(-mRotateMatrix4, -1.0f, 1.0f, 0.0f);//回転
+            glTranslatef( -mTotalMotionTranslation.x/10.0,
                      mTotalMotionTranslation.y/10.0,
                      0.0f);//移動
-        glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 50, 50 ) );//実体
+            glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 50, 50 ) );//実体
         gl::popMatrices();
         
         //右足を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX+25,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX+25,
                      mTotalMotionTranslation.y+defBodyTransY-75,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(mRotateMatrix0, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+            glRotatef(mRotateMatrix0, 1.0f, 0.0f, 0.0f);//回転
+            glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
         gl::popMatrices();
         
         //左足を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX-25,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX-25,
                      mTotalMotionTranslation.y+defBodyTransY-75,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(mRotateMatrix5, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+            glRotatef(mRotateMatrix5, 1.0f, 0.0f, 0.0f);//回転
+            glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
         gl::popMatrices();
         
     }
@@ -905,15 +904,15 @@ public:
         //サークル
         for(auto gesture : circle){
             gl::pushMatrices();
-            aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
+                aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
             auto mbox = TextBox()
             .font( Font( "游ゴシック体", gesture.radius() * 2 ) )
             .text ( aa.str() )
             .backgroundColor(ColorA(0,0,0));
             
-            auto texture = gl::Texture( mbox.render() );
+                auto texture = gl::Texture( mbox.render() );
             //gl::translate( textX, textY );//指の隣に移動させる
-            gl::draw( texture );//メッセージを表示
+                gl::draw( texture );//メッセージを表示
             gl::popMatrices();
             
         }
@@ -945,9 +944,9 @@ public:
         
         //for (int i = 0; i<18; i++) {
         gl::pushMatrices();
-        auto tbox0 = TextBox().alignment( TextBox::LEFT ).font( mFont ).text ( mm.str() ).color(Color( 1.0f, 1.0f, 1.0f )).backgroundColor( ColorA( 0, 1.0f, 0, 0 ) );
-        auto mTextTexture = gl::Texture( tbox0.render() );
-        gl::draw( mTextTexture );
+            auto tbox0 = TextBox().alignment( TextBox::LEFT ).font( mFont ).text ( mm.str() ).color(Color( 1.0f, 1.0f, 1.0f )).backgroundColor( ColorA( 0, 1.0f, 0, 0 ) );
+            auto mTextTexture = gl::Texture( tbox0.render() );
+            gl::draw( mTextTexture );
         gl::popMatrices();
         //}
     }
@@ -960,6 +959,7 @@ public:
         y = A*sin(w*(t * PI / 180.0) - p) + 100;
         
         gl::pushMatrices();
+        gl::setMatrices( mMayaCam.getCamera() );
         gl::drawSphere(Vec3f( 360, 675, -300 ), y, y );//指の位置
         gl::popMatrices();
         t += speed1;    //時間を進める
@@ -1278,13 +1278,13 @@ public:
     //半径を返す
     float getLayoutRadius(){ return getWindowHeight() * 0.415f; }
     
-    /*void socketCl(){
+    void socketCl(){
         //ソケット通信クライアント側
         portno = 9999;//ポート番号
         sockfd = ::socket(AF_INET, SOCK_STREAM, 0);//ソケットの生成
-        if (sockfd < 0)
+        if (sockfd < 0)//socketが作られていない
             error("ERROR opening socket");
-        server = gethostbyname("localhost");
+        server = gethostbyname("localhost");//サーバーの作成
         if (server == NULL) {
             fprintf(stderr,"ERROR, no such host\n");
             exit(0);
@@ -1298,25 +1298,34 @@ public:
         serv_addr.sin_port = htons(portno);
         if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0)
             error("ERROR connecting");
-        printf("Please enter the message: ");
+        //printf("Please enter the message: ");
         bzero(buffer,256);
+        
         std::string str = std::to_string(mLastFrame.hands().count());//string型に変換
+        
         strcpy(buffer,str.c_str());
         n = write(sockfd,str.c_str(),strlen(buffer));//データの発信
+        
         if (n < 0)
             error("ERROR writing to socket");
+        
         bzero(buffer,256);
+        
         n = read(sockfd,buffer,255);//データの受信
+        
         if (n < 0)
             error("ERROR reading from socket");
         printf("%s\n",buffer);
         close(sockfd);
         
-    }*/
+    }
     
     //ウィンドウサイズ
     static const int WindowWidth = 1440;
     static const int WindowHeight = 900;
+    
+//    int WindowWidth = getWindowWidth();
+//    int WindowHeight = getWindowHeight();
     
     // カメラ
     CameraPersp  mCam;
