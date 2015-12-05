@@ -47,12 +47,6 @@ using namespace cinder::gl;
 #define PI 3.141592653589793
 #define MAXPOINTS 100//記録できる点の限度
 GLint point[MAXPOINTS][2];//点の座標の入れ物
-
-//struct Messages_base{
-//    string message[40];
-//    //int num;
-//};
-
 string messageList[] = {
     
     {"わかった"},
