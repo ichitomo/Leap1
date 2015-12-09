@@ -120,22 +120,19 @@ public:
         mFont = Font( "YuGothic", 20 );
         
         // カメラ(視点)の設定
-        mCapture = Capture(getWindowWidth(), getWindowHeight());
-        mCapture.start();
+//        mCapture = Capture(getWindowWidth(), getWindowHeight());
+//        mCapture.start();
         
         mCameraDistance = 1500.0f;//カメラの距離（z座標）
-        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance );//位置
+        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance*3/4 );//位置
         mCenter			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, 0.0f);//カメラのみる先
         
         mCam.setEyePoint( mEye );//カメラの位置
         mCam.setCenterOfInterestPoint( mCenter );//カメラのみる先
-        //mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
         //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
         //fozyはカメラの画角、値が大きいほど透視が強くなり、絵が小さくなる
-        //getWindowAspectRatio()はアスペクト比
-        //nNearは奥行きの範囲：手前（全方面）
-        //zFarは奥行きの範囲：後方（後方面）
-        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
+        //getWindowAspectRatio()はアスペクト比、nNearは奥行きの範囲：手前（全方面）、zFarは奥行きの範囲：後方（後方面）
+        mCam.setPerspective( 45.0f, getWindowAspectRatio(), mCameraDistance/5, mCameraDistance*2 );//カメラから見える視界の設定
         mMayaCam.setCurrentCam(mCam);
         
         
@@ -435,9 +432,9 @@ public:
         gl::setMatrices( mCamPrep );
         gl::rotate( mSceneRotation );//カメラの回転
         
-        if( mCapture.checkNewFrame() ) {
-            imgTexture = gl::Texture(mCapture.getSurface() );
-        }
+//        if( mCapture.checkNewFrame() ) {
+//            imgTexture = gl::Texture(mCapture.getSurface() );
+//        }
         
         //messageUI
 //        if( mDictionary->isCompleteWord( mCurrentNode.getWord() ) ){
