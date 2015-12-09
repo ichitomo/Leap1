@@ -79,7 +79,7 @@ void CenterState::draw()
 	// biggest square that can fit in the circle is radius * sqrt(2) per side  x^2 = (r^2)/2
 	const float squareSide = sqrtf( ( radius * radius ) / 2.0f );
 	
-	float pixelScale = std::min( squareSide / mWordPixelLength, squareSide / 140 ) * 2.0f;
+	//float pixelScale = std::min( squareSide / mWordPixelLength, squareSide / 140 ) * 2.0f;
 	//gl::TextureFont::DrawOptions options = gl::TextureFont::DrawOptions().scale( pixelScale ).pixelSnap( false );
 		
 	//const Vec2f offset = Vec2f( -radius + ( radius * 2 - mWordPixelLength * pixelScale ) / 2, radius - (radius * 2.0f - 60 * pixelScale ) / 2 );
