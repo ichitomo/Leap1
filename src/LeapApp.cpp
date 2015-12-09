@@ -69,6 +69,7 @@ string messageList[] = {
     {"トイレに行きたいです"},
 };
 
+
 void error(const char *msg){
     //エラーメッセージ
     perror(msg);
@@ -357,15 +358,20 @@ public:
             // 各ジェスチャー固有のパラメーターを取得する
             if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
                 Leap::SwipeGesture swpie( gesture );
+                
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
                 Leap::CircleGesture circle( gesture );
+//                cirCount++;
+//                std::cout << "cirCount:" <<cirCount << "\n" << std::endl;
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
                 Leap::KeyTapGesture keytap( gesture );
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
                 Leap::ScreenTapGesture screentap( gesture );
+//                tapCount++;
+//                std::cout << "tapCount:" << tapCount << "\n" << std::endl;
             }
             
             //スワイプ
@@ -381,7 +387,7 @@ public:
             }
             else {
                 circle.push_back( gesture );
-                cirCount++;
+                //cirCount++;
             }
             //キータップ
             if ( it_keytap != keytap.end() ) {
@@ -396,7 +402,7 @@ public:
             }
             else {
                 screentap.push_back( gesture );
-                tapCount++;
+                //tapCount++;
             }
         }
         
@@ -421,7 +427,7 @@ public:
         iBox = mCurrentFrame.interactionBox();
         
         //updateLeapObject();
-        //renderFrameParameter();
+        renderFrameParameter();
 
         //カメラのアップデート処理
         mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
@@ -442,7 +448,7 @@ public:
         // erase any nodes which have been marked as ready to be deleted
         mDyingNodes.remove_if( bind( &WordNode::shouldBeDeleted, std::placeholders::_1 ) );
         
-        socketCl();//ソケット通信（クライアント側）
+        //socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
     void draw(){
@@ -451,13 +457,13 @@ public:
         gl::enableDepthWrite();
         gl::pushMatrices();
         gl::setMatrices( mMayaCam.getCamera() );
-            drawMessageUI();//MessageUIの描写
+            //drawMessageUI();//MessageUIの描写
             drawLeapObject();//マリオネットの描写
             //drawInteractionBox3();//インタラクションボックス
             drawListArea();//メッセージリストの表示
-            drawCircle();//値によって球体を拡大縮小させる描写の追加
-            drawSinGraph();//sin関数を描く
-            drawBarGraph();//検知した手の数を棒グラフとして描写していく
+            //drawCircle();//値によって球体を拡大縮小させる描写の追加
+            //drawSinGraph();//sin関数を描く
+            //drawBarGraph();//検知した手の数を棒グラフとして描写していく
             drawBox();//枠と軸になる線を描写する
         gl::popMatrices();
         // パラメーター設定UIを描画する
@@ -672,6 +678,37 @@ public:
                     ss << "指の長さと太さ：" << bone.length() << "," << bone.width() << std::endl;
                 }
             }
+        }
+        
+        //screentapの詳細
+        for ( auto screentapGesture : screentap ) {
+            ss << GestureTypeToString( screentapGesture.type() ) << " " <<
+            GestureStateToString( screentapGesture.state() ) << " " <<
+            screentapGesture.id() << " " <<
+            screentapGesture.duration() << " " <<
+            screentapGesture.hands().count() << " " <<
+            screentapGesture.hands()[0].id() << " " <<
+            screentapGesture.pointables().count() << " " <<
+            screentapGesture.pointable().id() << " " <<      // 1
+            screentapGesture.direction() << " " <<           // 2
+            screentapGesture.position() << " " <<            // 3
+            screentapGesture.progress() << " " <<            // 4
+            "\n";
+        }
+        
+        //swipeの詳細
+        for ( auto swipeGesture : swipe ) {
+            ss << GestureTypeToString( swipeGesture.type() ) << " " <<
+            GestureStateToString( swipeGesture.state() ) << " " <<
+            swipeGesture.id() << " " <<
+            swipeGesture.duration() << " " <<
+            swipeGesture.hands().count() << " " <<
+            swipeGesture.hands()[0].id() << " " <<
+            swipeGesture.pointables().count() << " " <<
+            swipeGesture.pointable().id() << " " <<      // 1
+            swipeGesture.direction() << " " <<           // 2
+            swipeGesture.position() << " " <<            // 3
+            "\n";
         }
         
         //インタラクションボックスの座標
@@ -949,7 +986,7 @@ public:
     }
     //サークル（手の数によって大きくなる球体の描写）
     void drawCircle(){
-        //sine, cosineを使った曲線的な拡大縮小///////////////////////////
+        //sine,  cosineを使った曲線的な拡大縮小///////////////////////////
         //この場合-A*sin(w*radians(t) - p)の計算結果は100.0~-100.0なので、
         //100を足すことによって、0~200にしている。
         
@@ -1300,48 +1337,101 @@ public:
             error("ERROR connecting");
         //printf("Please enter the message: ");
         bzero(buffer,256);
-        bzero(buffer2, 256);
-        bzero(buffer3, 256);
         
         std::string hansCount = std::to_string(mLastFrame.hands().count());//string型に変換
         std::string cirCountLength = std::to_string(cirCount);//string型に変換
         std::string tapCountLength = std::to_string(tapCount);//string型に変換
+       
+        hansCount += ',';
+        hansCount += cirCountLength;
+        hansCount += ',';
+        hansCount += tapCountLength;
+        hansCount += ',';
+        hansCount += messageList[5];
         
         strcpy(buffer,hansCount.c_str());
-        strcpy(buffer2, cirCountLength.c_str());
-        strcpy(buffer3, tapCountLength.c_str());
-        l = write(sockfd,buffer,strlen(buffer));//データの発信
-        m = write(sockfd,buffer2,strlen(buffer2));//データの発信
-        n = write(sockfd,buffer3,strlen(buffer3));//データの発信
         
-        if (l < 0 || m < 0 || n < 0){
+        l = write(sockfd,buffer,strlen(buffer));//データの発信
+
+        if (l < 0){
             error("ERROR writing to socket");
         }
         
         bzero(buffer,256);
-        bzero(buffer2,256);
-        bzero(buffer3,256);
         
         l = read(sockfd,buffer,255);//データの受信
-        m = read(sockfd,buffer2,255);//データの受信
-        n = read(sockfd,buffer3,255);//データの受信
         
-        if (l < 0 || m < 0 || n < 0){
+        if (l < 0){
             error("ERROR reading from socket");
         }
         printf("%s\n",buffer);
-        printf("%s\n",buffer2);
-        printf("%s\n",buffer3);
         
         close(sockfd);
     }
     
+    void ges(){
+        // Get gestures
+        const Leap::GestureList gestures = mLastFrame.gestures();
+        for (int g = 0; g < gestures.count(); ++g) {
+            
+            Leap::Gesture gesture = gestures[g];
+            
+            switch (gesture.type()) {
+                case Leap::Gesture::TYPE_CIRCLE:
+                {
+                    Leap::CircleGesture circle = gesture;
+                    std::string clockwiseness;
+                    
+                    if (circle.pointable().direction().angleTo(circle.normal()) <= PI/2) {
+                        clockwiseness = "clockwise";
+                    } else {
+                        clockwiseness = "counterclockwise";
+                    }
+                    
+                    // Calculate angle swept since last frame
+                    std::cout << std::string(2, ' ')
+                    << "Circle id: " << gesture.id()
+                    << ", progress: " << circle.progress()
+                    << ", radius: " << circle.radius()
+                    <<  ", " << clockwiseness << std::endl;
+                    break;
+                }
+                case Leap::Gesture::TYPE_SWIPE:
+                {
+                    Leap::SwipeGesture swipe = gesture;
+                    std::cout << std::string(2, ' ')
+                    << "Swipe id: " << gesture.id()
+                    << ", direction: " << swipe.direction()
+                    << ", speed: " << swipe.speed() << std::endl;
+                    break;
+                }
+                case Leap::Gesture::TYPE_KEY_TAP:
+                {
+                    Leap::KeyTapGesture tap = gesture;
+                    std::cout << std::string(2, ' ')
+                    << "Key Tap id: " << gesture.id()
+                    << ", position: " << tap.position()
+                    << ", direction: " << tap.direction()<< std::endl;
+                    break;
+                }
+                case Leap::Gesture::TYPE_SCREEN_TAP:
+                {
+                    Leap::ScreenTapGesture screentap = gesture;
+                    std::cout << std::string(2, ' ')
+                    << "Screen Tap id: " << gesture.id()
+                    << ", position: " << screentap.position()
+                    << ", direction: " << screentap.direction()<< std::endl;
+                    break;
+                }
+                default:
+                    std::cout << std::string(2, ' ')  << "Unknown gesture type." << std::endl;
+                    break;
+            }
+        }
+    }
     //ウィンドウサイズ
     static const int WindowWidth = 1440;
     static const int WindowHeight = 900;
-    
-//    int WindowWidth = getWindowWidth();
-//    int WindowHeight = getWindowHeight();
     
     // カメラ
     CameraPersp  mCam;
