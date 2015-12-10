@@ -184,10 +184,10 @@ public:
         // give CenterState its font
         //CenterState::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 150 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
         
-        initialize();
+        //initialize();
         
     }
-    void initialize(){
+ /*   void initialize(){
         mNodes.clear();
         // make the first 26 nodes, one for each letter
         //１つのメッセージにつき、メッセージぶんのnodeを作る
@@ -205,7 +205,7 @@ public:
         mMouseOverNode = mNodes.end();
         
         mEnableSelections = true;
-    }
+    }*/
     
     list<WordNode>::iterator getNodeAtPoint( const Vec2f &point ){
         for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
@@ -221,16 +221,6 @@ public:
         mMayaCam.mouseDown( event.getPos() );
 //                if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
 //                    drawPrintBinInfo( event.getX() );
-
-        
-        //messageUI
-        list<WordNode>::iterator clickedNode = getNodeAtPoint( event.getPos() );
-        if( clickedNode != mNodes.end() ){
-            selectNode( clickedNode );
-        } else {
-            if( ( event.getPos() - getWindowCenter() ).length() < 180.0f )
-                initialize();
-        }
 
     }
     
@@ -277,7 +267,7 @@ public:
                 selectNode( foundWord );
         } else {
             if( event.getCode() == KeyEvent::KEY_BACKSPACE ){
-                initialize();
+               // initialize();
             }
         }
     }
