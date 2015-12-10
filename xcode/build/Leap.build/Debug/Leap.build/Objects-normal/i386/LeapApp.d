@@ -150,11 +150,4 @@ dependencies: /Users/ichinosetomohiro/Desktop/Leap/src/LeapApp.cpp \
   ../../cinder_0.8.6_mac/include/cinder/Rand.h \
   ../../cinder_0.8.6_mac/include/cinder/Capture.h \
   /Users/ichinosetomohiro/Desktop/Leap/include/Resources.h \
-  ../../cinder_0.8.6_mac/include/cinder/CinderResources.h \
-  /Users/ichinosetomohiro/Desktop/Leap/include/WordNode.h \
-  ../../cinder_0.8.6_mac/include/cinder/Timeline.h \
-  ../../cinder_0.8.6_mac/include/cinder/TimelineItem.h \
-  ../../cinder_0.8.6_mac/include/cinder/Easing.h \
-  ../../cinder_0.8.6_mac/include/cinder/Tween.h \
-  ../../cinder_0.8.6_mac/include/cinder/gl/TextureFont.h \
-  /Users/ichinosetomohiro/Desktop/Leap/include/CenterState.h
+  ../../cinder_0.8.6_mac/include/cinder/CinderResources.h

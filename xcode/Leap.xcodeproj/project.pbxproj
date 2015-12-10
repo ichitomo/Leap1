@@ -69,8 +69,6 @@
 		898680941B37A2F90007A942 /* Leap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Leap.h; path = ../include/Leap.h; sourceTree = "<group>"; };
 		898680951B37A2F90007A942 /* LeapMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeapMath.h; path = ../include/LeapMath.h; sourceTree = "<group>"; };
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
-		89CA2CFE1C0EA59700B9CA0F /* WordNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordNode.h; path = ../include/WordNode.h; sourceTree = "<group>"; };
-		89CA2CFF1C0EA5A400B9CA0F /* CenterState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CenterState.h; path = ../include/CenterState.h; sourceTree = "<group>"; };
 		89CA2D041C0EA9F900B9CA0F /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background.png; path = ../resources/background.png; sourceTree = "<group>"; };
 		89CA2D051C0EA9F900B9CA0F /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = circle.png; path = ../resources/circle.png; sourceTree = "<group>"; };
 		89CA2D061C0EA9F900B9CA0F /* smallCircle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = smallCircle.png; path = ../resources/smallCircle.png; sourceTree = "<group>"; };
@@ -166,8 +164,6 @@
 				898680941B37A2F90007A942 /* Leap.h */,
 				898680951B37A2F90007A942 /* LeapMath.h */,
 				395CA7F11B4C49E08A01BA06 /* Leap_Prefix.pch */,
-				89CA2CFF1C0EA5A400B9CA0F /* CenterState.h */,
-				89CA2CFE1C0EA59700B9CA0F /* WordNode.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
