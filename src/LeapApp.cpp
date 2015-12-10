@@ -68,8 +68,6 @@ string messageList[] = {
     {"きたー"},
     {"トイレに行きたいです"},
 };
-
-
 void error(const char *msg){
     //エラーメッセージ
     perror(msg);
@@ -237,11 +235,10 @@ public:
     }
     
     // マウスのドラッグ
-    void mouseDrag( MouseEvent event ){
+    /*void mouseDrag( MouseEvent event ){
         mMayaCam.mouseDrag( event.getPos(), event.isLeftDown(),
                            event.isMiddleDown(), event.isRightDown() );
-    }
-    
+    }*/
     // マウスの動き
     void mouseMove( MouseEvent event ){
         if( ! mEnableSelections )
@@ -452,10 +449,12 @@ public:
         gl::clear();
         gl::enableDepthRead();
         gl::enableDepthWrite();
+        
         gl::pushMatrices();
-        gl::setMatrices( mMayaCam.getCamera() );
+            gl::setMatrices( mMayaCam.getCamera() );
             //drawMessageUI();//MessageUIの描写
-            drawLeapObject();//マリオネットの描写
+            drawMarionette();//マリオネット描写
+            //drawLeapObject();//マリオネットの描写
             //drawInteractionBox3();//インタラクションボックス
             drawListArea();//メッセージリストの表示
             //drawCircle();//値によって球体を拡大縮小させる描写の追加
@@ -463,6 +462,9 @@ public:
             //drawBarGraph();//検知した手の数を棒グラフとして描写していく
             drawBox();//枠と軸になる線を描写する
         gl::popMatrices();
+        
+        
+        
         // パラメーター設定UIを描画する
         mParams.draw();
         /*
@@ -725,8 +727,8 @@ public:
         
         gl::pushMatrices();// 表示座標系の保持
         // カメラ位置を設定する
-        gl::setMatrices( mMayaCam.getCamera() );
-        drawMarionette();//マリオネット描写
+        //gl::setMatrices( mMayaCam.getCamera() );
+        
         //色をデフォルトに戻す
         //setDiffuseColor( ci::ColorA( 0.8f, 0.8f, 0.8f, 1.0f ) );
         gl::popMatrices();// 表示座標系を戻す
@@ -973,13 +975,12 @@ public:
         mm << "きたー" << "\n";
         mm << "トイレに行きたいです" << "\n";
         
-        //for (int i = 0; i<18; i++) {
         gl::pushMatrices();
-            auto tbox0 = TextBox().alignment( TextBox::LEFT ).font( mFont ).text ( mm.str() ).color(Color( 1.0f, 1.0f, 1.0f )).backgroundColor( ColorA( 0, 1.0f, 0, 0 ) );
-            auto mTextTexture = gl::Texture( tbox0.render() );
-            gl::draw( mTextTexture );
+        auto tbox0 = TextBox().alignment( TextBox::LEFT ).font( mFont ).text ( mm.str() ).color(Color( 1.0f, 1.0f, 1.0f )).backgroundColor( ColorA( 0, 1.0f, 0, 0 ) );
+        auto mTextTexture = gl::Texture( tbox0.render() );
+        gl::translate(WindowWidth*2/3, WindowHeight);
+        gl::draw( mTextTexture );
         gl::popMatrices();
-        //}
     }
     //サークル（手の数によって大きくなる球体の描写）
     void drawCircle(){
@@ -990,7 +991,7 @@ public:
         //y = A*sin(w*(t * PI / 180.0) - p) + 100;
         
         gl::pushMatrices();
-        gl::setMatrices( mMayaCam.getCamera() );
+        //gl::setMatrices( mMayaCam.getCamera() );
         gl::drawSphere(Vec3f( 360, 675, -300 ), cirCount, cirCount );//指の位置
         gl::popMatrices();
         t += speed1;    //時間を進める
@@ -1007,7 +1008,7 @@ public:
     void drawSinGraph(){
         
         glPushMatrix();
-        gl::setMatrices( mMayaCam.getCamera() );
+        //gl::setMatrices( mMayaCam.getCamera() );
         drawGrid();  //基準線
         //サイン波を点で静止画として描画///////////////////////////
         for (t1 = 0.0; t1 < WindowWidth; t1 += speed) {
@@ -1026,7 +1027,7 @@ public:
     }
     void drawGrid(){
         glPushMatrix();
-        gl::setMatrices( mMayaCam.getCamera() );
+        //gl::setMatrices( mMayaCam.getCamera() );
         //横線
         glBegin(GL_LINES);
         glVertex2d(WindowWidth/2, 0);
@@ -1057,7 +1058,7 @@ public:
         for (int i = 0; i < pastSec; i++) {
             //棒グラフを描写していく
             glPushMatrix();
-            gl::setMatrices( mMayaCam.getCamera() );
+            //gl::setMatrices( mMayaCam.getCamera() );
             glBegin(GL_LINE_STRIP);
             glColor3d(1.0, 0.0, 0.0);
             glLineWidth(10);
@@ -1071,7 +1072,7 @@ public:
     //枠としてのBoxを描く
     void drawBox(){
         gl::pushMatrices();
-        gl::setMatrices( mMayaCam.getCamera() );
+        //gl::setMatrices( mMayaCam.getCamera() );
         // 上面
         gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),
                      Vec3f( mRight, mTop, mBackSide ) );
@@ -1098,29 +1099,35 @@ public:
         //        gl::drawLine( Vec3f( mLeft, mTop*2/3, mFrontSide ),
         //                     Vec3f( mLeft, mTop*2/3, mBackSide ) );
         //
+        
         // 中面
-        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),
-                     Vec3f( mRight, mTop/2, mBackSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),
-                     Vec3f( mRight, mTop/2, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),
-                     Vec3f( mLeft, mTop/2, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),
-                     Vec3f( mLeft, mTop/2, mBackSide ) );
+//        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),
+//                     Vec3f( mRight, mTop/2, mBackSide ) );
+//        
+//        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),
+//                     Vec3f( mRight, mTop/2, mFrontSide ) );
+//        
+//        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),
+//                     Vec3f( mLeft, mTop/2, mFrontSide ) );
+//        
+//        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),
+//                     Vec3f( mLeft, mTop/2, mBackSide ) );
         
         
         //中心線
+//        gl::drawLine( Vec3f( mLeft, mTop/2, 0 ),
+//                     Vec3f( mRight, mTop/2, 0 ) );
+//        
+//        gl::drawLine( Vec3f( 0, mTop/2, mBackSide ),
+//                     Vec3f( 0, mTop/2, mFrontSide ) );
+//        
+//        gl::drawLine( Vec3f( mRight/2, 0, 0 ),
+//                     Vec3f( mRight/2, mTop, 0 ) );
+        
+        
         gl::drawLine( Vec3f( mLeft, mTop/2, 0 ),
-                     Vec3f( mRight, mTop/2, 0 ) );
+                                          Vec3f( mRight, mTop/2, 0 ) );
         
-        gl::drawLine( Vec3f( 0, mTop/2, mBackSide ),
-                     Vec3f( 0, mTop/2, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mRight/2, 0, 0 ),
-                     Vec3f( mRight/2, mTop, 0 ) );
         
         
         // 下面
@@ -1182,14 +1189,20 @@ public:
     }
     
     // テクスチャの描画
-    void drawTexture(int x, int y){
+    void drawTexture(){
         
-        if( tbox0 ) {
-            gl::pushMatrices();
-            gl::translate( x, y);//位置
-            gl::draw( tbox0 );//描く
-            gl::popMatrices();
-        }
+//        if( tbox0 ) {
+//            gl::pushMatrices();
+//            gl::translate( 600, 500);//位置
+//            gl::draw( tbox0 );//描く
+//            gl::popMatrices();
+//        }
+//        if( tbox0 ) {
+//            gl::pushMatrices();
+//            gl::translate( x, y);//位置
+//            gl::draw( tbox0 );//描く
+//            gl::popMatrices();
+//        }
        
     }
     

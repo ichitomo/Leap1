@@ -23,8 +23,6 @@
 		8948FFC61BD8D929001C42F1 /* android_head.obj in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFC01BD8D929001C42F1 /* android_head.obj */; settings = {ASSET_TAGS = (); }; };
 		898680971B37A3360007A942 /* libLeap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; };
 		898680991B37A36C0007A942 /* libLeap.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		89CA2D011C0EA5B500B9CA0F /* CenterState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89CA2D001C0EA5B500B9CA0F /* CenterState.cpp */; settings = {ASSET_TAGS = (); }; };
-		89CA2D031C0EA5C600B9CA0F /* WordNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89CA2D021C0EA5C600B9CA0F /* WordNode.cpp */; settings = {ASSET_TAGS = (); }; };
 		89CA2D071C0EA9F900B9CA0F /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D041C0EA9F900B9CA0F /* background.png */; settings = {ASSET_TAGS = (); }; };
 		89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D051C0EA9F900B9CA0F /* circle.png */; settings = {ASSET_TAGS = (); }; };
 		89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D061C0EA9F900B9CA0F /* smallCircle.png */; settings = {ASSET_TAGS = (); }; };
@@ -73,8 +71,6 @@
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
 		89CA2CFE1C0EA59700B9CA0F /* WordNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordNode.h; path = ../include/WordNode.h; sourceTree = "<group>"; };
 		89CA2CFF1C0EA5A400B9CA0F /* CenterState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CenterState.h; path = ../include/CenterState.h; sourceTree = "<group>"; };
-		89CA2D001C0EA5B500B9CA0F /* CenterState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CenterState.cpp; path = ../src/CenterState.cpp; sourceTree = "<group>"; };
-		89CA2D021C0EA5C600B9CA0F /* WordNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WordNode.cpp; path = ../src/WordNode.cpp; sourceTree = "<group>"; };
 		89CA2D041C0EA9F900B9CA0F /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background.png; path = ../resources/background.png; sourceTree = "<group>"; };
 		89CA2D051C0EA9F900B9CA0F /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = circle.png; path = ../resources/circle.png; sourceTree = "<group>"; };
 		89CA2D061C0EA9F900B9CA0F /* smallCircle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = smallCircle.png; path = ../resources/smallCircle.png; sourceTree = "<group>"; };
@@ -113,8 +109,6 @@
 			isa = PBXGroup;
 			children = (
 				BB1E88BC784C44E5B798C665 /* LeapApp.cpp */,
-				89CA2D021C0EA5C600B9CA0F /* WordNode.cpp */,
-				89CA2D001C0EA5B500B9CA0F /* CenterState.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -280,8 +274,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				89CA2D031C0EA5C600B9CA0F /* WordNode.cpp in Sources */,
-				89CA2D011C0EA5B500B9CA0F /* CenterState.cpp in Sources */,
 				D0B15304848C4A48BF51AD81 /* LeapApp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
