@@ -23,6 +23,10 @@
 		8948FFC61BD8D929001C42F1 /* android_head.obj in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFC01BD8D929001C42F1 /* android_head.obj */; settings = {ASSET_TAGS = (); }; };
 		898680971B37A3360007A942 /* libLeap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; };
 		898680991B37A36C0007A942 /* libLeap.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		899F1B401C1938A6000A2CCC /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B3E1C1938A6000A2CCC /* 1.png */; settings = {ASSET_TAGS = (); }; };
+		899F1B411C1938A6000A2CCC /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B3F1C1938A6000A2CCC /* 2.png */; settings = {ASSET_TAGS = (); }; };
+		899F1B441C193A07000A2CCC /* m1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B421C193A07000A2CCC /* m1.jpg */; settings = {ASSET_TAGS = (); }; };
+		899F1B451C193A07000A2CCC /* m2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B431C193A07000A2CCC /* m2.jpg */; settings = {ASSET_TAGS = (); }; };
 		89CA2D071C0EA9F900B9CA0F /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D041C0EA9F900B9CA0F /* background.png */; settings = {ASSET_TAGS = (); }; };
 		89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D051C0EA9F900B9CA0F /* circle.png */; settings = {ASSET_TAGS = (); }; };
 		89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D061C0EA9F900B9CA0F /* smallCircle.png */; settings = {ASSET_TAGS = (); }; };
@@ -69,6 +73,10 @@
 		898680941B37A2F90007A942 /* Leap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Leap.h; path = ../include/Leap.h; sourceTree = "<group>"; };
 		898680951B37A2F90007A942 /* LeapMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeapMath.h; path = ../include/LeapMath.h; sourceTree = "<group>"; };
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
+		899F1B3E1C1938A6000A2CCC /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 1.png; path = ../resources/1.png; sourceTree = "<group>"; };
+		899F1B3F1C1938A6000A2CCC /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 2.png; path = ../resources/2.png; sourceTree = "<group>"; };
+		899F1B421C193A07000A2CCC /* m1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = m1.jpg; path = ../resources/m1.jpg; sourceTree = "<group>"; };
+		899F1B431C193A07000A2CCC /* m2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = m2.jpg; path = ../resources/m2.jpg; sourceTree = "<group>"; };
 		89CA2D041C0EA9F900B9CA0F /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background.png; path = ../resources/background.png; sourceTree = "<group>"; };
 		89CA2D051C0EA9F900B9CA0F /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = circle.png; path = ../resources/circle.png; sourceTree = "<group>"; };
 		89CA2D061C0EA9F900B9CA0F /* smallCircle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = smallCircle.png; path = ../resources/smallCircle.png; sourceTree = "<group>"; };
@@ -178,6 +186,10 @@
 				8948FFBB1BD8D929001C42F1 /* android_arm.mtl */,
 				8948FFBC1BD8D929001C42F1 /* android_arm.obj */,
 				8948FFBD1BD8D929001C42F1 /* android_foot.mtl */,
+				899F1B421C193A07000A2CCC /* m1.jpg */,
+				899F1B431C193A07000A2CCC /* m2.jpg */,
+				899F1B3E1C1938A6000A2CCC /* 1.png */,
+				899F1B3F1C1938A6000A2CCC /* 2.png */,
 				8948FFBE1BD8D929001C42F1 /* android_foot.obj */,
 				8948FFBF1BD8D929001C42F1 /* android_head.mtl */,
 				8948FFC01BD8D929001C42F1 /* android_head.obj */,
@@ -249,15 +261,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				899F1B411C1938A6000A2CCC /* 2.png in Resources */,
+				899F1B441C193A07000A2CCC /* m1.jpg in Resources */,
 				8948FFC21BD8D929001C42F1 /* android_arm.obj in Resources */,
 				89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */,
 				8948FFC31BD8D929001C42F1 /* android_foot.mtl in Resources */,
+				899F1B451C193A07000A2CCC /* m2.jpg in Resources */,
 				90137A2B51414E919CBC3A5C /* CinderApp.icns in Resources */,
 				8948FFC61BD8D929001C42F1 /* android_head.obj in Resources */,
 				8948FFC51BD8D929001C42F1 /* android_head.mtl in Resources */,
 				8929D8AD1BD072D30016BF57 /* image.jpg in Resources */,
 				8948FFC11BD8D929001C42F1 /* android_arm.mtl in Resources */,
 				89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */,
+				899F1B401C1938A6000A2CCC /* 1.png in Resources */,
 				89CA2D071C0EA9F900B9CA0F /* background.png in Resources */,
 				8948FFC41BD8D929001C42F1 /* android_foot.obj in Resources */,
 			);
