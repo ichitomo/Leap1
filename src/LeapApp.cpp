@@ -13,20 +13,18 @@
 #include "cinder/Utilities.h"
 #include "cinder/Rand.h"
 
-
 #include <list>
 #include <algorithm>
 
 #include <math.h>
-
 
 #include "cinder/Capture.h"
 #include "cinder/params/Params.h"
 #include "time.h"
 
 #include "Resources.h"
-#include "WordNode.h"
-#include "CenterState.h"
+//#include "WordNode.h"
+//#include "CenterState.h"
 
 //ソケット通信
 #include <stdio.h>
@@ -47,12 +45,6 @@ using namespace cinder::gl;
 #define PI 3.141592653589793
 #define MAXPOINTS 100//記録できる点の限度
 GLint point[MAXPOINTS][2];//点の座標の入れ物
-
-//struct Messages_base{
-//    string message[40];
-//    //int num;
-//};
-
 string messageList[] = {
     
     {"わかった"},
@@ -74,7 +66,6 @@ string messageList[] = {
     {"きたー"},
     {"トイレに行きたいです"},
 };
-
 void error(const char *msg){
     //エラーメッセージ
     perror(msg);
@@ -83,35 +74,6 @@ void error(const char *msg){
 
 class LeapApp : public AppNative {
 public:
-    //ウインドウサイズを設定し、渡すためのもの
-    void prepareSettings( Settings *settings ){
-        settings->setWindowSize( WindowWidth, WindowHeight);
-    }
-    //レイアウトを決める
-    void layoutWords( vector<string> words, float radius ){
-        int radiusDivisor = 26;//std::max<int>( 10, words.size() ); // don't let the circles get too small
-        mCurrentCircleRadius = radius / radiusDivisor * M_PI;
-        for( size_t w = 0; w < words.size(); ++w ) {
-            int wordLength	= words[w].length();
-            string s		= words[w];
-            int charIndex	= (int)s[wordLength-1] - 97;
-            float charPer	= charIndex/26.0f;
-            float angle		= charPer * 2.0f * M_PI;
-            //float angle = w / (float)words.size() * 2 * M_PI;
-            Vec2f pos = getWindowCenter() + radius * Vec2f( cos( angle ), sin( angle ) );
-            Color col(  CM_HSV, charPer, 0.875f, 1 );
-            mNodes.push_back( WordNode( words[w] ) );
-            mNodes.back().mPos = getWindowCenter() + radius * 0.5f * Vec2f( cos( angle ), sin( angle ) );
-            mNodes.back().mColor = ColorA( col, 0.0f );
-            mNodes.back().mRadiusDest = mCurrentCircleRadius;
-            mNodes.back().mRadius = 0;
-            
-            timeline().apply( &mNodes.back().mRadius, mNodes.back().mRadiusDest, 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
-            timeline().apply( &mNodes.back().mPos, pos, 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
-            timeline().apply( &mNodes.back().mColor, ColorA( col, 1.0f ), 0.4f, EaseOutAtan( 10 ) ).timelineEnd( -0.39f );
-        }
-    }
-
     void setup(){
         // ウィンドウの位置とサイズを設定
         setWindowPos( 0, 0 );
@@ -125,40 +87,38 @@ public:
         mFont = Font( "YuGothic", 20 );
         
         // カメラ(視点)の設定
-        mCapture = Capture(getWindowWidth(), getWindowHeight());
-        mCapture.start();
         
         mCameraDistance = 1500.0f;//カメラの距離（z座標）
-        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance );//位置
+        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance*3/4 );//位置
         mCenter			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, 0.0f);//カメラのみる先
         
         mCam.setEyePoint( mEye );//カメラの位置
         mCam.setCenterOfInterestPoint( mCenter );//カメラのみる先
-        //mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
         //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
         //fozyはカメラの画角、値が大きいほど透視が強くなり、絵が小さくなる
-        //getWindowAspectRatio()はアスペクト比
-        //nNearは奥行きの範囲：手前（全方面）
-        //zFarは奥行きの範囲：後方（後方面）
-        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
+        //getWindowAspectRatio()はアスペクト比、nNearは奥行きの範囲：手前（全方面）、zFarは奥行きの範囲：後方（後方面）
+        mCam.setPerspective( 45.0f, getWindowAspectRatio(), mCameraDistance/5, mCameraDistance*2 );//カメラから見える視界の設定
         mMayaCam.setCurrentCam(mCam);
         
         
         // アルファブレンディングを有効にする
-        gl::enableAlphaBlending();
+        
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl::enable(GL_BLEND);
+        //gl::enableAlphaBlending();
         
         // カメラのパラメータを描写するためのセッティング
-        mParams = params::InterfaceGl( "LearnHow", Vec2i( 200, 160 ) );
+        mParams = params::InterfaceGl( "Camera", Vec2i( 200, 160 ) );
+        mParams.setPosition(Vec2i( 1200, 660 ));
         mParams.addParam( "Scene Rotation", &mSceneRotation, "opened=1" );
         mParams.addSeparator();
         mParams.addParam( "Eye Distance", &mCameraDistance, "min=50.0 max=1500.0 step=50.0 keyIncr=s keyDecr=w" );
         
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        gl::enable(GL_BLEND);
         
         //backgroundImageの読み込み
         backgroundImage = gl::Texture(loadImage(loadResource("../resources/image.jpg")));
-        
+        m1 = gl::Texture(loadImage(loadResource("../resources/m1.jpg")));
+        m2 = gl::Texture(loadImage(loadResource("../resources/m2.jpg")));
         
         // 描画時に奥行きの考慮を有効にする
         gl::enableDepthRead();
@@ -174,74 +134,11 @@ public:
         p = 0.0;    //初期位相を設定
         t = 0.0;    //経過時間を初期化
         t2 = 0.0;    //経過時間を初期化
-        
-        //messageUIの設定
-        mCenterState = CenterState( 140.0f );
-        
-        // load textures
-        mBgTex = gl::Texture( loadImage( loadResource( RES_BACKGROUND_IMAGE ) ) );//backgroundImage
-        gl::Texture::Format fmt;
-        fmt.enableMipmapping();
-        mCircleTex = gl::Texture( loadImage( loadResource( RES_CIRCLE_IMAGE ) ), fmt );//中心の円
-        mSmallCircleTex = gl::Texture( loadImage( loadResource( RES_SMALL_CIRCLE_IMAGE ) ), fmt ); //周りの円
-        
-        // load the dictionary
-        //mDictionary = shared_ptr<Dictionary>( new Dictionary( loadResource( RES_DICTIONARY ) ) );
-        
-        // give the WordNodes their font
-        //WordNode::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 34 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
-        
-        // give CenterState its font
-        //CenterState::setFont( gl::TextureFont::create( Font( loadResource( RES_FONT ), 150 ), gl::TextureFont::Format().enableMipmapping( true ) ) );
-        
-        initialize();
-        
-    }
-    void initialize(){
-        mNodes.clear();
-        // make the first 26 nodes, one for each letter
-        //１つのメッセージにつき、メッセージぶんのnodeを作る
-        vector<string> initialWords;
-        for( int c = 0; c < 18; ++c )
-            //initialWords.push_back( string( 1, (char)('a' + c) ) );
-            initialWords.push_back( messageList[c] );
-        
-        layoutWords( initialWords, getLayoutRadius() );
-        
-        mCenterState.mCircles.clear();
-        mCenterState.setWord( "" );
-        
-        // mark our currently highlighted node as "none"
-        mMouseOverNode = mNodes.end();
-        
-        mEnableSelections = true;
-    }
-    
-    list<WordNode>::iterator getNodeAtPoint( const Vec2f &point ){
-        for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
-            if( nodeIt->isPointInside( point ) )
-                return nodeIt;
-        }
-        
-        return mNodes.end();
     }
     
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
-        //        if( mSpectrumPlot.getBounds().contains( event.getPos() ) )
-        //            drawPrintBinInfo( event.getX() );
-
-        
-        //messageUI
-        list<WordNode>::iterator clickedNode = getNodeAtPoint( event.getPos() );
-        if( clickedNode != mNodes.end() ){
-            selectNode( clickedNode );
-        } else {
-            if( ( event.getPos() - getWindowCenter() ).length() < 180.0f )
-                initialize();
-        }
-
     }
     
     // マウスのドラッグ
@@ -250,86 +147,6 @@ public:
                            event.isMiddleDown(), event.isRightDown() );
     }
     
-    // マウスの動き
-    void mouseMove( MouseEvent event ){
-        if( ! mEnableSelections )
-            return;
-        
-        list<WordNode>::iterator currentMouseOver = getNodeAtPoint( event.getPos() );
-        
-        if( currentMouseOver != mMouseOverNode ) {
-            mMouseOverNode = currentMouseOver;
-            
-            // make all the circles not moused-over normal size, and the mouse-over big
-            for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
-                if( mMouseOverNode == nodeIt ){
-                    timeline().apply( &nodeIt->mRadius, mCurrentCircleRadius * 1.35f, 0.25f, EaseOutElastic( 2.0f, 1.2f ) );
-                } else {
-                    timeline().apply( &nodeIt->mRadius, mCurrentCircleRadius, 0.5f, EaseOutAtan( 10 ) );
-                }
-            }
-        }
-    }
-    
-    void keyDown( KeyEvent event ){
-        //messageUI
-        if( ! mEnableSelections )
-            return;
-        
-        if( isalpha( event.getChar() ) ){
-            // see if we can find a word that ends with this letter
-            list<WordNode>::iterator foundWord = mNodes.end();
-            for( foundWord = mNodes.begin(); foundWord != mNodes.end(); ++foundWord ) {
-                if( foundWord->getWord()[foundWord->getWord().size()-1] == event.getChar() )
-                    break;
-            }
-            
-            if( foundWord != mNodes.end() )
-                selectNode( foundWord );
-        } else {
-            if( event.getCode() == KeyEvent::KEY_BACKSPACE ){
-                initialize();
-            }
-        }
-    }
-    
-    void selectNode( list<WordNode>::iterator selectedNode ){
-        // have all the nodes but this one disappear
-        for( list<WordNode>::iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ) {
-            if( nodeIt != selectedNode ) {
-                // copy this node to dying nodes and erase it from the current
-                mDyingNodes.push_back( *nodeIt );
-                timeline().apply( &mDyingNodes.back().mRadius, 0.0f, 0.5f, EaseInQuint() )
-                .finishFn( bind( &WordNode::setShouldBeDeleted, &(mDyingNodes.back()) ) ); // when you're done, mark yourself for deletion
-            }
-        }
-        mCurrentNode = *selectedNode;
-        mCurrentNode.setSelected();
-        mNodes.clear();
-        
-        Color c = Color( mCurrentNode.mColor().r, mCurrentNode.mColor().g, mCurrentNode.mColor().b );
-        Vec2f dirToCenter = ( mCurrentNode.mPos() - getWindowCenter() ) * 0.5f;
-        
-        timeline().add( bind( &CenterState::addCircle, &mCenterState, mCurrentNode.getWord(), c, dirToCenter * 0.2f ), timeline().getCurrentTime() + 0.25f );
-        
-        // move the selected node towards the center
-        
-        timeline().apply( &mCurrentNode.mPos, getWindowCenter() + dirToCenter, 0.3f, EaseInQuint() );
-        timeline().apply( &mCurrentNode.mColor, ColorA( mCurrentNode.mColor().r, mCurrentNode.mColor().g, mCurrentNode.mColor().b, 0.0f ), 0.3f, EaseInAtan( 10 ) );
-        
-        // now add all the descendants of the clicked node
-//        vector<string> children( mDictionary->getDescendants( mCurrentNode.getWord() ) );
-//        layoutWords( children, getLayoutRadius() );
-        
-        // mark our currently highlighted node as "none"
-        mMouseOverNode = mNodes.end();
-        
-        // once everything is done animating, then we can allow selections, but for now, disable them
-        mEnableSelections = false;
-//        std::function<void()> cueAction = bind( &VisualDictionaryApp::enableSelections, this );
-//        timeline().add( cueAction, timeline().getEndTime() - 2.0f );
-    }
-
     
     //更新処理
     void update(){
@@ -363,15 +180,20 @@ public:
             // 各ジェスチャー固有のパラメーターを取得する
             if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
                 Leap::SwipeGesture swpie( gesture );
+                
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
                 Leap::CircleGesture circle( gesture );
+//                cirCount++;
+//                std::cout << "cirCount:" <<cirCount << "\n" << std::endl;
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
                 Leap::KeyTapGesture keytap( gesture );
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
                 Leap::ScreenTapGesture screentap( gesture );
+//                tapCount++;
+//                std::cout << "tapCount:" << tapCount << "\n" << std::endl;
             }
             
             //スワイプ
@@ -387,6 +209,7 @@ public:
             }
             else {
                 circle.push_back( gesture );
+                //cirCount++;
             }
             //キータップ
             if ( it_keytap != keytap.end() ) {
@@ -401,6 +224,7 @@ public:
             }
             else {
                 screentap.push_back( gesture );
+                //tapCount++;
             }
         }
         
@@ -427,44 +251,36 @@ public:
         //updateLeapObject();
         //renderFrameParameter();
 
-        //カメラのアップデート処理
-        mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
-        mCamPrep.lookAt( mEye, mCenter, mUp);//カメラの位置、m詰めている先の位置、カメラの頭の方向を表すベクトル
-        gl::setMatrices( mCamPrep );
-        gl::rotate( mSceneRotation );//カメラの回転
+//        //カメラのアップデート処理
+//        mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
+//        mCamPrep.lookAt( mEye, mCenter, mUp);//カメラの位置、m詰めている先の位置、カメラの頭の方向を表すベクトル
+//        gl::setMatrices( mCamPrep );
+//        gl::rotate( mSceneRotation );//カメラの回転
         
-        if( mCapture.checkNewFrame() ) {
-            imgTexture = gl::Texture(mCapture.getSurface() );
-        }
-        
-        //messageUI
-//        if( mDictionary->isCompleteWord( mCurrentNode.getWord() ) ){
-//            //Dictionaryに言葉が存在したら
-//            mCenterState.update( mCurrentNode );
-//        }
-        
-        // erase any nodes which have been marked as ready to be deleted
-        mDyingNodes.remove_if( bind( &WordNode::shouldBeDeleted, std::placeholders::_1 ) );
-        
-        //socketCl();//ソケット通信（クライアント側）
+        socketCl();//ソケット通信（クライアント側）
     }
     //描写処理
     void draw(){
         gl::clear();
-        gl::enableDepthRead();
-        gl::enableDepthWrite();
+        
         gl::pushMatrices();
-        //drawLeapObject();//マリオネットの描写
-//        drawInteractionBox3();//インタラクションボックス
-//        drawListArea();//メッセージリストの表示
-        drawCircle();//値によって球体を拡大縮小させる描写の追加
-        //drawSinGraph();//sin関数を描く
-        drawBarGraph();//検知した手の数を棒グラフとして描写していく
-        drawBox();//枠と軸になる線を描写する
-        //drawMessageUI();//MessageUIの描写
+            gl::setMatrices( mMayaCam.getCamera() );
+            //drawListArea();//メッセージリストの表示
+            //drawMessageUI();//MessageUIの描写
+            drawMarionette();//マリオネット描写
+            //drawLeapObject();//マリオネットの描写
+            //drawInteractionBox3();//インタラクションボックス
+            //drawListArea();//メッセージリストの表示
+            //drawCircle();//値によって球体を拡大縮小させる描写の追加
+            //drawSinGraph();//sin関数を描く
+            //drawBarGraph();//検知した手の数を棒グラフとして描写していく
+            drawBox();//枠と軸になる線を描写する
+        drawImage();
         gl::popMatrices();
+        
         // パラメーター設定UIを描画する
         mParams.draw();
+        
         if( imgTexture ) {
             //バックグラウンドイメージを追加
             gl::draw( backgroundImage, getWindowBounds());
@@ -474,7 +290,7 @@ public:
             
         }
     }
-    /*
+    
     // Leap Motion関連のセットアップ
     void setupLeapObject(){
         
@@ -645,8 +461,21 @@ public:
             }
         }
     }
+    void drawImage(){
+        gl::pushMatrices();
+        //gl::translate(Vec2d(20,300));
+        //gl::scale(Vec2d(20,30));
+        //::resize(m1, m1.getBounds(), &newm1, Area(0, 0, 800, 600));
+        gl::draw( m1, Vec2d(50,20));
+        gl::popMatrices();
+        gl::pushMatrices();
+//        gl::scale(Vec2d(20,30));
+        gl::draw( m2, Vec2d(20,50));
+        gl::popMatrices();
+    }
+    
     // フレーム情報の描画
-    void renderFrameParameter(){
+    /*void renderFrameParameter(){
         //----- TextBoxを使って文字やパラメーターを表示する -----
         
         stringstream ss;//確認用変数
@@ -676,6 +505,37 @@ public:
             }
         }
         
+        //screentapの詳細
+        for ( auto screentapGesture : screentap ) {
+            ss << GestureTypeToString( screentapGesture.type() ) << " " <<
+            GestureStateToString( screentapGesture.state() ) << " " <<
+            screentapGesture.id() << " " <<
+            screentapGesture.duration() << " " <<
+            screentapGesture.hands().count() << " " <<
+            screentapGesture.hands()[0].id() << " " <<
+            screentapGesture.pointables().count() << " " <<
+            screentapGesture.pointable().id() << " " <<      // 1
+            screentapGesture.direction() << " " <<           // 2
+            screentapGesture.position() << " " <<            // 3
+            screentapGesture.progress() << " " <<            // 4
+            "\n";
+        }
+        
+        //swipeの詳細
+        for ( auto swipeGesture : swipe ) {
+            ss << GestureTypeToString( swipeGesture.type() ) << " " <<
+            GestureStateToString( swipeGesture.state() ) << " " <<
+            swipeGesture.id() << " " <<
+            swipeGesture.duration() << " " <<
+            swipeGesture.hands().count() << " " <<
+            swipeGesture.hands()[0].id() << " " <<
+            swipeGesture.pointables().count() << " " <<
+            swipeGesture.pointable().id() << " " <<      // 1
+            swipeGesture.direction() << " " <<           // 2
+            swipeGesture.position() << " " <<            // 3
+            "\n";
+        }
+        
         //インタラクションボックスの座標
         ss << "Width :" << iBox.width() << "mm" << "\n";
         ss << "Height:" << iBox.height() << "mm" << "\n";
@@ -687,19 +547,15 @@ public:
         mTextTexture0 = gl::Texture( tbox0.render() );
         
         
-    }
+    }*/
     // Leap Motion関連の描画
     void drawLeapObject(){
         
         gl::pushMatrices();// 表示座標系の保持
-        // カメラ位置を設定する
-        gl::setMatrices( mMayaCam.getCamera() );
-        drawMarionette();//マリオネット描写
         //色をデフォルトに戻す
         //setDiffuseColor( ci::ColorA( 0.8f, 0.8f, 0.8f, 1.0f ) );
         gl::popMatrices();// 表示座標系を戻す
     }
-    */
    
     //インタラクションボックスの作成
     /*void drawInteractionBox3(){
@@ -824,75 +680,74 @@ public:
         
         //頭
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defFaceTransX,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defFaceTransX,
                      mTotalMotionTranslation.y+defFaceTransY,
                      mTotalMotionTranslation.z+defFaceTransZ );//位置
-        glRotatef(-mRotateMatrix3, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
-        glTranslatef( mTotalMotionTranslation.x/10.0,0.0f,0.0f);//移動
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 80, 100 ) );//実体
+            glRotatef(-mRotateMatrix3, 1.0f, 0.0f, 0.0f);//回転
+            glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
+            glTranslatef( mTotalMotionTranslation.x/10.0,0.0f,0.0f);//移動
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 80, 100 ) );//実体
         gl::popMatrices();
         
 
         //胴体を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX,
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX,
                      mTotalMotionTranslation.y+defBodyTransY,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+            glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
         gl::popMatrices();
         
         //右腕を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX+75,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX+75,
                      mTotalMotionTranslation.y+defBodyTransY,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(mRotateMatrix2, 1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( mTotalMotionTranslation.x/10.0,
+            glRotatef(mRotateMatrix2, 1.0f, 1.0f, 0.0f);//回転
+            glTranslatef( mTotalMotionTranslation.x/10.0,
                      mTotalMotionTranslation.y/10.0,
                      0.0f);//移動
-        glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100,  50, 50 ) );//実体
+            glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100,  50, 50 ) );//実体
         gl::popMatrices();
         
         //左腕を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX-75,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX-75,
                      mTotalMotionTranslation.y+defBodyTransY,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(-mRotateMatrix4, -1.0f, 1.0f, 0.0f);//回転
-        glTranslatef( -mTotalMotionTranslation.x/10.0,
+            glRotatef(-mRotateMatrix4, -1.0f, 1.0f, 0.0f);//回転
+            glTranslatef( -mTotalMotionTranslation.x/10.0,
                      mTotalMotionTranslation.y/10.0,
                      0.0f);//移動
-        glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 50, 50 ) );//実体
+            glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 50, 50 ) );//実体
         gl::popMatrices();
         
         //右足を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX+25,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX+25,
                      mTotalMotionTranslation.y+defBodyTransY-75,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(mRotateMatrix0, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+            glRotatef(mRotateMatrix0, 1.0f, 0.0f, 0.0f);//回転
+            glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
         gl::popMatrices();
         
         //左足を描く
         gl::pushMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-        glTranslatef( mTotalMotionTranslation.x+defBodyTransX-25,
+            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
+            glTranslatef( mTotalMotionTranslation.x+defBodyTransX-25,
                      mTotalMotionTranslation.y+defBodyTransY-75,
                      mTotalMotionTranslation.z+defBodyTransZ);//移動
-        glRotatef(mRotateMatrix5, 1.0f, 0.0f, 0.0f);//回転
-        glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
-        gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
+            glRotatef(mRotateMatrix5, 1.0f, 0.0f, 0.0f);//回転
+            glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
+            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
         gl::popMatrices();
         
     }
@@ -905,15 +760,15 @@ public:
         //サークル
         for(auto gesture : circle){
             gl::pushMatrices();
-            aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
+                aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
             auto mbox = TextBox()
             .font( Font( "游ゴシック体", gesture.radius() * 2 ) )
             .text ( aa.str() )
             .backgroundColor(ColorA(0,0,0));
             
-            auto texture = gl::Texture( mbox.render() );
+                auto texture = gl::Texture( mbox.render() );
             //gl::translate( textX, textY );//指の隣に移動させる
-            gl::draw( texture );//メッセージを表示
+                gl::draw( texture );//メッセージを表示
             gl::popMatrices();
             
         }
@@ -943,24 +798,25 @@ public:
         mm << "きたー" << "\n";
         mm << "トイレに行きたいです" << "\n";
         
-        //for (int i = 0; i<18; i++) {
-        gl::pushMatrices();
-        auto tbox0 = TextBox().alignment( TextBox::LEFT ).font( mFont ).text ( mm.str() ).color(Color( 1.0f, 1.0f, 1.0f )).backgroundColor( ColorA( 0, 1.0f, 0, 0 ) );
-        auto mTextTexture = gl::Texture( tbox0.render() );
-        gl::draw( mTextTexture );
-        gl::popMatrices();
-        //}
+//        gl::pushMatrices();
+//        
+//        auto tbox0 = TextBox().alignment( TextBox::LEFT ).font( mFont ).text ( mm.str() ).color(Color( 1.0f, 1.0f, 1.0f )).backgroundColor( ColorA( 0, 0, 0, 0.2 ) );
+//        auto mTextTexture = gl::Texture( tbox0.render() );
+//        //gl::translate(0, WindowHeight/3);
+//        //gl::rotate(Vec3f(180,180,0));
+//        gl::draw( mTextTexture );
+//        gl::popMatrices();
     }
     //サークル（手の数によって大きくなる球体の描写）
     void drawCircle(){
-        //sine, cosineを使った曲線的な拡大縮小///////////////////////////
+        //sine,  cosineを使った曲線的な拡大縮小///////////////////////////
         //この場合-A*sin(w*radians(t) - p)の計算結果は100.0~-100.0なので、
         //100を足すことによって、0~200にしている。
         
-        y = A*sin(w*(t * PI / 180.0) - p) + 100;
+        //y = A*sin(w*(t * PI / 180.0) - p) + 100;
         
         gl::pushMatrices();
-        gl::drawSphere(Vec3f( 360, 675, -300 ), y, y );//指の位置
+        gl::drawSphere(Vec3f( 360, 675, -300 ), cirCount, cirCount );//指の位置
         gl::popMatrices();
         t += speed1;    //時間を進める
         if(t > 360.0) t = 0.0;
@@ -975,8 +831,8 @@ public:
     //sinグラフを描く
     void drawSinGraph(){
         
-        glPushMatrix();
-        gl::setMatrices( mMayaCam.getCamera() );
+        gl::pushMatrices();
+       
         drawGrid();  //基準線
         //サイン波を点で静止画として描画///////////////////////////
         for (t1 = 0.0; t1 < WindowWidth; t1 += speed) {
@@ -990,23 +846,23 @@ public:
         
         t2 += speed;    //時間を進める
         if (t2 > WindowWidth) t2 = 0.0;    //点が右端まで行ったらになったら原点に戻る
-        glPopMatrix();
+        gl::popMatrices();
         
     }
     void drawGrid(){
-        glPushMatrix();
-        gl::setMatrices( mMayaCam.getCamera() );
+        gl::pushMatrices();
+        //gl::setMatrices( mMayaCam.getCamera() );
         //横線
-        glBegin(GL_LINES);
+        gl::begin(GL_LINES);
         glVertex2d(WindowWidth/2, 0);
         glVertex2d(WindowWidth/2, WindowHeight);
-        glEnd();
+        gl::end();
         //横線
-        glBegin(GL_LINES);
+        gl::begin(GL_LINES);
         glVertex2d(0, WindowHeight/2);
         glVertex2d(WindowWidth, WindowHeight/2);
-        glEnd();
-        glPopMatrix();
+        gl::end();
+        gl::popMatrices();
     }
     //時間ごとに座標を記録する関数
     void graphUpdate(){
@@ -1025,33 +881,26 @@ public:
     void drawBarGraph(){
         for (int i = 0; i < pastSec; i++) {
             //棒グラフを描写していく
-            glPushMatrix();
+            gl::pushMatrices();
+            //gl::setMatrices( mMayaCam.getCamera() );
             glBegin(GL_LINE_STRIP);
             glColor3d(1.0, 0.0, 0.0);
             glLineWidth(10);
             glVertex2d(point[i][0]*10, 0);//x座標
             glVertex2d(point[i][0]*10 , point[i][1]*100);//y座標
             glEnd();
-            glPopMatrix();
-            
+            gl::popMatrices();
         }
     }
     //枠としてのBoxを描く
     void drawBox(){
         gl::pushMatrices();
         // 上面
-        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),
-                     Vec3f( mRight, mTop, mBackSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),
-                     Vec3f( mRight, mTop, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),
-                     Vec3f( mLeft, mTop, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),
-                     Vec3f( mLeft, mTop, mBackSide ) );
-        
+//        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mRight, mTop, mBackSide ) );//手前
+//        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mTop, mFrontSide ) );//右
+//        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mLeft, mTop, mFrontSide ) );//奥
+//        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mTop, mBackSide ) );//左
+//
         //        //2/3面
         //        gl::drawLine( Vec3f( mLeft, mTop*2/3, mBackSide ),
         //                     Vec3f( mRight, mTop*2/3, mBackSide ) );
@@ -1065,56 +914,31 @@ public:
         //        gl::drawLine( Vec3f( mLeft, mTop*2/3, mFrontSide ),
         //                     Vec3f( mLeft, mTop*2/3, mBackSide ) );
         //
-        // 中面
-        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),
-                     Vec3f( mRight, mTop/2, mBackSide ) );
         
-        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),
-                     Vec3f( mRight, mTop/2, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),
-                     Vec3f( mLeft, mTop/2, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),
-                     Vec3f( mLeft, mTop/2, mBackSide ) );
+//        // 中面
+//        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mBackSide ) );//手前
+//        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mFrontSide ) );//右
+//        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mFrontSide ) );//奥
+//        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mBackSide ) );//左
         
         
         //中心線
-        gl::drawLine( Vec3f( mLeft, mTop/2, 0 ),
-                     Vec3f( mRight, mTop/2, 0 ) );
+        gl::drawLine( Vec3f( mLeft, mTop/2, 0 ),Vec3f( mRight, mTop/2, 0 ) );//横線
+        gl::drawLine( Vec3f( mRight/2, 0, 0 ),Vec3f( mRight/2, mTop, 0 ) );//縦線
+//        gl::drawLine( Vec3f( mRight/2, mTop/2, mBackSide ),Vec3f( mRight/2, mTop/2, mFrontSide ) );//手前から奥
         
-        gl::drawLine( Vec3f( 0, mTop/2, mBackSide ),
-                     Vec3f( 0, mTop/2, mFrontSide ) );
+//        // 下面
+//        gl::drawLine( Vec3f( mLeft, mBottom, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
+//        gl::drawLine( Vec3f( mRight, mBottom, mBackSide ),Vec3f( mRight, mBottom, mFrontSide ) );
+//        gl::drawLine( Vec3f( mRight, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
+//        gl::drawLine( Vec3f( mLeft, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mBackSide ) );
+//        
+//        // 側面
+//        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
+//        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mLeft, mBottom, mBackSide ) );
+//        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mRight, mBottom, mFrontSide ) );
+//        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
         
-        gl::drawLine( Vec3f( mRight/2, 0, 0 ),
-                     Vec3f( mRight/2, mTop, 0 ) );
-        
-        
-        // 下面
-        gl::drawLine( Vec3f( mLeft, mBottom, mBackSide ),
-                     Vec3f( mRight, mBottom, mBackSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mBottom, mBackSide ),
-                     Vec3f( mRight, mBottom, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mBottom, mFrontSide ),
-                     Vec3f( mLeft, mBottom, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mLeft, mBottom, mFrontSide ),
-                     Vec3f( mLeft, mBottom, mBackSide ) );
-        
-        // 側面
-        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),
-                     Vec3f( mLeft, mBottom, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),
-                     Vec3f( mLeft, mBottom, mBackSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),
-                     Vec3f( mRight, mBottom, mFrontSide ) );
-        
-        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),
-                     Vec3f( mRight, mBottom, mBackSide ) );
         gl::popMatrices();
     }
     //骨（手）の形を作る
@@ -1149,15 +973,15 @@ public:
     }
     
     // テクスチャの描画
-    void drawTexture(int x, int y){
+    void drawTexture(){
         
         if( tbox0 ) {
             gl::pushMatrices();
-            gl::translate( x, y);//位置
+            //gl::translate( 600, 500);//位置
+            //gl::rotate(Vec3f(0,180,0));
             gl::draw( tbox0 );//描く
             gl::popMatrices();
         }
-       
     }
     
     // GL_LIGHT0の色を変える
@@ -1165,46 +989,6 @@ public:
         gl::color( diffuseColor );
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
-    
-    //新しいメッセージUI
-    void drawMessageUI(){
-        gl::clear( Color( 0, 0, 0 ) );
-        gl::enableAlphaBlending();
-        
-        // draw background image
-        gl::color( Color::white() );
-        mBgTex.enableAndBind();
-        gl::drawSolidRect( getWindowBounds() );
-        
-        
-        mCircleTex.bind();
-        
-        // draw the center circles
-        mCenterState.draw();
-        
-        // draw the dying nodes
-        mSmallCircleTex.bind();
-        for( list<WordNode>::const_iterator nodeIt = mDyingNodes.begin(); nodeIt != mDyingNodes.end(); ++nodeIt )
-            nodeIt->draw();
-        
-        // draw all the non-mouseOver nodes
-        for( list<WordNode>::const_iterator nodeIt = mNodes.begin(); nodeIt != mNodes.end(); ++nodeIt ){
-            if( nodeIt != mMouseOverNode )
-                nodeIt->draw();
-        }
-        
-        // if there is a mouseOverNode, draw it last so it is 'above' the non-mouseOver nodes
-        if( mMouseOverNode != mNodes.end() )
-            mMouseOverNode->draw();
-        
-        // if there is a currentNode (previously selected), draw it
-        if( ! mCurrentNode.getWord().empty() )
-            mCurrentNode.draw();
-        
-        mSmallCircleTex.disable();
-    }
-    
-    void enableSelections() { mEnableSelections = true; }
     
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
@@ -1278,14 +1062,15 @@ public:
     //半径を返す
     float getLayoutRadius(){ return getWindowHeight() * 0.415f; }
     
-    /*void socketCl(){
+    void socketCl(){
         //ソケット通信クライアント側
         portno = 9999;//ポート番号
         sockfd = ::socket(AF_INET, SOCK_STREAM, 0);//ソケットの生成
-        if (sockfd < 0)
+        if (sockfd < 0)//socketが作られていない
             error("ERROR opening socket");
-        server = gethostbyname("localhost");
+        server = gethostbyname("mima.c.fun.ac.jp");//サーバーの作成
         if (server == NULL) {
+            //サーバーにアクセスできない
             fprintf(stderr,"ERROR, no such host\n");
             exit(0);
         }
@@ -1298,22 +1083,100 @@ public:
         serv_addr.sin_port = htons(portno);
         if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0)
             error("ERROR connecting");
-        printf("Please enter the message: ");
+        //printf("Please enter the message: ");
         bzero(buffer,256);
-        std::string str = std::to_string(mLastFrame.hands().count());//string型に変換
-        strcpy(buffer,str.c_str());
-        n = write(sockfd,str.c_str(),strlen(buffer));//データの発信
-        if (n < 0)
-            error("ERROR writing to socket");
-        bzero(buffer,256);
-        n = read(sockfd,buffer,255);//データの受信
-        if (n < 0)
-            error("ERROR reading from socket");
-        printf("%s\n",buffer);
-        close(sockfd);
         
-    }*/
+        std::string hansCount = std::to_string(mLastFrame.hands().count());//string型に変換
+        std::string cirCountLength = std::to_string(cirCount);//string型に変換
+        std::string tapCountLength = std::to_string(tapCount);//string型に変換
+       
+        hansCount += ',';
+        hansCount += cirCountLength;
+        hansCount += ',';
+        hansCount += tapCountLength;
+        hansCount += ',';
+        hansCount += messageList[5];
+        
+        strcpy(buffer,hansCount.c_str());
+        
+        l = write(sockfd,buffer,strlen(buffer));//データの発信
+
+        if (l < 0){
+            error("ERROR writing to socket");
+        }
+        
+        bzero(buffer,256);
+        
+        l = read(sockfd,buffer,255);//データの受信
+        
+        if (l < 0){
+            error("ERROR reading from socket");
+        }
+        printf("%s\n",buffer);
+        
+        close(sockfd);
+    }
     
+    void ges(){
+        // Get gestures
+        const Leap::GestureList gestures = mLastFrame.gestures();
+        for (int g = 0; g < gestures.count(); ++g) {
+            
+            Leap::Gesture gesture = gestures[g];
+            
+            switch (gesture.type()) {
+                case Leap::Gesture::TYPE_CIRCLE:
+                {
+                    Leap::CircleGesture circle = gesture;
+                    std::string clockwiseness;
+                    
+                    if (circle.pointable().direction().angleTo(circle.normal()) <= PI/2) {
+                        clockwiseness = "clockwise";
+                    } else {
+                        clockwiseness = "counterclockwise";
+                    }
+                    
+                    // Calculate angle swept since last frame
+                    std::cout << std::string(2, ' ')
+                    << "Circle id: " << gesture.id()
+                    << ", progress: " << circle.progress()
+                    << ", radius: " << circle.radius()
+                    <<  ", " << clockwiseness << std::endl;
+                    break;
+                }
+                case Leap::Gesture::TYPE_SWIPE:
+                {
+                    Leap::SwipeGesture swipe = gesture;
+                    std::cout << std::string(2, ' ')
+                    << "Swipe id: " << gesture.id()
+                    << ", direction: " << swipe.direction()
+                    << ", speed: " << swipe.speed() << std::endl;
+                    break;
+                }
+                case Leap::Gesture::TYPE_KEY_TAP:
+                {
+                    Leap::KeyTapGesture tap = gesture;
+                    std::cout << std::string(2, ' ')
+                    << "Key Tap id: " << gesture.id()
+                    << ", position: " << tap.position()
+                    << ", direction: " << tap.direction()<< std::endl;
+                    break;
+                }
+                case Leap::Gesture::TYPE_SCREEN_TAP:
+                {
+                    Leap::ScreenTapGesture screentap = gesture;
+                    std::cout << std::string(2, ' ')
+                    << "Screen Tap id: " << gesture.id()
+                    << ", position: " << screentap.position()
+                    << ", direction: " << screentap.direction()<< std::endl;
+                    break;
+                }
+                default:
+                    std::cout << std::string(2, ' ')  << "Unknown gesture type." << std::endl;
+                    break;
+            }
+        }
+    }
     //ウィンドウサイズ
     static const int WindowWidth = 1440;
     static const int WindowHeight = 900;
@@ -1329,6 +1192,8 @@ public:
     
     //バックグラウンド
     gl::Texture backgroundImage;
+    gl::Texture m1;
+    gl::Texture m2;
     
     //フォント
     Font mFont;
@@ -1371,7 +1236,7 @@ public:
     //サークル
     float mMinRadius;//半径
     float mMinArc;//弧
-    
+
     //キータップ、スクリーンタップ
     float mMinDownVelocity;//速さ
     float mHistorySeconds;//秒数
@@ -1404,21 +1269,24 @@ public:
     float defMouseTransZ = 0.0;//口のz座標の位置
     //ci::Vec3f mTotalMotionTranslation;//移動
     
-    //bool flag = false;//テキストの文字表示フラグ
-    
     //InteractionBoxの実装
     Leap::InteractionBox iBox;
     
     //メッセージを取得する時に使う
     int messageNumber = -1;
-
     
     //ソケット通信
-    int sockfd, portno, n;
+    int sockfd, portno, l,m,n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
     
     char buffer[256];
+    char buffer2[256];
+    char buffer3[256];
+    int cirCount = 0;
+    int tapCount = 0;
+    
+    
     
     //カメラをコントロールする
     Capture	        mCapture;
@@ -1456,22 +1324,6 @@ public:
     float mBackSide = 500.0;//前面のz座標
     float mFrontSide = -500.0;//後面のz座標
     
-    //メッセージUIのためのもの
-    //list<WordNode>::iterator	getNodeAtPoint( const Vec2f &point );
-    
-    //shared_ptr<Dictionary>		mDictionary;
-    list<WordNode>				mNodes, mDyingNodes;
-    list<WordNode>::iterator	mMouseOverNode;
-    
-    CenterState					mCenterState;
-    
-    gl::Texture					mBgTex;
-    gl::Texture					mCircleTex;
-    gl::Texture					mSmallCircleTex;
-    
-    bool						mEnableSelections;
-    WordNode					mCurrentNode;
-    float						mCurrentCircleRadius;
     
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
