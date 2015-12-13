@@ -1,4 +1,5 @@
 #include "cinder/app/AppNative.h"
+#include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 
 
@@ -76,11 +77,18 @@ public:
         // カメラ(視点)の設定
         
         mCameraDistance = 1500.0f;//カメラの距離（z座標）
-        mEye			= Vec3f( 720.0f, 880.0f, 1500.0f );//位置
-        mCenter			= Vec3f( 720.0f, 720.0f, 0.0f);//カメラのみる先
+        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance );//位置
+        mCenter			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, 0.0f);//カメラのみる先
+        //mUp				= Vec3f::yAxis();//頭の方向を表すベクトル
         mCam.setEyePoint( mEye );//カメラの位置
-        mCam.setCenterOfInterestPoint( mCenter );//カメラのみる先
-        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 5, 3000.0f );//カメラから見える視界の設定
+        mCam.setCenterOfInterestPoint(mCenter);//カメラのみる先
+        //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+        //fozyはカメラの画角、値が大きいほど透視が強くなり、絵が小さくなる
+        //getWindowAspectRatio()はアスペクト比
+        //nNearは奥行きの範囲：手前（全方面）
+        //zFarは奥行きの範囲：後方（後方面）
+        mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
+        
         mMayaCam.setCurrentCam(mCam);
         // アルファブレンディングを有効にする
         
@@ -95,9 +103,27 @@ public:
         
         
         //backgroundImageの読み込み
-        backgroundImage = gl::Texture(loadImage(loadResource("../resources/image.jpg")));
-        m1 = gl::Texture(loadImage(loadResource("../resources/m1.jpg")));
-        m2 = gl::Texture(loadImage(loadResource("../resources/m2.jpg")));
+        backgroundImage = gl::Texture(loadImage(loadResource(RES_BACKGROUND_IMAGE)));
+        
+        //メッセージ画像の読み込み
+        ok = gl::Texture(loadImage(loadResource(RES_OK_IMAGE)));
+        no = gl::Texture(loadImage(loadResource(RES_NO_IMAGE)));
+        again = gl::Texture(loadImage(loadResource(RES_AGAIN_IMAGE)));
+        cool = gl::Texture(loadImage(loadResource(RES_COOL_IMAGE)));
+        fast = gl::Texture(loadImage(loadResource(RES_FAST_IMAGE)));
+        fight = gl::Texture(loadImage(loadResource(RES_FIGHT_IMAGE)));
+        large = gl::Texture(loadImage(loadResource(RES_LARGE_IMAGE)));
+        wc = gl::Texture(loadImage(loadResource(RES_WC_IMAGE)));
+        
+        //メッセージ画像の読み込み
+        ok2 = gl::Texture(loadImage(loadResource(RES_OK2_IMAGE)));
+        no2 = gl::Texture(loadImage(loadResource(RES_NO2_IMAGE)));
+        again2 = gl::Texture(loadImage(loadResource(RES_AGAIN2_IMAGE)));
+        cool2 = gl::Texture(loadImage(loadResource(RES_COOL2_IMAGE)));
+        fast2 = gl::Texture(loadImage(loadResource(RES_FAST2_IMAGE)));
+        fight2 = gl::Texture(loadImage(loadResource(RES_FIGHT2_IMAGE)));
+        large2 = gl::Texture(loadImage(loadResource(RES_LARGE2_IMAGE)));
+        wc2 = gl::Texture(loadImage(loadResource(RES_WC2_IMAGE)));
         
         // 描画時に奥行きの考慮を有効にする
         gl::enableDepthRead();
@@ -244,9 +270,9 @@ public:
     void draw(){
         gl::clear();
         
-        //gl::pushMatrices();
+        gl::pushMatrices();
             gl::setMatrices( mMayaCam.getCamera() );
-            drawListArea();//メッセージリストの表示
+            //drawListArea();//メッセージリストの表示
             //drawMessageUI();//MessageUIの描写
             drawMarionette();//マリオネット描写
             drawLeapObject();//手の描写
@@ -258,20 +284,11 @@ public:
 //            drawBone();
             drawBox();//枠と軸になる線を描写する
             drawImage();
+        drawTexture();
         
         
-            // パラメーター設定UIを描画する
-            mParams.draw();
+        gl::popMatrices();
         
-            if( imgTexture ) {
-                //バックグラウンドイメージを追加
-                gl::draw( backgroundImage, getWindowBounds());
-            }else{
-                //ロードする間にコメント
-                gl::drawString("Loading image please wait..",getWindowCenter());
-            
-            }
-       // gl::popMatrices();
     }
     
     // Leap Motion関連のセットアップ
@@ -537,12 +554,13 @@ public:
             }
         }
     }
+    
     void drawImage(){
         gl::pushMatrices();
-            gl::draw( m1, Vec2d(50,20));
+     //       gl::draw( m1, Vec2d(50,20));
         gl::popMatrices();
         gl::pushMatrices();
-            gl::draw( m2, Vec2d(20,50));
+     //       gl::draw( m2, Vec2d(20,50));
         gl::popMatrices();
     }
     // Leap Motion関連の描画
@@ -816,9 +834,20 @@ public:
     // テクスチャの描画
     void drawTexture(){
         if( mTextTexture ) {
-            gl::translate( 1000, 100);//位置
-            //gl::rotate(Vec3f(0,180,0));
+            gl::translate( 0, 100);//位置
             gl::draw( mTextTexture );//描く
+        }
+        if( backgroundImage ) {
+            //バックグラウンドイメージを追加
+            gl::draw( backgroundImage, getWindowBounds());
+        }else{
+            //ロードする間にコメント
+            gl::drawString("Loading image please wait..",getWindowCenter());
+        }
+        
+        if (ok) {
+            gl::translate(100,100);
+            gl::draw(ok);
         }
     }
     
@@ -828,74 +857,6 @@ public:
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
-    // Leap SDKのVectorをCinderのVec3fに変換する
-    Vec3f toVec3f( Leap::Vector vec ){
-        return Vec3f( vec.x, vec.y, vec.z );
-    }
-    
-    std::string SwipeDirectionToString( Leap::Vector direction ){
-        std::string text = "";
-        
-        const auto threshold = 0.5f;
-        
-        // 左右
-        if ( direction.x < -threshold ) {
-            text += "Left";
-        }
-        else if ( direction.x > threshold ) {
-            text += "Right";
-        }
-        
-        // 上下
-        if ( direction.y < -threshold ) {
-            text += "Down";
-        }
-        else if ( direction.y > threshold ) {
-            text += "Up";
-        }
-        
-        // 前後
-        if ( direction.z < -threshold ) {
-            text += "Back";
-        }
-        else if ( direction.z > threshold ) {
-            text += "Front";
-        }
-        
-        return text;
-    }
-    // ジェスチャー種別を文字列にする
-    std::string GestureTypeToString( Leap::Gesture::Type type ){
-        if ( type == Leap::Gesture::Type::TYPE_SWIPE ) {
-            return "swipe";
-        }
-        else if ( type == Leap::Gesture::Type::TYPE_CIRCLE ) {
-            return "circle";
-        }
-        else if ( type == Leap::Gesture::Type::TYPE_SCREEN_TAP ) {
-            return "screen_tap";
-        }
-        else if ( type == Leap::Gesture::Type::TYPE_KEY_TAP ) {
-            return "key_tap";
-        }
-        
-        return "invalid";
-    }
-    
-    // ジェスチャーの状態を文字列にする
-    std::string GestureStateToString( Leap::Gesture::State state ){
-        if ( state == Leap::Gesture::State::STATE_START ) {
-            return "start";
-        }
-        else if ( state == Leap::Gesture::State::STATE_UPDATE ) {
-            return "update";
-        }
-        else if ( state == Leap::Gesture::State::STATE_STOP ) {
-            return "stop";
-        }
-        
-        return "invalid";
-    }
     
     void socketCl(){
         //ソケット通信クライアント側
@@ -924,7 +885,7 @@ public:
         std::string hansCount = std::to_string(mLastFrame.hands().count());//string型に変換
         std::string cirCountLength = std::to_string(cirCount);//string型に変換
         std::string tapCountLength = std::to_string(tapCount);//string型に変換
-       
+        
         hansCount += ',';
         hansCount += cirCountLength;
         hansCount += ',';
@@ -935,7 +896,7 @@ public:
         strcpy(buffer,hansCount.c_str());
         
         l = write(sockfd,buffer,strlen(buffer));//データの発信
-
+        
         if (l < 0){
             error("ERROR writing to socket");
         }
@@ -1011,6 +972,75 @@ public:
             }
         }
     }
+    // Leap SDKのVectorをCinderのVec3fに変換する
+    Vec3f toVec3f( Leap::Vector vec ){
+        return Vec3f( vec.x, vec.y, vec.z );
+    }
+    
+    std::string SwipeDirectionToString( Leap::Vector direction ){
+        std::string text = "";
+        
+        const auto threshold = 0.5f;
+        
+        // 左右
+        if ( direction.x < -threshold ) {
+            text += "Left";
+        }
+        else if ( direction.x > threshold ) {
+            text += "Right";
+        }
+        
+        // 上下
+        if ( direction.y < -threshold ) {
+            text += "Down";
+        }
+        else if ( direction.y > threshold ) {
+            text += "Up";
+        }
+        
+        // 前後
+        if ( direction.z < -threshold ) {
+            text += "Back";
+        }
+        else if ( direction.z > threshold ) {
+            text += "Front";
+        }
+        
+        return text;
+    }
+    // ジェスチャー種別を文字列にする
+    std::string GestureTypeToString( Leap::Gesture::Type type ){
+        if ( type == Leap::Gesture::Type::TYPE_SWIPE ) {
+            return "swipe";
+        }
+        else if ( type == Leap::Gesture::Type::TYPE_CIRCLE ) {
+            return "circle";
+        }
+        else if ( type == Leap::Gesture::Type::TYPE_SCREEN_TAP ) {
+            return "screen_tap";
+        }
+        else if ( type == Leap::Gesture::Type::TYPE_KEY_TAP ) {
+            return "key_tap";
+        }
+        
+        return "invalid";
+    }
+    
+    // ジェスチャーの状態を文字列にする
+    std::string GestureStateToString( Leap::Gesture::State state ){
+        if ( state == Leap::Gesture::State::STATE_START ) {
+            return "start";
+        }
+        else if ( state == Leap::Gesture::State::STATE_UPDATE ) {
+            return "update";
+        }
+        else if ( state == Leap::Gesture::State::STATE_STOP ) {
+            return "stop";
+        }
+        
+        return "invalid";
+    }
+   
     //ウィンドウサイズ
     static const int WindowWidth = 1440;
     static const int WindowHeight = 900;
@@ -1026,8 +1056,10 @@ public:
     
     //バックグラウンド
     gl::Texture backgroundImage;
-    gl::Texture m1;
-    gl::Texture m2;
+    //メッセージテクスチャ
+    gl::Texture ok,  no, again, large, cool, fight, fast, inter, wc;
+    gl::Texture ok2, no2, again2, large2, cool2, fight2, fast2, inter2, wc2;
+    
     
     //フォント
     Font mFont;
@@ -1082,16 +1114,16 @@ public:
     
     //ci::Vec3f defFaceTrans(new Point3D(0.0, 120.0, 50.0));
     float defFaceTransX = 1080.0;//顔のx座標の位置
-    float defFaceTransY = 675-110.0;//顔のy座標の位置
+    float defFaceTransY = 675+110.0;//顔のy座標の位置
     float defFaceTransZ = 0.0;//顔のz座標の位置
     
     float defBodyTransX = 1080.0;//体のx座標の位置
     float defBodyTransY = 675.0;//体のy座標の位置
     float defBodyTransZ = 0.0;//体のz座標の位置
     
-    float defLeftArmTransX=1080.0-75.0;
-    float defRightArmTransX=1080.0+75.0;
-    float defArmTransY=675-20.0;
+    float defLeftArmTransX=1080.0+75.0;
+    float defRightArmTransX=1080.0-75.0;
+    float defArmTransY=675+20.0;
     float defArmTransZ=0.0;
     
     float rightEyeAngle = 0.0;//右目の角度
@@ -1101,8 +1133,6 @@ public:
     float defEyeTransZ = 0.0;//左目のz座標の位置
     
     float defMouseTransZ = 0.0;//口のz座標の位置
-    
-
     //ci::Vec3f mTotalMotionTranslation;//移動
     
     //InteractionBoxの実装
