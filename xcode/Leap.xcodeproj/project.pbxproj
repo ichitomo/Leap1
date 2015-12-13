@@ -15,12 +15,6 @@
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		8929D8AD1BD072D30016BF57 /* image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8929D8AC1BD072D30016BF57 /* image.jpg */; settings = {ASSET_TAGS = (); }; };
-		8948FFC11BD8D929001C42F1 /* android_arm.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFBB1BD8D929001C42F1 /* android_arm.mtl */; settings = {ASSET_TAGS = (); }; };
-		8948FFC21BD8D929001C42F1 /* android_arm.obj in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFBC1BD8D929001C42F1 /* android_arm.obj */; settings = {ASSET_TAGS = (); }; };
-		8948FFC31BD8D929001C42F1 /* android_foot.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFBD1BD8D929001C42F1 /* android_foot.mtl */; settings = {ASSET_TAGS = (); }; };
-		8948FFC41BD8D929001C42F1 /* android_foot.obj in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFBE1BD8D929001C42F1 /* android_foot.obj */; settings = {ASSET_TAGS = (); }; };
-		8948FFC51BD8D929001C42F1 /* android_head.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFBF1BD8D929001C42F1 /* android_head.mtl */; settings = {ASSET_TAGS = (); }; };
-		8948FFC61BD8D929001C42F1 /* android_head.obj in Resources */ = {isa = PBXBuildFile; fileRef = 8948FFC01BD8D929001C42F1 /* android_head.obj */; settings = {ASSET_TAGS = (); }; };
 		898680971B37A3360007A942 /* libLeap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; };
 		898680991B37A36C0007A942 /* libLeap.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		899F1B401C1938A6000A2CCC /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B3E1C1938A6000A2CCC /* 1.png */; settings = {ASSET_TAGS = (); }; };
@@ -64,12 +58,6 @@
 		5323E6B50EAFCA7E003A9687 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		84BB2BF7371E4767863296E4 /* CinderApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CinderApp.icns; path = ../resources/CinderApp.icns; sourceTree = "<group>"; };
 		8929D8AC1BD072D30016BF57 /* image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = image.jpg; path = ../resources/image.jpg; sourceTree = "<group>"; };
-		8948FFBB1BD8D929001C42F1 /* android_arm.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = android_arm.mtl; path = ../resources/android_arm.mtl; sourceTree = "<group>"; };
-		8948FFBC1BD8D929001C42F1 /* android_arm.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = android_arm.obj; path = ../resources/android_arm.obj; sourceTree = "<group>"; };
-		8948FFBD1BD8D929001C42F1 /* android_foot.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = android_foot.mtl; path = ../resources/android_foot.mtl; sourceTree = "<group>"; };
-		8948FFBE1BD8D929001C42F1 /* android_foot.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = android_foot.obj; path = ../resources/android_foot.obj; sourceTree = "<group>"; };
-		8948FFBF1BD8D929001C42F1 /* android_head.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = android_head.mtl; path = ../resources/android_head.mtl; sourceTree = "<group>"; };
-		8948FFC01BD8D929001C42F1 /* android_head.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = android_head.obj; path = ../resources/android_head.obj; sourceTree = "<group>"; };
 		898680941B37A2F90007A942 /* Leap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Leap.h; path = ../include/Leap.h; sourceTree = "<group>"; };
 		898680951B37A2F90007A942 /* LeapMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeapMath.h; path = ../include/LeapMath.h; sourceTree = "<group>"; };
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
@@ -183,16 +171,10 @@
 				89CA2D041C0EA9F900B9CA0F /* background.png */,
 				89CA2D051C0EA9F900B9CA0F /* circle.png */,
 				89CA2D061C0EA9F900B9CA0F /* smallCircle.png */,
-				8948FFBB1BD8D929001C42F1 /* android_arm.mtl */,
-				8948FFBC1BD8D929001C42F1 /* android_arm.obj */,
-				8948FFBD1BD8D929001C42F1 /* android_foot.mtl */,
 				899F1B421C193A07000A2CCC /* m1.jpg */,
 				899F1B431C193A07000A2CCC /* m2.jpg */,
 				899F1B3E1C1938A6000A2CCC /* 1.png */,
 				899F1B3F1C1938A6000A2CCC /* 2.png */,
-				8948FFBE1BD8D929001C42F1 /* android_foot.obj */,
-				8948FFBF1BD8D929001C42F1 /* android_head.mtl */,
-				8948FFC01BD8D929001C42F1 /* android_head.obj */,
 				84BB2BF7371E4767863296E4 /* CinderApp.icns */,
 				4E5C3383173146FDBE20C58E /* Info.plist */,
 			);
@@ -236,6 +218,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastUpgradeCheck = 0700;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Leap" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -263,19 +246,13 @@
 			files = (
 				899F1B411C1938A6000A2CCC /* 2.png in Resources */,
 				899F1B441C193A07000A2CCC /* m1.jpg in Resources */,
-				8948FFC21BD8D929001C42F1 /* android_arm.obj in Resources */,
 				89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */,
-				8948FFC31BD8D929001C42F1 /* android_foot.mtl in Resources */,
 				899F1B451C193A07000A2CCC /* m2.jpg in Resources */,
 				90137A2B51414E919CBC3A5C /* CinderApp.icns in Resources */,
-				8948FFC61BD8D929001C42F1 /* android_head.obj in Resources */,
-				8948FFC51BD8D929001C42F1 /* android_head.mtl in Resources */,
 				8929D8AD1BD072D30016BF57 /* image.jpg in Resources */,
-				8948FFC11BD8D929001C42F1 /* android_arm.mtl in Resources */,
 				89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */,
 				899F1B401C1938A6000A2CCC /* 1.png in Resources */,
 				89CA2D071C0EA9F900B9CA0F /* background.png in Resources */,
-				8948FFC41BD8D929001C42F1 /* android_foot.obj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,6 +293,7 @@
 					"$(PROJECT_DIR)",
 				);
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.libcinder.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Leap;
 				SYMROOT = ./build;
 				WRAPPER_EXTENSION = app;
@@ -346,6 +324,7 @@
 					"$(PROJECT_DIR)",
 				);
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.libcinder.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Leap;
 				STRIP_INSTALLED_PRODUCT = YES;
 				SYMROOT = ./build;
@@ -357,14 +336,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = i386;
 				CINDER_PATH = ../../cinder_0.8.6_mac;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				ENABLE_TESTABILITY = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
 			};
@@ -374,7 +354,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = i386;
 				CINDER_PATH = ../../cinder_0.8.6_mac;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
