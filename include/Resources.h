@@ -24,4 +24,4 @@
 #define RES_INTER2_IMAGE	CINDER_RESOURCE( ../resources/, inter2.png, 143, IMAGE )
 #define RES_LARGE2_IMAGE		CINDER_RESOURCE( ../resources/, large2.png, 144, IMAGE )
 #define RES_AGAIN2_IMAGE	CINDER_RESOURCE( ../resources/, again2.png, 145, IMAGE )
-#define RES_WC2_IMAGE	CINDER_RESOURCE( ../resources/, wc.png2, 146, IMAGE )
+#define RES_WC2_IMAGE	CINDER_RESOURCE( ../resources/, wc2.png, 146, IMAGE )

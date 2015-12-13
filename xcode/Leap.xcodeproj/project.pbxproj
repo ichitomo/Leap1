@@ -95,7 +95,7 @@
 		893325BF1C1E0B890003F034 /* no2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = no2.png; sourceTree = "<group>"; };
 		893325C01C1E0B890003F034 /* ok2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ok2.png; sourceTree = "<group>"; };
 		893325C11C1E0B890003F034 /* wc2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wc2.png; sourceTree = "<group>"; };
-		893325D41C1E0B970003F034 /* class.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = class.png; path = ../class.png; sourceTree = "<group>"; };
+		893325D41C1E0B970003F034 /* class.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = class.png; path = ../resources/class.png; sourceTree = "<group>"; };
 		898680941B37A2F90007A942 /* Leap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Leap.h; path = ../include/Leap.h; sourceTree = "<group>"; };
 		898680951B37A2F90007A942 /* LeapMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeapMath.h; path = ../include/LeapMath.h; sourceTree = "<group>"; };
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
@@ -209,6 +209,7 @@
 				893325B81C1E0B890003F034 /* message2 */,
 				8929D8AC1BD072D30016BF57 /* image.jpg */,
 				89CA2D041C0EA9F900B9CA0F /* background.png */,
+				893325D41C1E0B970003F034 /* class.png */,
 				89CA2D051C0EA9F900B9CA0F /* circle.png */,
 				89CA2D061C0EA9F900B9CA0F /* smallCircle.png */,
 				899F1B421C193A07000A2CCC /* m1.jpg */,
@@ -250,7 +251,6 @@
 		893325B81C1E0B890003F034 /* message2 */ = {
 			isa = PBXGroup;
 			children = (
-				893325D41C1E0B970003F034 /* class.png */,
 				893325B91C1E0B890003F034 /* again2.png */,
 				893325BA1C1E0B890003F034 /* cool2.png */,
 				893325BB1C1E0B890003F034 /* fast2.png */,
