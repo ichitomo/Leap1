@@ -104,8 +104,26 @@ public:
         
         //backgroundImageの読み込み
         backgroundImage = gl::Texture(loadImage(loadResource(RES_BACKGROUND_IMAGE)));
-        m1 = gl::Texture(loadImage(loadResource("../resources/m1.jpg")));
-        m2 = gl::Texture(loadImage(loadResource("../resources/m2.jpg")));
+        
+        //メッセージ画像の読み込み
+        ok = gl::Texture(loadImage(loadResource(RES_OK_IMAGE)));
+        no = gl::Texture(loadImage(loadResource(RES_NO_IMAGE)));
+        again = gl::Texture(loadImage(loadResource(RES_AGAIN_IMAGE)));
+        cool = gl::Texture(loadImage(loadResource(RES_COOL_IMAGE)));
+        fast = gl::Texture(loadImage(loadResource(RES_FAST_IMAGE)));
+        fight = gl::Texture(loadImage(loadResource(RES_FIGHT_IMAGE)));
+        large = gl::Texture(loadImage(loadResource(RES_LARGE_IMAGE)));
+        wc = gl::Texture(loadImage(loadResource(RES_WC_IMAGE)));
+        
+        //メッセージ画像の読み込み
+        ok2 = gl::Texture(loadImage(loadResource(RES_OK2_IMAGE)));
+        no2 = gl::Texture(loadImage(loadResource(RES_NO2_IMAGE)));
+        again2 = gl::Texture(loadImage(loadResource(RES_AGAIN2_IMAGE)));
+        cool2 = gl::Texture(loadImage(loadResource(RES_COOL2_IMAGE)));
+        fast2 = gl::Texture(loadImage(loadResource(RES_FAST2_IMAGE)));
+        fight2 = gl::Texture(loadImage(loadResource(RES_FIGHT2_IMAGE)));
+        large2 = gl::Texture(loadImage(loadResource(RES_LARGE2_IMAGE)));
+        wc2 = gl::Texture(loadImage(loadResource(RES_WC2_IMAGE)));
         
         // 描画時に奥行きの考慮を有効にする
         gl::enableDepthRead();
@@ -254,7 +272,7 @@ public:
         
         gl::pushMatrices();
             gl::setMatrices( mMayaCam.getCamera() );
-            drawListArea();//メッセージリストの表示
+            //drawListArea();//メッセージリストの表示
             //drawMessageUI();//MessageUIの描写
             drawMarionette();//マリオネット描写
             drawLeapObject();//手の描写
@@ -539,10 +557,10 @@ public:
     
     void drawImage(){
         gl::pushMatrices();
-            gl::draw( m1, Vec2d(50,20));
+     //       gl::draw( m1, Vec2d(50,20));
         gl::popMatrices();
         gl::pushMatrices();
-            gl::draw( m2, Vec2d(20,50));
+     //       gl::draw( m2, Vec2d(20,50));
         gl::popMatrices();
     }
     // Leap Motion関連の描画
@@ -819,12 +837,17 @@ public:
             gl::translate( 0, 100);//位置
             gl::draw( mTextTexture );//描く
         }
-        if( imgTexture ) {
+        if( backgroundImage ) {
             //バックグラウンドイメージを追加
             gl::draw( backgroundImage, getWindowBounds());
         }else{
             //ロードする間にコメント
             gl::drawString("Loading image please wait..",getWindowCenter());
+        }
+        
+        if (ok) {
+            gl::translate(100,100);
+            gl::draw(ok);
         }
     }
     
@@ -1033,8 +1056,10 @@ public:
     
     //バックグラウンド
     gl::Texture backgroundImage;
-    gl::Texture m1;
-    gl::Texture m2;
+    //メッセージテクスチャ
+    gl::Texture ok,  no, again, large, cool, fight, fast, inter, wc;
+    gl::Texture ok2, no2, again2, large2, cool2, fight2, fast2, inter2, wc2;
+    
     
     //フォント
     Font mFont;

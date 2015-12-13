@@ -4,7 +4,7 @@
 //#define RES_MY_RES			CINDER_RESOURCE( ../resources/, image_name.png, 128, IMAGE )
 
 //#define RES_FONT				CINDER_RESOURCE( ../resources/, YanoneKaffeesatz-Regular.ttf, 128, TTF_FONT )
-#define RES_BACKGROUND_IMAGE	CINDER_RESOURCE( ../resources/, background.png, 128, IMAGE )
+#define RES_BACKGROUND_IMAGE	CINDER_RESOURCE( ../resources/, class.png, 128, IMAGE )
 
 #define RES_OK_IMAGE		CINDER_RESOURCE( ../resources/, ok.png, 129, IMAGE )
 #define RES_NO_IMAGE	CINDER_RESOURCE( ../resources/, no.png, 130, IMAGE )
