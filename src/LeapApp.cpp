@@ -257,13 +257,13 @@ public:
         gl::clear();
 
         gl::pushMatrices();
-        drawLeapObject();//手の描写
-        drawListArea();//メッセージリストの表示
-        drawInteractionBox3();//インタラクションボックス
+        
         drawBox();//枠と軸になる線を描写する
+        drawListArea();//メッセージリストの表示
         drawImage();
-        //drawTexture();
-        // gl::setMatrices( mMayaCam.getCamera() );
+        //drawLeapObject();//手の描写
+        drawInteractionBox3();//インタラクションボックス
+         gl::setMatrices( mMayaCam.getCamera() );
         gl::popMatrices();
         
     }
@@ -434,125 +434,6 @@ public:
         
         gl::popMatrices();
      }
-    
-    // Leap Motion関連の更新
-    void updateLeapObject(){
-        
-        //------ 指をもってくる -----
-        auto thumb = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_THUMB);//親指を持ってくる
-        auto index = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_INDEX);//人さし指を持ってくる
-        auto middle = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_MIDDLE);//中指を持ってくる
-        auto ring = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_RING);//薬指を持ってくる
-        auto pinky = mCurrentFrame.fingers().fingerType(Leap::Finger::Type::TYPE_PINKY);//小指を持ってくる
-        
-        //------ 移動、回転のパラメーターを変更 -----
-        
-        //初期値に戻す
-        mRotateMatrix0 = 0.0;//親指（向かって右足）の回転
-        mRotateMatrix2 = 0.0;//人さし指（向かって右腕）の回転
-        mRotateMatrix3 = 0.0;//中指（頭）の回転
-        mRotateMatrix4 = 0.0;//薬指（向かって左腕）の回転
-        mRotateMatrix5 = 0.0;//小指（向かって左足）の回転
-        
-        //親指（向かって右足）
-        for(auto hand : mCurrentFrame.hands()){
-            for (auto finger : thumb) {
-                if (finger.hand().isLeft() && finger.isExtended()==false ){//左手の指を曲げていて
-                    //向かって右足のrotateのパラメーターを変化させ、回転させる
-                    if(finger.hand().sphereRadius() <= 80) {//手にフィットする球の半径が80以下
-                        // 前のフレームからの回転量
-                        if ( mCurrentFrame.rotationProbability( mLastFrame ) > 0.4 ) {
-                            mRotateMatrix0 = finger.hand().sphereRadius()*10;
-                        }
-                    }
-                }
-            }
-        }
-        
-        //人差し指（向かって右腕）
-        for(auto hand : mCurrentFrame.hands()){
-            for (auto finger : index) {
-                if (finger.hand().isLeft() && finger.isExtended()==false){//左手の指を曲げていて
-                    //向かって右腕のrotateのパラメーターを変化させ、回転させる
-                    if(hand.sphereRadius()<=80) {////手にフィットする球の半径が80以下
-                        // 前のフレームからの回転量
-                        if ( mCurrentFrame.rotationProbability( mLastFrame ) > 0.4 ) {
-                            mRotateMatrix2 = hand.sphereRadius()*10;
-                        }
-                    }
-                }else if (finger.hand().isRight() && finger.isExtended()==false){//右手の指を曲げていて
-                //喜びの口の角度になるように、口のrotateのパラメーターを変化させ、回転させる
-                
-                }
-            }
-        }
-        
-        
-        //中指(頭)
-        for(auto hand : mCurrentFrame.hands()){
-            for (auto finger : middle) {
-                if (finger.hand().isLeft() && finger.isExtended()==false){//左手で曲げていて
-                    if(hand.sphereRadius()<=80) {////手にフィットする球の半径が80以下
-                        // 前のフレームからの回転量
-                        if ( mCurrentFrame.rotationProbability( mLastFrame ) > 0.4 ) {
-                            mRotateMatrix3 = hand.sphereRadius()*10;
-                        }
-                    }
-                }
-            }
-        }
-        
-        
-        //薬指(向かって左腕)
-        for(auto hand : mCurrentFrame.hands()){
-            for (auto finger : ring) {
-                if (finger.hand().isLeft() && finger.isExtended()==false){//左手で曲げていて
-                    if(hand.sphereRadius()<=80) {////手にフィットする球の半径が80以下
-                        // 前のフレームからの回転量
-                        if ( mCurrentFrame.rotationProbability( mLastFrame ) > 0.4 ) {
-                            mRotateMatrix4 = hand.sphereRadius()*10;
-                        }
-                    }
-                }
-            }
-        }
-        
-        
-        //小指(向かって左足)
-        for(auto hand : mCurrentFrame.hands()){
-            for (auto finger : pinky) {
-                if (finger.hand().isLeft() && finger.isExtended()==false){//左手で曲げていて
-                    // 前のフレームからの回転量
-                    if(hand.sphereRadius()<=80) {//曲げた時
-                        if ( mCurrentFrame.rotationProbability( mLastFrame ) > 0.4 ) {
-                            mRotateMatrix5 = hand.sphereRadius()*10;
-                        }
-                    }
-                }
-            }
-        }
-        
-        //手足の移動と回転
-        for(auto hand : mCurrentFrame.hands()){
-            if (hand.isLeft()) {
-                // 前のフレームからの移動量
-                if ( mCurrentFrame.translationProbability( mLastFrame ) > 0.4 ) {
-                    // 回転を考慮して移動する
-                    mTotalMotionTranslation += mRotationMatrix.rigidInverse().transformDirection( mCurrentFrame.translation( mLastFrame ) );
-                }
-            }
-        }
-        
-        
-        //目の回転（手にフィットするボールの半径で変更させる）
-        for(auto hand : mCurrentFrame.hands()){
-            if (hand.isRight()) {
-                rightEyeAngle = hand.sphereRadius();//右目
-                leftEyeAngle = -hand.sphereRadius();//左目
-            }
-        }
-    }
-    
     void drawImage(){
         //背景画像
         gl::pushMatrices();
@@ -596,80 +477,7 @@ public:
             setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
         
     }
-    //マリオネット
-    /*void drawMarionette(){
-        
-        //マリオネットを描く関数
-        
-        //頭
-        gl::pushMatrices();
-            setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-            glTranslatef( mTotalMotionTranslation.x+defFaceTransX,
-                     mTotalMotionTranslation.y+defFaceTransY,
-                     mTotalMotionTranslation.z+defFaceTransZ );//位置
-            glRotatef(-mRotateMatrix3, 1.0f, 0.0f, 0.0f);//回転
-            glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
-            glTranslatef( mTotalMotionTranslation.x/10.0,0.0f,0.0f);//移動
-            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 80, 100 ) );//実体
-        gl::popMatrices();
-        
-
-        //胴体を描く
-        gl::pushMatrices();
-            glTranslatef( mTotalMotionTranslation.x+defBodyTransX,
-                     mTotalMotionTranslation.y+defBodyTransY,
-                     mTotalMotionTranslation.z+defBodyTransZ);//移動
-            glScalef( mTotalMotionScale, mTotalMotionScale, mTotalMotionScale );//大きさ
-            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
-        gl::popMatrices();
-        
-        //右腕を描く
-        gl::pushMatrices();
-            glTranslatef( mTotalMotionTranslation.x+defBodyTransX+75,
-                     mTotalMotionTranslation.y+defBodyTransY,
-                     mTotalMotionTranslation.z+defBodyTransZ);//移動
-            glRotatef(mRotateMatrix2, 1.0f, 1.0f, 0.0f);//回転
-            glTranslatef( mTotalMotionTranslation.x/10.0,
-                     mTotalMotionTranslation.y/10.0,
-                     0.0f);//移動
-            glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100,  50, 50 ) );//実体
-        gl::popMatrices();
-        
-        //左腕を描く
-        gl::pushMatrices();
-            glTranslatef( mTotalMotionTranslation.x+defBodyTransX-75,
-                     mTotalMotionTranslation.y+defBodyTransY,
-                     mTotalMotionTranslation.z+defBodyTransZ);//移動
-            glRotatef(-mRotateMatrix4, -1.0f, 1.0f, 0.0f);//回転
-            glTranslatef( -mTotalMotionTranslation.x/10.0,
-                     mTotalMotionTranslation.y/10.0,
-                     0.0f);//移動
-            glScalef( mTotalMotionScale/2, mTotalMotionScale/4, mTotalMotionScale/2 );//大きさ
-            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 50, 50 ) );//実体
-        gl::popMatrices();
-        
-        //右足を描く
-        gl::pushMatrices();
-            glTranslatef( mTotalMotionTranslation.x+defBodyTransX+25,
-                     mTotalMotionTranslation.y+defBodyTransY-75,
-                     mTotalMotionTranslation.z+defBodyTransZ);//移動
-            glRotatef(mRotateMatrix0, 1.0f, 0.0f, 0.0f);//回転
-            glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
-            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
-        gl::popMatrices();
-        
-        //左足を描く
-        gl::pushMatrices();
-            glTranslatef( mTotalMotionTranslation.x+defBodyTransX-25,
-                     mTotalMotionTranslation.y+defBodyTransY-75,
-                     mTotalMotionTranslation.z+defBodyTransZ);//移動
-            glRotatef(mRotateMatrix5, 1.0f, 0.0f, 0.0f);//回転
-            glScalef( mTotalMotionScale/4, mTotalMotionScale/2, mTotalMotionScale/2 );//大きさ
-            gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
-        gl::popMatrices();
-        setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-    }*/
+    
     //ジェスチャー
     void drawGestureAction(int messageNumber, int x, int y, float textX, float textY){
         gl::pushMatrices();
