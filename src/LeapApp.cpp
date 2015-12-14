@@ -506,73 +506,58 @@ public:
         // タッチ状態
         else if( index.touchZone() == Leap::Pointable::Zone::ZONE_TOUCHING ) {
             gl::color(1, 0, 0);
-     
-            if (x >= 0 && x <= 200){
-                if (y >= 40 && y <= 60 ) {
+            //１列目
+            if (x >= 97.5 && x <= 447.5){
+                if (y >= 100 && y <= 250 ) {
+                    //大きな声で
                     messageNumber = 0;
                 }
-                else if (y >= 80 && y <= 100 ) {
+                else if (y >= 270 && y <= 420 ) {
+                    //
                     messageNumber = 1;
                 }
-                else if (y >= 120 && y <= 140 ) {
+                else if (y >= 440 && y <= 590 ) {
+                    //
                     messageNumber = 2;
                 }
-                else if (y >= 160 && y <= 180 ) {
+            }
+            //2列目
+            else if (x >= 545 && x <= 895 ) {
+                if (y >= 100 && y <= 250 ) {
                     messageNumber = 3;
                 }
-                else if (y >= 200 && y <= 220 ) {
+                else if (y >= 100 && y <= 250 ) {
                     messageNumber = 5;
                 }
-                else if (y >= 240 && y <= 260 ) {
+                else if (y >= 270 && y <= 420 ) {
                     messageNumber = 6;
                 }
-                else if (y >= 280 && y <= 300 ) {
+                else if (y >= 440 && y <= 590 ) {
                     messageNumber = 7;
                 }
-                else if (y >= 320 && y <= 340 ) {
+            }
+            //3列目
+            else if (x >= 992.5 && x <= 1342.5 ) {
+                if (y >= 320 && y <= 340 ) {
                     messageNumber = 8;
                 }
-                else if (y >= 360 && y <= 380 ) {
+                else if (y >= 100 && y <= 250 ) {
                     messageNumber = 9;
                 }
-                else if (y >= 400 && y <= 420 ) {
+                else if (y >= 270 && y <= 420 ) {
                     messageNumber = 10;
                 }
-                else if (y >= 440 && y <= 460 ) {
+                else if (y >= 440 && y <= 590 ) {
                     messageNumber = 11;
                 }
-                else if (y >= 480 && y <= 500 ) {
-                    messageNumber = 12;
-                }
-                else if (y >= 520 && y <= 540 ) {
-                    messageNumber = 13;
-                }
-                else if (y >= 560 && y <= 580 ) {
-                    messageNumber = 14;
-                }
-                else if (y >= 600 && y <= 620 ) {
-                    messageNumber = 15;
-                }
-                else if (y >= 640 && y <= 660 ) {
-                    messageNumber = 16;
-                }
-                else if (y >= 680 && y <= 700 ) {
-                    messageNumber = 17;
-                }
-                //                else if (y >= 720 && y <= 740 ) {
-                //                    messageNumber = 18;
-                //                }
-                //                else{
-                //                    messageNumber = -1;
-                //                }
-     
-                }
             }
-            // タッチ対象外
-            else {
-                gl::color(0, 0, 1, .05);
-            }
-            gl::drawSolidCircle( Vec2f( x, y ), 10 );//指の位置
+        }
+        // タッチ対象外
+        else {
+            gl::color(0, 0, 1, .05);
+            messageNumber = -1;
+        }
+        gl::drawSolidCircle( Vec2f( x, y ), 10 );//指の位置
         // 指の座標を表示する
         gl::pushMatrices();
         stringstream ss;
