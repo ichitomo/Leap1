@@ -257,13 +257,13 @@ public:
         gl::clear();
 
         gl::pushMatrices();
-            gl::setMatrices( mMayaCam.getCamera() );
-            drawListArea();//メッセージリストの表示
-            drawLeapObject();//手の描写
-            drawInteractionBox3();//インタラクションボックス
-            drawBox();//枠と軸になる線を描写する
-            drawImage();
-            //drawTexture();
+        drawLeapObject();//手の描写
+        drawListArea();//メッセージリストの表示
+        drawInteractionBox3();//インタラクションボックス
+        drawBox();//枠と軸になる線を描写する
+        drawImage();
+        //drawTexture();
+        // gl::setMatrices( mMayaCam.getCamera() );
         gl::popMatrices();
         
     }
