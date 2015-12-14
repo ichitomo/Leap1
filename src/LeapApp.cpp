@@ -77,9 +77,9 @@ public:
         // カメラ(視点)の設定
         
         mCameraDistance = 1500.0f;//カメラの距離（z座標）
-        mEye			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, mCameraDistance );//位置
-        mCenter			= Vec3f( getWindowWidth()/2, getWindowHeight()/2, 0.0f);//カメラのみる先
-        //mUp				= Vec3f::yAxis();//頭の方向を表すベクトル
+        mEye			= Vec3f( WindowWidth/2, WindowHeight/2, mCameraDistance );//位置
+        mCenter			= Vec3f( WindowWidth/2, WindowHeight/2, 0.0f);//カメラのみる先
+
         mCam.setEyePoint( mEye );//カメラの位置
         mCam.setCenterOfInterestPoint(mCenter);//カメラのみる先
         //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
@@ -90,17 +90,6 @@ public:
         mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
         
         mMayaCam.setCurrentCam(mCam);
-        // アルファブレンディングを有効にする
-        
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        gl::enable(GL_BLEND);
-        // カメラのパラメータを描写するためのセッティング
-//        mParams = params::InterfaceGl( "Camera", Vec2i( 200, 160 ) );
-//        mParams.setPosition(Vec2i( 1200, 660 ));
-//        mParams.addParam( "Scene Rotation", &mSceneRotation, "opened=1" );
-//        mParams.addSeparator();
-//        mParams.addParam( "Eye Distance", &mCameraDistance, "min=50.0 max=1500.0 step=50.0 keyIncr=s keyDecr=w" );
-        
         
         //backgroundImageの読み込み
         backgroundImage = gl::Texture(loadImage(loadResource(RES_BACKGROUND_IMAGE)));
@@ -113,6 +102,7 @@ public:
         fast = gl::Texture(loadImage(loadResource(RES_FAST_IMAGE)));
         fight = gl::Texture(loadImage(loadResource(RES_FIGHT_IMAGE)));
         large = gl::Texture(loadImage(loadResource(RES_LARGE_IMAGE)));
+        inter = gl::Texture(loadImage(loadResource(RES_INTER_IMAGE)));
         wc = gl::Texture(loadImage(loadResource(RES_WC_IMAGE)));
         
         //メッセージ画像の読み込み
@@ -123,20 +113,16 @@ public:
         fast2 = gl::Texture(loadImage(loadResource(RES_FAST2_IMAGE)));
         fight2 = gl::Texture(loadImage(loadResource(RES_FIGHT2_IMAGE)));
         large2 = gl::Texture(loadImage(loadResource(RES_LARGE2_IMAGE)));
+        inter2 = gl::Texture(loadImage(loadResource(RES_INTER2_IMAGE)));
         wc2 = gl::Texture(loadImage(loadResource(RES_WC2_IMAGE)));
         
         // 描画時に奥行きの考慮を有効にする
         gl::enableDepthRead();
+        gl::enableDepthWrite();
         
         // Leap Motion関連のセットアップ
         setupLeapObject();
         
-        //球体の拡大縮小とsin関数のセッティング
-        A = 100.0;    //振幅を設定
-        w = 1.0;    //角周波数を設定
-        p = 0.0;    //初期位相を設定
-        t = 0.0;    //経過時間を初期化
-        t2 = 0.0;    //経過時間を初期化
     }
     
     // マウスのクリック
@@ -269,24 +255,15 @@ public:
     //描写処理
     void draw(){
         gl::clear();
-        
+
         gl::pushMatrices();
             gl::setMatrices( mMayaCam.getCamera() );
-            //drawListArea();//メッセージリストの表示
-            //drawMessageUI();//MessageUIの描写
-            drawMarionette();//マリオネット描写
+            drawListArea();//メッセージリストの表示
             drawLeapObject();//手の描写
             drawInteractionBox3();//インタラクションボックス
-            //drawListArea();//メッセージリストの表示
-            //drawCircle();//値によって球体を拡大縮小させる描写の追加
-            //drawSinGraph();//sin関数を描く
-            //drawBarGraph();//検知した手の数を棒グラフとして描写していく
-//            drawBone();
             drawBox();//枠と軸になる線を描写する
             drawImage();
-        drawTexture();
-        
-        
+            //drawTexture();
         gl::popMatrices();
         
     }
@@ -432,8 +409,29 @@ public:
             else {
                 gl::color(0, 0, 1, .05);
             }
-        
             gl::drawSolidCircle( Vec2f( x, y ), 10 );//指の位置
+        // 指の座標を表示する
+        gl::pushMatrices();
+        stringstream ss;
+        //ss << normalizedPosition.x << ", " << normalizedPosition.y << "\n";//0~1の値で表示
+        ss << x << ", " << y << "\n";//ウィンドウサイズの値で表示
+        ss << messageNumber << "\n";
+        
+        auto tbox = TextBox().font( Font( "游ゴシック体", 20 ) ).text ( ss.str() );
+        auto texture = gl::Texture( tbox.render() );//テクスチャをつくる
+        
+        auto textX = (normalizedPosition.x < 0.5) ?
+        x : x - texture.getBounds().getWidth();//テキストの位置を計算（x座標）
+        auto textY = (normalizedPosition.y > 0.5) ?
+        y : y - texture.getBounds().getHeight();//テキストの位置を計算（y座標）
+        
+        gl::color( 0, 0, 0, 1 );//白色
+        gl::translate( textX, textY );//指の隣に移動させる
+        gl::draw( texture );//座標を描写
+        //drawGestureAction(messageNumber, x, y, textX, textY);//ジェスチャーを使った時の処理を描写
+        gl::popMatrices();
+
+        
         gl::popMatrices();
      }
     
@@ -556,46 +554,50 @@ public:
     }
     
     void drawImage(){
+        //背景画像
         gl::pushMatrices();
-     //       gl::draw( m1, Vec2d(50,20));
+        if( backgroundImage ) {
+            gl::draw( backgroundImage, getWindowBounds());//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",getWindowCenter());//ロードする間にコメント
+        }
         gl::popMatrices();
-        gl::pushMatrices();
-     //       gl::draw( m2, Vec2d(20,50));
-        gl::popMatrices();
+        
     }
     // Leap Motion関連の描画
     void drawLeapObject(){
-        
+        gl::pushMatrices();
             // 手の位置を表示する
             auto frame = mLeap.frame();
             for ( auto hand : frame.hands() ) {
                 double red = hand.isLeft() ? 1.0 : 0.0;
                 
                 setDiffuseColor( ci::ColorA( red, 1.0, 0.5 ) );
+                //gl::drawSphere( toVec3f( hand.palmPosition() ), 10 );
+                
                 gl::drawSphere( toVec3f( hand.palmPosition() ), 10 );
     
                 setDiffuseColor( ci::ColorA( red, 0.5, 1.0 ) );
                 for ( auto finger : hand.fingers() ){
-                    const Leap::Bone::Type boneType[] = {
-                        Leap::Bone::Type::TYPE_METACARPAL,
-                        Leap::Bone::Type::TYPE_PROXIMAL,
-                        Leap::Bone::Type::TYPE_INTERMEDIATE,
-                        Leap::Bone::Type::TYPE_DISTAL,
+                    const Leap::Finger::Joint jointType[] = {
+                        Leap::Finger::Joint::JOINT_MCP,
+                        Leap::Finger::Joint::JOINT_PIP,
+                        Leap::Finger::Joint::JOINT_DIP,
+                        Leap::Finger::Joint::JOINT_TIP,
                     };
                     
-                    for ( auto type : boneType ) {
-                        auto bone = finger.bone( type );
-                        gl::drawSphere( toVec3f( bone.center() ), 10 );
+                    for ( auto type : jointType ) {
+                        gl::drawSphere( toVec3f( finger.jointPosition( type ) ), 10 );
                     }
                 }
             }
-            
+        gl::popMatrices();
             // 元に戻す
             setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
         
     }
     //マリオネット
-    void drawMarionette(){
+    /*void drawMarionette(){
         
         //マリオネットを描く関数
         
@@ -667,78 +669,123 @@ public:
             gl::drawColorCube( Vec3f( 0,0,0 ), Vec3f( 100, 100, 100 ) );//実体
         gl::popMatrices();
         setDiffuseColor( ci::ColorA( 0.7f, 0.7f, 0.7f, 1.0f ) );
-    }
+    }*/
     //ジェスチャー
     void drawGestureAction(int messageNumber, int x, int y, float textX, float textY){
+        gl::pushMatrices();
         stringstream aa;
         
         //---------------　　各ジェスチャーのアクション　　---------------
         
         //サークル
         for(auto gesture : circle){
-            gl::pushMatrices();
+            
                 aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
                 auto mbox = TextBox().font( Font( "游ゴシック体", gesture.radius() * 2 ) ).text ( aa.str() )
                     .backgroundColor(ColorA(0,0,0));
                 auto texture = gl::Texture( mbox.render() );
                 gl::draw( texture );//メッセージを表示
-            gl::popMatrices();
+            
             
         }
+        gl::popMatrices();
     }
     //メッセージリスト
     void drawListArea(){
-        stringstream mm;
+        //"大きな声で"画像
         
-        //リストを表示する
-        mm << "\n";
-        mm << "わかった" << "\n";
-        mm << "わからない" << "\n";
-        mm << "もう一度" << "\n";
-        mm << "戻って" << "\n";
-        mm << "速い" << "\n";
-        mm << "大きな声で" << "\n";
-        mm << "面白い" << "\n";
-        mm << "いいね！" << "\n";
-        mm << "すごい！" << "\n";
-        mm << "かっこいい" << "\n";
-        mm << "なるほど" << "\n";
-        mm << "ありがとうございます" << "\n";
-        mm << "うわー" << "\n";
-        mm << "楽しみ" << "\n";
-        mm << "はい" << "\n";
-        mm << "いいえ" << "\n";
-        mm << "きたー" << "\n";
-        mm << "トイレに行きたいです" << "\n";
-        auto tbox0 = TextBox().alignment( TextBox::LEFT ).font( mFont ).text ( mm.str() ).color(Color( 1.0f, 1.0f, 1.0f )).backgroundColor( ColorA( 0, 0, 0, 0.2 ) );
-        auto mTextTexture = gl::Texture( tbox0.render() );
-        gl::draw( mTextTexture );
-    }
-    //サークル（手の数によって大きくなる球体の描写）
-    void drawCircle(){
+        if( large ) {
+            gl::pushMatrices();
+            gl::translate( 97.5, 440);//位置
+            gl::draw( large, Vec2d(350,150));//バックグラウンドイメージを追加
+            gl::popMatrices();
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+            
+        }
+        
+        //"頑張れ"画像
+        
+        if( fight ) {
+            gl::pushMatrices();
+            gl::translate( 97.5, 270);//位置
+            gl::draw( fight, Vec2d(350,150));//バックグラウンドイメージを追加
+            gl::popMatrices();
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+            
+
+        }
+        
+        //"もう一度説明して"画像
         gl::pushMatrices();
-            gl::drawSphere(Vec3f( 360, 675, -300 ), cirCount, cirCount );//指の位置
-        gl::popMatrices();
-            t += speed1;    //時間を進める
-            if(t > 360.0) t = 0.0;
-    }
-    //sinグラフを描く
-    void drawSinGraph(){
-        
-        gl::pushMatrices();
-            //サイン波を点で静止画として描画///////////////////////////
-            for (t1 = 0.0; t1 < WindowWidth; t1 += speed) {
-                y = A*sin(w*(t1 * PI / 180.0) - p);
-                drawSolidCircle(Vec2f(t1, y + WindowHeight/2), 1);  //円を描く
-            }
-        
-            //点のアニメーションを描画////////////////////////////////
-            y = A*sin(w*(t2 * PI / 180.0) - p);
-            drawSolidCircle(Vec2f(t2, y + WindowHeight/2), 10);  //円を描く
-            t2 += speed;    //時間を進める
-            if (t2 > WindowWidth) t2 = 0.0;    //点が右端まで行ったらになったら原点に戻る
+        if( again ) {
+            gl::translate( 97.5, 100);//位置
+            gl::draw( again, Vec2d(350,150));//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+        }
         gl::popMatrices();
         
+        //"面白い"画像
+        gl::pushMatrices();
+        if( inter ) {
+            gl::translate( 545, 440);//位置
+            gl::draw( inter, Vec2d(350,150));//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+        }
+        gl::popMatrices();
+        
+        //"トイレにいきたい"画像
+        gl::pushMatrices();
+        if( wc ) {
+            gl::translate( 545, 270);//位置
+            gl::draw( wc, Vec2d(350,150));//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+        }
+        gl::popMatrices();
+        
+        //"わかった"画像
+        gl::pushMatrices();
+        if( ok ) {
+            gl::translate( 545, 100);//位置
+            gl::draw( ok, Vec2d(350,150));//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+        }
+        gl::popMatrices();
+        
+        //"かっこいい"画像
+        gl::pushMatrices();
+        if( cool ) {
+            gl::translate( 992.5, 440);//位置
+            gl::draw( cool, Vec2d(350,150));//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+        }
+        gl::popMatrices();
+        
+        //"速い!"画像
+        gl::pushMatrices();
+        if( fast ) {
+            gl::translate( 992.5, 270);//位置
+            gl::draw( fast, Vec2d(350,150));//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+        }
+        gl::popMatrices();
+        
+        //"わからない"画像
+        gl::pushMatrices();
+        if( no ) {
+            gl::translate( 992.5, 100);//位置
+            gl::draw( no, Vec2d(350,150));//バックグラウンドイメージを追加
+        }else{
+            gl::drawString("Loading image please wait..",Vec2d(350,150));//ロードする間にコメント
+        }
+        gl::popMatrices();
     }
     //時間ごとに座標を記録する関数
     void graphUpdate(){
@@ -753,49 +800,20 @@ public:
             pointt.y=mCurrentFrame.hands().count();
         }
     }
-    //棒グラフを描く
-    void drawBarGraph(){
-        for (int i = 0; i < pastSec; i++) {
-            //棒グラフを描写していく
-            gl::pushMatrices();
-                //gl::setMatrices( mMayaCam.getCamera() );
-                glBegin(GL_LINE_STRIP);
-                glColor3d(1.0, 0.0, 0.0);
-                glLineWidth(10);
-                glVertex2d(point[i][0]*10, 0);//x座標
-                glVertex2d(point[i][0]*10 , point[i][1]*100);//y座標
-                glEnd();
-            gl::popMatrices();
-        }
-    }
     //枠としてのBoxを描く
     void drawBox(){
         gl::pushMatrices();
         // 上面
-//        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mRight, mTop, mBackSide ) );//手前
-//        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mTop, mFrontSide ) );//右
-//        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mLeft, mTop, mFrontSide ) );//奥
-//        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mTop, mBackSide ) );//左
-//
-        //        //2/3面
-        //        gl::drawLine( Vec3f( mLeft, mTop*2/3, mBackSide ),
-        //                     Vec3f( mRight, mTop*2/3, mBackSide ) );
-        //
-        //        gl::drawLine( Vec3f( mRight, mTop*2/3, mBackSide ),
-        //                     Vec3f( mRight, mTop*2/3, mFrontSide ) );
-        //
-        //        gl::drawLine( Vec3f( mRight, mTop*2/3, mFrontSide ),
-        //                     Vec3f( mLeft, mTop*2/3, mFrontSide ) );
-        //
-        //        gl::drawLine( Vec3f( mLeft, mTop*2/3, mFrontSide ),
-        //                     Vec3f( mLeft, mTop*2/3, mBackSide ) );
-        //
-        
-//        // 中面
-//        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mBackSide ) );//手前
-//        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mFrontSide ) );//右
-//        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mFrontSide ) );//奥
-//        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mBackSide ) );//左
+        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mRight, mTop, mBackSide ) );//手前
+        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mTop, mFrontSide ) );//右
+        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mLeft, mTop, mFrontSide ) );//奥
+        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mTop, mBackSide ) );//左
+
+                // 中面
+        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mBackSide ) );//手前
+        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mFrontSide ) );//右
+        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mFrontSide ) );//奥
+        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mBackSide ) );//左
         
         
         //中心線
@@ -803,32 +821,19 @@ public:
         gl::drawLine( Vec3f( mRight/2, 0, 0 ),Vec3f( mRight/2, mTop, 0 ) );//縦線
 //        gl::drawLine( Vec3f( mRight/2, mTop/2, mBackSide ),Vec3f( mRight/2, mTop/2, mFrontSide ) );//手前から奥
         
-//        // 下面
-//        gl::drawLine( Vec3f( mLeft, mBottom, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
-//        gl::drawLine( Vec3f( mRight, mBottom, mBackSide ),Vec3f( mRight, mBottom, mFrontSide ) );
-//        gl::drawLine( Vec3f( mRight, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
-//        gl::drawLine( Vec3f( mLeft, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mBackSide ) );
-//        
-//        // 側面
-//        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
-//        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mLeft, mBottom, mBackSide ) );
-//        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mRight, mBottom, mFrontSide ) );
-//        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
+        // 下面
+        gl::drawLine( Vec3f( mLeft, mBottom, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
+        gl::drawLine( Vec3f( mRight, mBottom, mBackSide ),Vec3f( mRight, mBottom, mFrontSide ) );
+        gl::drawLine( Vec3f( mRight, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
+        gl::drawLine( Vec3f( mLeft, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mBackSide ) );
+        
+        // 側面
+        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
+        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mLeft, mBottom, mBackSide ) );
+        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mRight, mBottom, mFrontSide ) );
+        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
         
         gl::popMatrices();
-    }
-    //骨（手）の形を作る
-    void drawBone(Leap::Bone bone){
-        //手の書き方
-        gl::pushMatrices();
-            //中心
-            gl::drawSphere(toVec3f(bone.center()), 5);
-            //手の平側
-            gl::drawColorCube(toVec3f(bone.nextJoint()), Vec3f(7,7,7));
-            //指先側
-            gl::drawSphere(Vec3f(x,y,-1.0f), 5);
-        gl::popMatrices();
-        
     }
     
     // テクスチャの描画
@@ -837,18 +842,6 @@ public:
             gl::translate( 0, 100);//位置
             gl::draw( mTextTexture );//描く
         }
-        if( backgroundImage ) {
-            //バックグラウンドイメージを追加
-            gl::draw( backgroundImage, getWindowBounds());
-        }else{
-            //ロードする間にコメント
-            gl::drawString("Loading image please wait..",getWindowCenter());
-        }
-        
-        if (ok) {
-            gl::translate(100,100);
-            gl::draw(ok);
-        }
     }
     
     // GL_LIGHT0の色を変える
@@ -856,7 +849,6 @@ public:
         gl::color( diffuseColor );
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
-    
     
     void socketCl(){
         //ソケット通信クライアント側
@@ -911,66 +903,6 @@ public:
         printf("%s\n",buffer);
         
         close(sockfd);
-    }
-    void ges(){
-        // Get gestures
-        const Leap::GestureList gestures = mLastFrame.gestures();
-        for (int g = 0; g < gestures.count(); ++g) {
-            
-            Leap::Gesture gesture = gestures[g];
-            
-            switch (gesture.type()) {
-                case Leap::Gesture::TYPE_CIRCLE:
-                {
-                    Leap::CircleGesture circle = gesture;
-                    std::string clockwiseness;
-                    
-                    if (circle.pointable().direction().angleTo(circle.normal()) <= PI/2) {
-                        clockwiseness = "clockwise";
-                    } else {
-                        clockwiseness = "counterclockwise";
-                    }
-                    
-                    // Calculate angle swept since last frame
-                    std::cout << std::string(2, ' ')
-                    << "Circle id: " << gesture.id()
-                    << ", progress: " << circle.progress()
-                    << ", radius: " << circle.radius()
-                    <<  ", " << clockwiseness << std::endl;
-                    break;
-                }
-                case Leap::Gesture::TYPE_SWIPE:
-                {
-                    Leap::SwipeGesture swipe = gesture;
-                    std::cout << std::string(2, ' ')
-                    << "Swipe id: " << gesture.id()
-                    << ", direction: " << swipe.direction()
-                    << ", speed: " << swipe.speed() << std::endl;
-                    break;
-                }
-                case Leap::Gesture::TYPE_KEY_TAP:
-                {
-                    Leap::KeyTapGesture tap = gesture;
-                    std::cout << std::string(2, ' ')
-                    << "Key Tap id: " << gesture.id()
-                    << ", position: " << tap.position()
-                    << ", direction: " << tap.direction()<< std::endl;
-                    break;
-                }
-                case Leap::Gesture::TYPE_SCREEN_TAP:
-                {
-                    Leap::ScreenTapGesture screentap = gesture;
-                    std::cout << std::string(2, ' ')
-                    << "Screen Tap id: " << gesture.id()
-                    << ", position: " << screentap.position()
-                    << ", direction: " << screentap.direction()<< std::endl;
-                    break;
-                }
-                default:
-                    std::cout << std::string(2, ' ')  << "Unknown gesture type." << std::endl;
-                    break;
-            }
-        }
     }
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
@@ -1056,6 +988,7 @@ public:
     
     //バックグラウンド
     gl::Texture backgroundImage;
+    
     //メッセージテクスチャ
     gl::Texture ok,  no, again, large, cool, fight, fast, inter, wc;
     gl::Texture ok2, no2, again2, large2, cool2, fight2, fast2, inter2, wc2;
@@ -1163,19 +1096,8 @@ public:
     float				mCameraDistance;
     Vec3f				mEye, mCenter, mUp;
     
-    //球体の拡大縮小
-    float x, y;  //x, y座標
-    float A;  //振幅
-    float w;  //角周波数
-    float p;  //初期位相
-    float t;  //経過時間
-    float speed1 = 1.0;    //アニメーションの基準となるスピード
-    float speed2 = 1.0;
-    float eSize = 0.0;
-    //sinグラフ
-    float t1;  //静止画用経過時間（X座標）
-    float t2;  //アニメーション用経過時間（X座標）
-    float speed = 1.0;    //アニメーションのスピード
+    //float x, y;  //x, y座標
+    
     //タイマー
     time_t last = time(0);
     time_t next;
