@@ -12,6 +12,7 @@
 #include "cinder/ObjLoader.h"//
 #include "time.h"
 #include "Resources.h"
+#include <iostream>
 
 
 //ソケット通信
@@ -35,24 +36,15 @@ using namespace cinder::gl;
 GLint point[MAXPOINTS][2];//点の座標の入れ物
 string messageList[] = {
     
-    {"わかった"},
-    {"わからない"},
-    {"もう一度"},
-    {"戻って"},
-    {"速い"},
     {"大きな声で"},
-    {"面白い"},
-    {"いいね！"},
-    {"すごい！"},
-    {"かっこいい"},
-    {"なるほど"},
-    {"ありがとうございます"},
-    {"うわー"},
-    {"楽しみ"},
-    {"はい"},
-    {"いいえ"},
-    {"きたー"},
-    {"トイレに行きたいです"},
+    {"頑張れ！"},
+    {"もう一度説明して"},
+    {"面白い！"},
+    {"トイレに行きたい"},
+    {"わかった"},
+    {"かっこいい！"},
+    {"ゆっくり話して"},
+    {"わからない"},
 };
 void error(const char *msg){
     //エラーメッセージ
@@ -254,6 +246,8 @@ public:
     }
     //描写処理
     void draw(){
+        
+        socketCl();//ソケット通信（クライアント側）
         gl::clear();
 
         gl::pushMatrices();
@@ -501,6 +495,7 @@ public:
         if ( index.touchZone() == Leap::Pointable::Zone::ZONE_HOVERING ) {
                 gl::color(0, 1, 0, 1 - index.touchDistance());
                 gl::drawSphere(Vec3f(x,y,1.0f), 10.0);//指の先端
+                messageNumber = -1;
         }
      
         // タッチ状態
@@ -513,43 +508,42 @@ public:
                     messageNumber = 0;
                 }
                 else if (y >= 270 && y <= 420 ) {
-                    //
+                    //頑張れ
                     messageNumber = 1;
                 }
                 else if (y >= 440 && y <= 590 ) {
-                    //
+                    //もう一度説明して
                     messageNumber = 2;
                 }
             }
             //2列目
             else if (x >= 545 && x <= 895 ) {
                 if (y >= 100 && y <= 250 ) {
+                    //面白い
                     messageNumber = 3;
                 }
-                else if (y >= 100 && y <= 250 ) {
-                    messageNumber = 5;
-                }
                 else if (y >= 270 && y <= 420 ) {
-                    messageNumber = 6;
+                    //トイレに行きたい
+                    messageNumber = 4;
                 }
                 else if (y >= 440 && y <= 590 ) {
-                    messageNumber = 7;
+                    //わかった
+                    messageNumber = 5;
                 }
             }
             //3列目
             else if (x >= 992.5 && x <= 1342.5 ) {
-                if (y >= 320 && y <= 340 ) {
+                if (y >= 100 && y <= 250 ) {
+                    messageNumber = 6;
+                }
+                else if ( y >= 270 && y <= 420 ) {
+                    messageNumber = 7;
+                }
+                else if ( y >= 440 && y <= 590  ) {
                     messageNumber = 8;
                 }
-                else if (y >= 100 && y <= 250 ) {
-                    messageNumber = 9;
-                }
-                else if (y >= 270 && y <= 420 ) {
-                    messageNumber = 10;
-                }
-                else if (y >= 440 && y <= 590 ) {
-                    messageNumber = 11;
-                }
+            }else{
+                messageNumber = -1;
             }
         }
         // タッチ対象外
@@ -582,26 +576,7 @@ public:
         
         gl::popMatrices();
      }
-    //ジェスチャー
-    void drawGestureAction(int messageNumber, int x, int y, float textX, float textY){
-        gl::pushMatrices();
-        stringstream aa;
-        
-        //---------------　　各ジェスチャーのアクション　　---------------
-        
-        //サークル
-        for(auto gesture : circle){
-            
-                aa << messageList[messageNumber]<< std::endl;//メッセージリストから対象のメッセージをとってくる
-                auto mbox = TextBox().font( Font( "游ゴシック体", gesture.radius() * 2 ) ).text ( aa.str() )
-                    .backgroundColor(ColorA(0,0,0));
-                auto texture = gl::Texture( mbox.render() );
-                gl::draw( texture );//メッセージを表示
-            
-            
-        }
-        gl::popMatrices();
-    }
+
     //時間ごとに座標を記録する関数
     void graphUpdate(){
         //時間が１秒経つごとに座標を配列に記録していく
@@ -652,20 +627,29 @@ public:
         //printf("Please enter the message: ");
         bzero(buffer,256);
         
+        std::string clientNumber = "0";//0. 一ノ瀬、1. 佐々木、2. 佐藤あ、3. 佐藤ま、4. 菅崎、5. 田中、6.先生
         std::string hansCount = std::to_string(mLastFrame.hands().count());//string型に変換
         std::string cirCountLength = std::to_string(cirCount);//string型に変換
         std::string tapCountLength = std::to_string(tapCount);//string型に変換
+        std::string sendMessage = std::to_string(messageNumber);//string型に変換
+        std::string dammyMessage = "1";
         
-        hansCount += ',';
-        hansCount += cirCountLength;
-        hansCount += ',';
-        hansCount += tapCountLength;
-        hansCount += ',';
-        hansCount += messageList[5];
+        clientNumber += ',';
+        clientNumber += hansCount;
+        clientNumber += ',';
+        clientNumber += cirCountLength;
+        clientNumber += ',';
+        clientNumber += tapCountLength;
+        clientNumber += ',';
+        clientNumber += sendMessage;
+        clientNumber += ',';
+        clientNumber += dammyMessage;
         
-        strcpy(buffer,hansCount.c_str());
+        strcpy(buffer, clientNumber.c_str());
         
         l = write(sockfd,buffer,strlen(buffer));//データの発信
+        //l = sendto(sockfd, buffer, strlen(buffer), 0, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
+        
         
         if (l < 0){
             error("ERROR writing to socket");
@@ -681,6 +665,7 @@ public:
         printf("%s\n",buffer);
         
         close(sockfd);
+        
     }
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
@@ -874,8 +859,6 @@ public:
     float				mCameraDistance;
     Vec3f				mEye, mCenter, mUp;
     
-    //float x, y;  //x, y座標
-    
     //タイマー
     time_t last = time(0);
     time_t next;
@@ -890,8 +873,6 @@ public:
     float mBottom = 0.0;//下面のy座標
     float mBackSide = 500.0;//前面のz座標
     float mFrontSide = -500.0;//後面のz座標
-    
-    
 };
 CINDER_APP_NATIVE( LeapApp, RendererGl )
 
