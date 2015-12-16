@@ -13,7 +13,7 @@
 #include "time.h"
 #include "Resources.h"
 #include <iostream>
-
+#include <vector>
 
 //ソケット通信
 #include <stdio.h>
@@ -32,8 +32,10 @@ using namespace std;
 using namespace cinder::gl;
 
 #define PI 3.141592653589793
-#define MAXPOINTS 100//記録できる点の限度
-GLint point[MAXPOINTS][2];//点の座標の入れ物
+//#define MAXPOINTS 100//記録できる点の限度
+//GLint point[MAXPOINTS][2];//点の座標の入れ物
+std::vector<std::vector<int>> point;//点の座標の入れ物
+
 string messageList[] = {
     
     {"大きな声で"},
@@ -553,7 +555,6 @@ public:
         }
         gl::drawSolidCircle( Vec2f( x, y ), 10 );//指の位置
         // 指の座標を表示する
-        gl::pushMatrices();
         stringstream ss;
         //ss << normalizedPosition.x << ", " << normalizedPosition.y << "\n";//0~1の値で表示
         ss << x << ", " << y << "\n";//ウィンドウサイズの値で表示
@@ -571,9 +572,7 @@ public:
         gl::translate( textX, textY );//指の隣に移動させる
         gl::draw( texture );//座標を描写
         //drawGestureAction(messageNumber, x, y, textX, textY);//ジェスチャーを使った時の処理を描写
-        gl::popMatrices();
 
-        
         gl::popMatrices();
      }
 
