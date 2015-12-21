@@ -32,9 +32,9 @@ using namespace std;
 using namespace cinder::gl;
 
 #define PI 3.141592653589793
-//#define MAXPOINTS 100//記録できる点の限度
-//GLint point[MAXPOINTS][2];//点の座標の入れ物
-std::vector<std::vector<int>> point;//点の座標の入れ物
+#define MAXPOINTS 100//記録できる点の限度
+GLint point[MAXPOINTS][2];//点の座標の入れ物
+//std::vector<std::vector<int>> point;//点の座標の入れ物
 
 string messageList[] = {
     
@@ -92,9 +92,9 @@ public:
         ok = gl::Texture(loadImage(loadResource(RES_OK_IMAGE)));
         no = gl::Texture(loadImage(loadResource(RES_NO_IMAGE)));
         again = gl::Texture(loadImage(loadResource(RES_AGAIN_IMAGE)));
-        cool = gl::Texture(loadImage(loadResource(RES_COOL_IMAGE)));
+        cool = gl::Texture(loadImage(loadResource(RES_HE_IMAGE)));
         fast = gl::Texture(loadImage(loadResource(RES_FAST_IMAGE)));
-        fight = gl::Texture(loadImage(loadResource(RES_FIGHT_IMAGE)));
+        fight = gl::Texture(loadImage(loadResource(RES_QUESTION_IMAGE)));
         large = gl::Texture(loadImage(loadResource(RES_LARGE_IMAGE)));
         inter = gl::Texture(loadImage(loadResource(RES_INTER_IMAGE)));
         wc = gl::Texture(loadImage(loadResource(RES_WC_IMAGE)));
@@ -103,9 +103,9 @@ public:
         ok2 = gl::Texture(loadImage(loadResource(RES_OK2_IMAGE)));
         no2 = gl::Texture(loadImage(loadResource(RES_NO2_IMAGE)));
         again2 = gl::Texture(loadImage(loadResource(RES_AGAIN2_IMAGE)));
-        cool2 = gl::Texture(loadImage(loadResource(RES_COOL2_IMAGE)));
+        cool2 = gl::Texture(loadImage(loadResource(RES_HE2_IMAGE)));
         fast2 = gl::Texture(loadImage(loadResource(RES_FAST2_IMAGE)));
-        fight2 = gl::Texture(loadImage(loadResource(RES_FIGHT2_IMAGE)));
+        fight2 = gl::Texture(loadImage(loadResource(RES_QUESTION2_IMAGE)));
         large2 = gl::Texture(loadImage(loadResource(RES_LARGE2_IMAGE)));
         inter2 = gl::Texture(loadImage(loadResource(RES_INTER2_IMAGE)));
         wc2 = gl::Texture(loadImage(loadResource(RES_WC2_IMAGE)));
