@@ -190,7 +190,6 @@ public:
             }
             else {
                 circle.push_back( gesture );
-                //cirCount++;
             }
             //キータップ
             if ( it_keytap != keytap.end() ) {
@@ -205,7 +204,6 @@ public:
             }
             else {
                 screentap.push_back( gesture );
-                //tapCount++;
             }
         }
         
@@ -256,7 +254,6 @@ public:
         drawListArea();//メッセージリストの表示
         drawImage();
         //drawLeapObject();//手の描写
-         //gl::setMatrices( mMayaCam.getCamera() );
         gl::popMatrices();
         
     }
@@ -662,7 +659,6 @@ public:
         close(sockfd);
         cirCount = 0;//初期値に戻す
         tapCount = 0;//初期値に戻す
-        
     }
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
