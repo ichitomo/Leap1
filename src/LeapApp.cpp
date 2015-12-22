@@ -167,16 +167,14 @@ public:
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
                 Leap::CircleGesture circle( gesture );
-//                cirCount++;
-//                std::cout << "cirCount:" <<cirCount << "\n" << std::endl;
+                cirCount = 1;
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
                 Leap::KeyTapGesture keytap( gesture );
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
                 Leap::ScreenTapGesture screentap( gesture );
-//                tapCount++;
-//                std::cout << "tapCount:" << tapCount << "\n" << std::endl;
+                tapCount = 1;
             }
             
             //スワイプ
@@ -647,8 +645,6 @@ public:
         strcpy(buffer, clientNumber.c_str());
         
         l = write(sockfd,buffer,strlen(buffer));//データの発信
-        //l = sendto(sockfd, buffer, strlen(buffer), 0, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
-        
         
         if (l < 0){
             error("ERROR writing to socket");
@@ -664,6 +660,8 @@ public:
         printf("%s\n",buffer);
         
         close(sockfd);
+        cirCount = 0;//初期値に戻す
+        tapCount = 0;//初期値に戻す
         
     }
     // Leap SDKのVectorをCinderのVec3fに変換する
