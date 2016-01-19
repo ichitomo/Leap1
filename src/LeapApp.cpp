@@ -299,8 +299,6 @@ public:
         //socketCl();//ソケット通信（クライアント側）
         gl::clear();
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
-        
-        
         gl::pushMatrices();
         drawInteractionBox();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
@@ -395,13 +393,13 @@ public:
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
     
-    //枠としてのBoxを描く
+    //枠としてのcircleを描く
     void drawSendCircle(){
         float sendRadius;//円の半径
-        sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 100)*0.2;
+        sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 100);
         gl::pushMatrices();
-        gl::color(1.0, 0, 0);
-        gl::drawStrokedCircle(Vec2f(1000.0, 750.0), sendRadius);
+        gl::color(0.65, 0.83, 0.58);
+        gl::drawStrokedCircle(Vec2f(545.0, 450.0), sendRadius);
         gl::popMatrices();
         t += speed1;    //時間を進める
         if(t > 360.0) t = 0.0;
@@ -523,44 +521,38 @@ public:
             fingerIsDown = true;
             
             //１列目
-            if (x >= 97.5 && x <= 447.5){
-                if (y >= 100 && y <= 250 ) {
+            if (x >= 992.5 && x <= 270){
+                if (y >= 145 && y <= 195 ) {
                     //大きな声で
                     messageNumber = 0;
                 }
-                else if (y >= 270 && y <= 420 ) {
+                else if (y >= 215 && y <= 265 ) {
                     //頑張れ
                     messageNumber = 1;
                 }
-                else if (y >= 440 && y <= 590 ) {
+                else if (y >= 285 && y <= 335 ) {
                     //もう一度説明して
                     messageNumber = 2;
                 }
-            }
-            //2列目
-            else if (x >= 545 && x <= 895 ) {
-                if (y >= 100 && y <= 250 ) {
+                else if (y >= 355 && y <= 405 ) {
                     //面白い
                     messageNumber = 3;
                 }
-                else if (y >= 270 && y <= 420 ) {
+                else if (y >= 425 && y <= 455 ) {
                     //トイレに行きたい
                     messageNumber = 4;
                 }
-                else if (y >= 440 && y <= 590 ) {
+                else if (y >= 475 && y <= 525 ) {
                     //わかった
                     messageNumber = 5;
                 }
-            }
-            //3列目
-            else if (x >= 992.5 && x <= 1342.5 ) {
-                if (y >= 100 && y <= 250 ) {
+                else if (y >= 545 && y <= 595 ) {
                     messageNumber = 6;
                 }
-                else if ( y >= 270 && y <= 420 ) {
+                else if ( y >= 615 && y <= 665 ) {
                     messageNumber = 7;
                 }
-                else if ( y >= 440 && y <= 590  ) {
+                else if ( y >= 685 && y <= 735  ) {
                     messageNumber = 8;
                 }
             }else{
