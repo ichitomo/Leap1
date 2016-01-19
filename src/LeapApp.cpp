@@ -100,7 +100,7 @@ public:
         
         // 表示フォントの設定
         mFont = Font( "YuGothic", 44 );//文字の形式、サイズ
-        mFontColor = ColorA(1.0,1.0,0);//文字の色
+        mFontColor = ColorA(0.65, 0.83, 0.58);//文字の色
         
         // カメラ(視点)の設定
         
@@ -395,7 +395,7 @@ public:
     }
     //枠としてのBoxを描く
     void drawBox(){
-        gl::color(1.0, 1.0, 0);
+        gl::color(0.65, 0.83, 0.58);
         gl::drawStrokedRect(Rectf(0,0,350,150));
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
