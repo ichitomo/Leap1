@@ -1,4 +1,4 @@
-#include "cinder/app/AppNative.h"
+//#include "cinder/app/AppNative.h"
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 
@@ -14,6 +14,11 @@
 #include "Resources.h"
 #include <iostream>
 #include <vector>
+
+//マウスアクション
+#include "cinder/Perlin.h"
+#include "Particle.h"
+#include "Emitter.h"
 
 //ソケット通信
 #include <stdio.h>
@@ -36,6 +41,18 @@ using namespace cinder::gl;
 GLint point[MAXPOINTS][2];//点の座標の入れ物
 //std::vector<std::vector<int>> point;//点の座標の入れ物
 
+// global variables //マウスアクション
+int			counter = 0;
+float		floorLevel = 400.0f;
+gl::TextureRef particleImg, emitterImg;
+bool		ALLOWFLOOR = false;
+bool		ALLOWGRAVITY = false;
+bool		ALLOWPERLIN = false;
+bool		ALLOWTRAILS = false;
+Vec3f		gravity( 0, 0.35f, 0 );
+const int	CINDER_FACTOR = 10; // how many times more particles than the Java version
+
+
 string messageList[] = {
     
     {"大きな声で"},
@@ -54,16 +71,32 @@ void error(const char *msg){
     exit(0);
 }
 
-class LeapApp : public AppNative {
+extern void renderImage( Vec3f _loc, float _diam, Color _col, float _alpha ){
+    gl::pushMatrices();
+    gl::translate( _loc.x, _loc.y, _loc.z );
+    gl::scale( _diam, _diam, _diam );
+    gl::color( _col.r, _col.g, _col.b, _alpha );
+    gl::begin( GL_QUADS );
+    gl::texCoord(0, 0);    gl::vertex(-.5, -.5);
+    gl::texCoord(1, 0);    gl::vertex( .5, -.5);
+    gl::texCoord(1, 1);    gl::vertex( .5,  .5);
+    gl::texCoord(0, 1);    gl::vertex(-.5,  .5);
+    gl::end();
+    gl::popMatrices();
+}
+
+class LeapApp : public AppBasic {
 public:
+    Renderer* prepareRenderer() { return new RendererGl( RendererGl::AA_MSAA_2 ); }
     void setup(){
         // ウィンドウの位置とサイズを設定
         setWindowPos( 0, 0 );
         setWindowSize( WindowWidth, WindowHeight );
         
         // 光源を追加する
-        glEnable( GL_LIGHTING );
-        glEnable( GL_LIGHT0 );
+        //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition);
+        //glEnable( GL_LIGHT0 );
+        //glEnable( GL_LIGHTING );//これをつけると影ができる
         
         // 表示フォントの設定
         mFont = Font( "YuGothic", 20 );
@@ -109,9 +142,18 @@ public:
         large2 = gl::Texture(loadImage(loadResource(RES_LARGE2_IMAGE)));
         inter2 = gl::Texture(loadImage(loadResource(RES_INTER2_IMAGE)));
         wc2 = gl::Texture(loadImage(loadResource(RES_WC2_IMAGE)));
+
+        //マウスアクション
+        particleImg = gl::Texture::create( loadImage( loadResource( RES_PARTICLE ) ) );
+        emitterImg = gl::Texture::create( loadImage( loadResource( RES_EMITTER ) ) );
         
+        mouseIsDown = false;
+        mMousePos = getWindowCenter();
+
+
         // 描画時に奥行きの考慮を有効にする
-        gl::enableDepthRead();
+        
+        //gl::enableDepthRead();
         gl::enableDepthWrite();
         
         // Leap Motion関連のセットアップ
@@ -121,15 +163,35 @@ public:
     
     // マウスのクリック
     void mouseDown( MouseEvent event ){
+        mouseIsDown = true;
         mMayaCam.mouseDown( event.getPos() );
     }
+    void mouseUp( MouseEvent event )
+    {
+        mouseIsDown = false;
+    }
     
+    void mouseMove( MouseEvent event )
+    {
+        mMousePos = event.getPos();
+    }
     // マウスのドラッグ
     void mouseDrag( MouseEvent event ){
         mMayaCam.mouseDrag( event.getPos(), event.isLeftDown(),
                            event.isMiddleDown(), event.isRightDown() );
     }
-    
+    void keyDown( KeyEvent event ){
+        char key = event.getChar();
+        
+        if( ( key == 'g' ) || ( key == 'G' ) )
+            ALLOWGRAVITY = ! ALLOWGRAVITY;
+        else if( ( key == 'p' ) || ( key == 'P' ) )
+            ALLOWPERLIN = ! ALLOWPERLIN;
+        else if( ( key == 't' ) || ( key == 'T' ) )
+            ALLOWTRAILS = ! ALLOWTRAILS;
+        else if( ( key == 'f' ) || ( key == 'F' ) )
+            ALLOWFLOOR = ! ALLOWFLOOR;
+    }
     
     //更新処理
     void update(){
@@ -241,13 +303,27 @@ public:
         //カメラのアップデート処理
         mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
         //socketCl();//ソケット通信（クライアント側）
+        
+        //マウスアクション
+        counter++;
+        
+        if( mouseIsDown ) {
+            if( ALLOWTRAILS && ALLOWFLOOR ) {
+                mEmitter.addParticles( 5 * CINDER_FACTOR );
+            }
+            else {
+                mEmitter.addParticles( 10 * CINDER_FACTOR );
+            }
+        }
+        
     }
     //描写処理
     void draw(){
         
-        socketCl();//ソケット通信（クライアント側）
+        //socketCl();//ソケット通信（クライアント側）
         gl::clear();
-
+        gl::enableAdditiveBlending();//PNG画像のエッジがなくす
+        
         gl::pushMatrices();
         drawInteractionBox3();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
@@ -255,6 +331,9 @@ public:
         drawImage();
         //drawLeapObject();//手の描写
         gl::popMatrices();
+        
+        floorLevel = 2 / 3.0f * getWindowHeight();
+        mEmitter.exist( mMousePos );
         
     }
     //枠としてのBoxを描く
@@ -475,6 +554,7 @@ public:
     void drawInteractionBox3(){
      
      gl::pushMatrices();
+        
         // 人差し指を取得する
         Leap::Finger index = mLeap.frame().fingers().fingerType( Leap::Finger::Type::TYPE_INDEX )[0];
         if ( !index.isValid() ) {
@@ -498,6 +578,16 @@ public:
         // タッチ状態
         else if( index.touchZone() == Leap::Pointable::Zone::ZONE_TOUCHING ) {
             gl::color(1, 0, 0);
+            
+            counter++;
+            
+            if( ALLOWTRAILS && ALLOWFLOOR ) {
+                mEmitter.addParticles( 5 * CINDER_FACTOR );
+            }
+            else {
+                mEmitter.addParticles( 10 * CINDER_FACTOR );
+            }
+            
             //１列目
             if (x >= 97.5 && x <= 447.5){
                 if (y >= 100 && y <= 250 ) {
@@ -549,25 +639,11 @@ public:
             messageNumber = -1;
         }
         gl::drawSolidCircle( Vec2f( x, y ), 10 );//指の位置
-        // 指の座標を表示する
-        stringstream ss;
-        //ss << normalizedPosition.x << ", " << normalizedPosition.y << "\n";//0~1の値で表示
-        ss << x << ", " << y << "\n";//ウィンドウサイズの値で表示
-        ss << messageNumber << "\n";
         
-        auto tbox = TextBox().font( Font( "游ゴシック体", 20 ) ).text ( ss.str() );
-        auto texture = gl::Texture( tbox.render() );//テクスチャをつくる
-        
-        auto textX = (normalizedPosition.x < 0.5) ?
-        x : x - texture.getBounds().getWidth();//テキストの位置を計算（x座標）
-        auto textY = (normalizedPosition.y > 0.5) ?
-        y : y - texture.getBounds().getHeight();//テキストの位置を計算（y座標）
-        
-        gl::color( 0, 0, 0, 1 );//白色
-        gl::translate( textX, textY );//指の隣に移動させる
-        gl::draw( texture );//座標を描写
-        //drawGestureAction(messageNumber, x, y, textX, textY);//ジェスチャーを使った時の処理を描写
-
+        //マウスアクション
+        //mEmitter.exist(Vec2i(textX, textY));
+        floorLevel = 2 / 3.0f * getWindowHeight();
+        mEmitter.exist( mMousePos );
         gl::popMatrices();
      }
 
@@ -597,13 +673,15 @@ public:
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
-    void socketCl(){
+    
+    
+    /*void socketCl(){
         //ソケット通信クライアント側
         sockfd = ::socket(AF_INET, SOCK_STREAM, 0);//ソケットの生成
         if (sockfd < 0)//socketが作られていない
             error("ERROR opening socket");
-        //server = gethostbyname("mima.c.fun.ac.jp");//サーバーの作成
-        server = gethostbyname("10.70.87.215");//サーバーの作成
+        server = gethostbyname("mima.c.fun.ac.jp");//サーバーの作成
+        //server = gethostbyname("10.70.87.215");//サーバーの作成
         if (server == NULL) {
             //サーバーにアクセスできない
             fprintf(stderr,"ERROR, no such host\n");
@@ -659,7 +737,7 @@ public:
         close(sockfd);
         cirCount = 0;//初期値に戻す
         tapCount = 0;//初期値に戻す
-    }
+    }*/
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
         return Vec3f( vec.x, vec.y, vec.z );
@@ -728,7 +806,7 @@ public:
         
         return "invalid";
     }
-   
+    
     //ウィンドウサイズ
     static const int WindowWidth = 1440;
     static const int WindowHeight = 900;
@@ -866,6 +944,11 @@ public:
     float mBottom = 0.0;//下面のy座標
     float mBackSide = 500.0;//前面のz座標
     float mFrontSide = -500.0;//後面のz座標
+    
+    //マウスアクション
+    Emitter		mEmitter;
+    bool		mouseIsDown;
+    Vec2i		mMousePos;
 };
-CINDER_APP_NATIVE( LeapApp, RendererGl )
+CINDER_APP_BASIC( LeapApp, RendererGl )
 

@@ -14,39 +14,44 @@
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
-		8929D8AD1BD072D30016BF57 /* image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8929D8AC1BD072D30016BF57 /* image.jpg */; settings = {ASSET_TAGS = (); }; };
-		893325C21C1E0B890003F034 /* again.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325AF1C1E0B890003F034 /* again.png */; settings = {ASSET_TAGS = (); }; };
-		893325C31C1E0B890003F034 /* cool.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B01C1E0B890003F034 /* cool.png */; settings = {ASSET_TAGS = (); }; };
-		893325C41C1E0B890003F034 /* fast.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B11C1E0B890003F034 /* fast.png */; settings = {ASSET_TAGS = (); }; };
-		893325C51C1E0B890003F034 /* fight.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B21C1E0B890003F034 /* fight.png */; settings = {ASSET_TAGS = (); }; };
-		893325C61C1E0B890003F034 /* inter.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B31C1E0B890003F034 /* inter.png */; settings = {ASSET_TAGS = (); }; };
-		893325C71C1E0B890003F034 /* large.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B41C1E0B890003F034 /* large.png */; settings = {ASSET_TAGS = (); }; };
-		893325C81C1E0B890003F034 /* no.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B51C1E0B890003F034 /* no.png */; settings = {ASSET_TAGS = (); }; };
-		893325C91C1E0B890003F034 /* ok.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B61C1E0B890003F034 /* ok.png */; settings = {ASSET_TAGS = (); }; };
-		893325CA1C1E0B890003F034 /* wc.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B71C1E0B890003F034 /* wc.png */; settings = {ASSET_TAGS = (); }; };
-		893325CB1C1E0B890003F034 /* again2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B91C1E0B890003F034 /* again2.png */; settings = {ASSET_TAGS = (); }; };
-		893325CC1C1E0B890003F034 /* cool2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BA1C1E0B890003F034 /* cool2.png */; settings = {ASSET_TAGS = (); }; };
-		893325CD1C1E0B890003F034 /* fast2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BB1C1E0B890003F034 /* fast2.png */; settings = {ASSET_TAGS = (); }; };
-		893325CE1C1E0B890003F034 /* fight2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BC1C1E0B890003F034 /* fight2.png */; settings = {ASSET_TAGS = (); }; };
-		893325CF1C1E0B890003F034 /* inter2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BD1C1E0B890003F034 /* inter2.png */; settings = {ASSET_TAGS = (); }; };
-		893325D01C1E0B890003F034 /* large2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BE1C1E0B890003F034 /* large2.png */; settings = {ASSET_TAGS = (); }; };
-		893325D11C1E0B890003F034 /* no2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BF1C1E0B890003F034 /* no2.png */; settings = {ASSET_TAGS = (); }; };
-		893325D21C1E0B890003F034 /* ok2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325C01C1E0B890003F034 /* ok2.png */; settings = {ASSET_TAGS = (); }; };
-		893325D31C1E0B890003F034 /* wc2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325C11C1E0B890003F034 /* wc2.png */; settings = {ASSET_TAGS = (); }; };
-		893325D51C1E0B970003F034 /* class.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325D41C1E0B970003F034 /* class.png */; settings = {ASSET_TAGS = (); }; };
-		8974FB0F1C27D1090029A1E8 /* he.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB0D1C27D1090029A1E8 /* he.png */; settings = {ASSET_TAGS = (); }; };
-		8974FB101C27D1090029A1E8 /* question.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB0E1C27D1090029A1E8 /* question.png */; settings = {ASSET_TAGS = (); }; };
-		8974FB131C27DB9E0029A1E8 /* he2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB111C27DB9E0029A1E8 /* he2.png */; settings = {ASSET_TAGS = (); }; };
-		8974FB141C27DB9E0029A1E8 /* question2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB121C27DB9E0029A1E8 /* question2.png */; settings = {ASSET_TAGS = (); }; };
+		8929D8AD1BD072D30016BF57 /* image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8929D8AC1BD072D30016BF57 /* image.jpg */; };
+		893325C21C1E0B890003F034 /* again.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325AF1C1E0B890003F034 /* again.png */; };
+		893325C31C1E0B890003F034 /* cool.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B01C1E0B890003F034 /* cool.png */; };
+		893325C41C1E0B890003F034 /* fast.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B11C1E0B890003F034 /* fast.png */; };
+		893325C51C1E0B890003F034 /* fight.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B21C1E0B890003F034 /* fight.png */; };
+		893325C61C1E0B890003F034 /* inter.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B31C1E0B890003F034 /* inter.png */; };
+		893325C71C1E0B890003F034 /* large.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B41C1E0B890003F034 /* large.png */; };
+		893325C81C1E0B890003F034 /* no.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B51C1E0B890003F034 /* no.png */; };
+		893325C91C1E0B890003F034 /* ok.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B61C1E0B890003F034 /* ok.png */; };
+		893325CA1C1E0B890003F034 /* wc.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B71C1E0B890003F034 /* wc.png */; };
+		893325CB1C1E0B890003F034 /* again2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325B91C1E0B890003F034 /* again2.png */; };
+		893325CC1C1E0B890003F034 /* cool2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BA1C1E0B890003F034 /* cool2.png */; };
+		893325CD1C1E0B890003F034 /* fast2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BB1C1E0B890003F034 /* fast2.png */; };
+		893325CE1C1E0B890003F034 /* fight2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BC1C1E0B890003F034 /* fight2.png */; };
+		893325CF1C1E0B890003F034 /* inter2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BD1C1E0B890003F034 /* inter2.png */; };
+		893325D01C1E0B890003F034 /* large2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BE1C1E0B890003F034 /* large2.png */; };
+		893325D11C1E0B890003F034 /* no2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325BF1C1E0B890003F034 /* no2.png */; };
+		893325D21C1E0B890003F034 /* ok2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325C01C1E0B890003F034 /* ok2.png */; };
+		893325D31C1E0B890003F034 /* wc2.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325C11C1E0B890003F034 /* wc2.png */; };
+		893325D51C1E0B970003F034 /* class.png in Resources */ = {isa = PBXBuildFile; fileRef = 893325D41C1E0B970003F034 /* class.png */; };
+		8974FB0F1C27D1090029A1E8 /* he.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB0D1C27D1090029A1E8 /* he.png */; };
+		8974FB101C27D1090029A1E8 /* question.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB0E1C27D1090029A1E8 /* question.png */; };
+		8974FB131C27DB9E0029A1E8 /* he2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB111C27DB9E0029A1E8 /* he2.png */; };
+		8974FB141C27DB9E0029A1E8 /* question2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8974FB121C27DB9E0029A1E8 /* question2.png */; };
+		8974FB3A1C291C730029A1E8 /* Emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974FB381C291C730029A1E8 /* Emitter.cpp */; };
+		8974FB3B1C291C730029A1E8 /* Particle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974FB391C291C730029A1E8 /* Particle.cpp */; };
 		898680971B37A3360007A942 /* libLeap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; };
 		898680991B37A36C0007A942 /* libLeap.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 898680961B37A3360007A942 /* libLeap.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		899F1B401C1938A6000A2CCC /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B3E1C1938A6000A2CCC /* 1.png */; settings = {ASSET_TAGS = (); }; };
-		899F1B411C1938A6000A2CCC /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B3F1C1938A6000A2CCC /* 2.png */; settings = {ASSET_TAGS = (); }; };
-		899F1B441C193A07000A2CCC /* m1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B421C193A07000A2CCC /* m1.jpg */; settings = {ASSET_TAGS = (); }; };
-		899F1B451C193A07000A2CCC /* m2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B431C193A07000A2CCC /* m2.jpg */; settings = {ASSET_TAGS = (); }; };
-		89CA2D071C0EA9F900B9CA0F /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D041C0EA9F900B9CA0F /* background.png */; settings = {ASSET_TAGS = (); }; };
-		89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D051C0EA9F900B9CA0F /* circle.png */; settings = {ASSET_TAGS = (); }; };
-		89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D061C0EA9F900B9CA0F /* smallCircle.png */; settings = {ASSET_TAGS = (); }; };
+		899F1B401C1938A6000A2CCC /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B3E1C1938A6000A2CCC /* 1.png */; };
+		899F1B411C1938A6000A2CCC /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B3F1C1938A6000A2CCC /* 2.png */; };
+		899F1B441C193A07000A2CCC /* m1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B421C193A07000A2CCC /* m1.jpg */; };
+		899F1B451C193A07000A2CCC /* m2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 899F1B431C193A07000A2CCC /* m2.jpg */; };
+		89CA2D071C0EA9F900B9CA0F /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D041C0EA9F900B9CA0F /* background.png */; };
+		89CA2D081C0EA9F900B9CA0F /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D051C0EA9F900B9CA0F /* circle.png */; };
+		89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89CA2D061C0EA9F900B9CA0F /* smallCircle.png */; };
+		89F2AE4C1C2BA7A00012131B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89F2AE4B1C2BA7A00012131B /* Carbon.framework */; };
+		89F2AE4E1C2BAF860012131B /* particle.png in Resources */ = {isa = PBXBuildFile; fileRef = 89F2AE4D1C2BAF860012131B /* particle.png */; };
+		89F2AE501C2BAF900012131B /* emitter.png in Resources */ = {isa = PBXBuildFile; fileRef = 89F2AE4F1C2BAF900012131B /* emitter.png */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		90137A2B51414E919CBC3A5C /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = 84BB2BF7371E4767863296E4 /* CinderApp.icns */; };
 		D0B15304848C4A48BF51AD81 /* LeapApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB1E88BC784C44E5B798C665 /* LeapApp.cpp */; };
@@ -104,6 +109,10 @@
 		8974FB0E1C27D1090029A1E8 /* question.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = question.png; sourceTree = "<group>"; };
 		8974FB111C27DB9E0029A1E8 /* he2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = he2.png; path = ../resources/message2/he2.png; sourceTree = "<group>"; };
 		8974FB121C27DB9E0029A1E8 /* question2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = question2.png; path = ../resources/message2/question2.png; sourceTree = "<group>"; };
+		8974FB381C291C730029A1E8 /* Emitter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Emitter.cpp; path = ../src/Emitter.cpp; sourceTree = "<group>"; };
+		8974FB391C291C730029A1E8 /* Particle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Particle.cpp; path = ../src/Particle.cpp; sourceTree = "<group>"; };
+		8974FB3C1C291C840029A1E8 /* Emitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Emitter.h; path = ../include/Emitter.h; sourceTree = "<group>"; };
+		8974FB3D1C291C840029A1E8 /* Particle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Particle.h; path = ../include/Particle.h; sourceTree = "<group>"; };
 		898680941B37A2F90007A942 /* Leap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Leap.h; path = ../include/Leap.h; sourceTree = "<group>"; };
 		898680951B37A2F90007A942 /* LeapMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeapMath.h; path = ../include/LeapMath.h; sourceTree = "<group>"; };
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
@@ -114,6 +123,9 @@
 		89CA2D041C0EA9F900B9CA0F /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background.png; path = ../resources/background.png; sourceTree = "<group>"; };
 		89CA2D051C0EA9F900B9CA0F /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = circle.png; path = ../resources/circle.png; sourceTree = "<group>"; };
 		89CA2D061C0EA9F900B9CA0F /* smallCircle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = smallCircle.png; path = ../resources/smallCircle.png; sourceTree = "<group>"; };
+		89F2AE4B1C2BA7A00012131B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		89F2AE4D1C2BAF860012131B /* particle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = particle.png; path = ../resources/particle.png; sourceTree = "<group>"; };
+		89F2AE4F1C2BAF900012131B /* emitter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = emitter.png; path = ../resources/emitter.png; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Leap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Leap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB1E88BC784C44E5B798C665 /* LeapApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.cpp; name = LeapApp.cpp; path = ../src/LeapApp.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -123,6 +135,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89F2AE4C1C2BA7A00012131B /* Carbon.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				0091D8F90E81B9330029341E /* OpenGL.framework in Frameworks */,
 				5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */,
@@ -148,6 +161,8 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				8974FB381C291C730029A1E8 /* Emitter.cpp */,
+				8974FB391C291C730029A1E8 /* Particle.cpp */,
 				BB1E88BC784C44E5B798C665 /* LeapApp.cpp */,
 			);
 			name = Source;
@@ -205,6 +220,8 @@
 				3CAE9C5EC24B4A19906F69B6 /* Resources.h */,
 				898680941B37A2F90007A942 /* Leap.h */,
 				898680951B37A2F90007A942 /* LeapMath.h */,
+				8974FB3C1C291C840029A1E8 /* Emitter.h */,
+				8974FB3D1C291C840029A1E8 /* Particle.h */,
 				395CA7F11B4C49E08A01BA06 /* Leap_Prefix.pch */,
 			);
 			name = Headers;
@@ -213,6 +230,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				89F2AE4D1C2BAF860012131B /* particle.png */,
+				89F2AE4F1C2BAF900012131B /* emitter.png */,
 				893325AE1C1E0B890003F034 /* message */,
 				893325B81C1E0B890003F034 /* message2 */,
 				8929D8AC1BD072D30016BF57 /* image.jpg */,
@@ -235,6 +254,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				89F2AE4B1C2BA7A00012131B /* Carbon.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -339,6 +359,7 @@
 				8974FB0F1C27D1090029A1E8 /* he.png in Resources */,
 				893325C31C1E0B890003F034 /* cool.png in Resources */,
 				899F1B441C193A07000A2CCC /* m1.jpg in Resources */,
+				89F2AE501C2BAF900012131B /* emitter.png in Resources */,
 				893325C21C1E0B890003F034 /* again.png in Resources */,
 				89CA2D091C0EA9F900B9CA0F /* smallCircle.png in Resources */,
 				8974FB141C27DB9E0029A1E8 /* question2.png in Resources */,
@@ -351,6 +372,7 @@
 				893325C61C1E0B890003F034 /* inter.png in Resources */,
 				893325CA1C1E0B890003F034 /* wc.png in Resources */,
 				893325C91C1E0B890003F034 /* ok.png in Resources */,
+				89F2AE4E1C2BAF860012131B /* particle.png in Resources */,
 				893325D21C1E0B890003F034 /* ok2.png in Resources */,
 				893325D51C1E0B970003F034 /* class.png in Resources */,
 				899F1B451C193A07000A2CCC /* m2.jpg in Resources */,
@@ -373,6 +395,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8974FB3A1C291C730029A1E8 /* Emitter.cpp in Sources */,
+				8974FB3B1C291C730029A1E8 /* Particle.cpp in Sources */,
 				D0B15304848C4A48BF51AD81 /* LeapApp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -383,6 +407,7 @@
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
@@ -402,9 +427,11 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.libcinder.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Leap;
+				SDKROOT = macosx;
 				SYMROOT = ./build;
 				WRAPPER_EXTENSION = app;
 			};
@@ -413,6 +440,7 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -433,9 +461,11 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.libcinder.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Leap;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
 				SYMROOT = ./build;
 				WRAPPER_EXTENSION = app;
@@ -454,7 +484,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
 			};
