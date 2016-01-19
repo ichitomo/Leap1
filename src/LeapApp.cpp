@@ -147,8 +147,8 @@ public:
         particleImg = gl::Texture::create( loadImage( loadResource( RES_PARTICLE ) ) );
         emitterImg = gl::Texture::create( loadImage( loadResource( RES_EMITTER ) ) );
         
-        mouseIsDown = false;
-        mMousePos = getWindowCenter();
+        fingerIsDown = false;
+        mFingerPos = getWindowCenter();
 
 
         // 描画時に奥行きの考慮を有効にする
@@ -163,17 +163,16 @@ public:
     
     // マウスのクリック
     void mouseDown( MouseEvent event ){
-        mouseIsDown = true;
         mMayaCam.mouseDown( event.getPos() );
     }
     void mouseUp( MouseEvent event )
     {
-        mouseIsDown = false;
+        
     }
     
     void mouseMove( MouseEvent event )
     {
-        mMousePos = event.getPos();
+        
     }
     // マウスのドラッグ
     void mouseDrag( MouseEvent event ){
@@ -304,10 +303,10 @@ public:
         mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
         //socketCl();//ソケット通信（クライアント側）
         
-        //マウスアクション
+        //フィンガーアクション
         counter++;
         
-        if( mouseIsDown ) {
+        if( fingerIsDown ) {
             if( ALLOWTRAILS && ALLOWFLOOR ) {
                 mEmitter.addParticles( 5 * CINDER_FACTOR );
             }
@@ -325,15 +324,15 @@ public:
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
         
         gl::pushMatrices();
-        drawInteractionBox3();//インタラクションボックス
+        drawInteractionBox();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
-        drawListArea();//メッセージリストの表示
-        drawImage();
+        //drawListArea();//メッセージリストの表示
+        //drawImage();
         //drawLeapObject();//手の描写
         gl::popMatrices();
         
-        floorLevel = 2 / 3.0f * getWindowHeight();
-        mEmitter.exist( mMousePos );
+        //floorLevel = 2 / 3.0f * getWindowHeight();
+        //mEmitter.exist( mMousePos );
         
     }
     //枠としてのBoxを描く
@@ -551,7 +550,7 @@ public:
     }
     
     //インタラクションボックスの作成
-    void drawInteractionBox3(){
+    void drawInteractionBox(){
      
      gl::pushMatrices();
         
@@ -570,23 +569,17 @@ public:
      
         // ホバー状態
         if ( index.touchZone() == Leap::Pointable::Zone::ZONE_HOVERING ) {
-                gl::color(0, 1, 0, 1 - index.touchDistance());
-                gl::drawSphere(Vec3f(x,y,1.0f), 10.0);//指の先端
-                messageNumber = -1;
+            messageNumber = -1;
+            //EMITTER(マウスアップ)
+            fingerIsDown = false;
         }
      
         // タッチ状態
         else if( index.touchZone() == Leap::Pointable::Zone::ZONE_TOUCHING ) {
             gl::color(1, 0, 0);
             
-            counter++;
-            
-            if( ALLOWTRAILS && ALLOWFLOOR ) {
-                mEmitter.addParticles( 5 * CINDER_FACTOR );
-            }
-            else {
-                mEmitter.addParticles( 10 * CINDER_FACTOR );
-            }
+            //EMITTER
+            fingerIsDown = true;
             
             //１列目
             if (x >= 97.5 && x <= 447.5){
@@ -635,15 +628,14 @@ public:
         }
         // タッチ対象外
         else {
-            gl::color(0, 0, 1, .05);
             messageNumber = -1;
+            //EMITTER
+            fingerIsDown = false;
+            mFingerPos = Vec2f(index.tipPosition().x,index.tipPosition().y);
         }
-        gl::drawSolidCircle( Vec2f( x, y ), 10 );//指の位置
-        
         //マウスアクション
-        //mEmitter.exist(Vec2i(textX, textY));
+        mEmitter.exist(Vec2f( x, y ));
         floorLevel = 2 / 3.0f * getWindowHeight();
-        mEmitter.exist( mMousePos );
         gl::popMatrices();
      }
 
@@ -947,8 +939,8 @@ public:
     
     //マウスアクション
     Emitter		mEmitter;
-    bool		mouseIsDown;
-    Vec2i		mMousePos;
+    bool		fingerIsDown;
+    Vec2i		mFingerPos;
 };
 CINDER_APP_BASIC( LeapApp, RendererGl )
 
