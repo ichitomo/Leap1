@@ -401,9 +401,10 @@ public:
     //枠としてのcircleを描く
     void drawSendCircle(){
         float sendRadius;//円の半径
-        sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 100);
+        sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 200);
         gl::pushMatrices();
         gl::color(0.65, 0.83, 0.58);
+        gl::drawString("Send Message", Vec2f(465.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         gl::drawStrokedCircle(Vec2f(545.0, 450.0), sendRadius);
         gl::popMatrices();
         t += speed1;    //時間を進める
