@@ -299,6 +299,11 @@ public:
         //socketCl();//ソケット通信（クライアント側）
         gl::clear();
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
+        //"title"描写
+        gl::pushMatrices();
+        gl::drawString("Client Program", Vec2f(100,100),mFontColor, mFont);
+        gl::popMatrices();
+        
         gl::pushMatrices();
         drawInteractionBox();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
@@ -310,7 +315,7 @@ public:
     }
     //メッセージリスト
     void drawListArea(){
-        
+
         //"大きな声で"描写
         gl::pushMatrices();
         gl::drawString(messageList[0],Vec2f(992.5, 145), mFontColor, mFont);
@@ -882,6 +887,7 @@ public:
     float speed1 = 1.0;    //アニメーションの基準となるスピード
     float speed2 = 1.0;
     float eSize = 0.0;
+    
 };
 CINDER_APP_BASIC( LeapApp, RendererGl )
 

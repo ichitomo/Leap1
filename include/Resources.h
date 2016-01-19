@@ -26,5 +26,6 @@
 #define RES_AGAIN2_IMAGE	CINDER_RESOURCE( ../resources/, again2.png, 145, PNG )
 #define RES_WC2_IMAGE	CINDER_RESOURCE( ../resources/, wc2.png, 146, PNG )
 
+//フィンガーアクション
 #define RES_PARTICLE		CINDER_RESOURCE( ../resources/, particle.png, 147, PNG )
 #define RES_EMITTER			CINDER_RESOURCE( ../resources/, emitter.png, 148, PNG )

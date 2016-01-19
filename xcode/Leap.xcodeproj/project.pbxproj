@@ -116,6 +116,7 @@
 		898680941B37A2F90007A942 /* Leap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Leap.h; path = ../include/Leap.h; sourceTree = "<group>"; };
 		898680951B37A2F90007A942 /* LeapMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LeapMath.h; path = ../include/LeapMath.h; sourceTree = "<group>"; };
 		898680961B37A3360007A942 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libLeap.dylib; sourceTree = "<group>"; };
+		89888A1B1C4E7BB600160FCE /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
 		899F1B3E1C1938A6000A2CCC /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 1.png; path = ../resources/1.png; sourceTree = "<group>"; };
 		899F1B3F1C1938A6000A2CCC /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 2.png; path = ../resources/2.png; sourceTree = "<group>"; };
 		899F1B421C193A07000A2CCC /* m1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = m1.jpg; path = ../resources/m1.jpg; sourceTree = "<group>"; };
@@ -254,6 +255,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				89888A1B1C4E7BB600160FCE /* QuickTime.framework */,
 				89F2AE4B1C2BA7A00012131B /* Carbon.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
