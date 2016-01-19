@@ -33,12 +33,12 @@ void Emitter::exist( Vec2i mouseLoc )
 
 void Emitter::setVelToMouse( Vec2i mouseLoc )
 {
-	velToMouse.set( mouseLoc.x - loc.x, mouseLoc.y - loc.y, 0 );
+	velToFinger.set( mouseLoc.x - loc.x, mouseLoc.y - loc.y, 0 );
 }
 
 void Emitter::findVelocity()
 {
-	vel += ( velToMouse - vel ) * 0.25f;
+	vel += ( velToFinger - vel ) * 0.25f;
 }
 
 void Emitter::setPosition()

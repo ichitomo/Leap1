@@ -16,8 +16,8 @@ multiple emitters.
 class Emitter {
  public:
 	Emitter();  
-	void exist( ci::Vec2i mouseLoc );
-	void setVelToMouse( ci::Vec2i mouseLoc );
+	void exist( ci::Vec2i fingerLoc );
+	void setVelToMouse( ci::Vec2i fingerLoc );
 	void findVelocity();
 	void setPosition();
 	void iterateListExist();
@@ -27,7 +27,7 @@ class Emitter {
 
 	ci::Vec3f loc;
 	ci::Vec3f vel;
-	ci::Vec3f velToMouse;
+	ci::Vec3f velToFinger;
 	ci::Color myColor;
 	std::list<Particle>	particles;	
 };
