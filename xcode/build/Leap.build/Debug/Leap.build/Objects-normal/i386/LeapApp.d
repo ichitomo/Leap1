@@ -1,5 +1,4 @@
 dependencies: /Users/ichinosetomohiro/Desktop/Leap/src/LeapApp.cpp \
-  ../../cinder_0.8.6_mac/include/cinder/app/AppNative.h \
   ../../cinder_0.8.6_mac/include/cinder/gl/Texture.h \
   ../../cinder_0.8.6_mac/include/cinder/Text.h \
   ../../cinder_0.8.6_mac/include/cinder/MayaCamUI.h \
@@ -19,4 +18,7 @@ dependencies: /Users/ichinosetomohiro/Desktop/Leap/src/LeapApp.cpp \
   ../../cinder_0.8.6_mac/boost/boost/type_traits/detail/type_trait_undef.hpp \
   ../../cinder_0.8.6_mac/boost/boost/type_traits/remove_volatile.hpp \
   /Users/ichinosetomohiro/Desktop/Leap/include/Resources.h \
-  ../../cinder_0.8.6_mac/include/cinder/CinderResources.h
+  ../../cinder_0.8.6_mac/include/cinder/CinderResources.h \
+  ../../cinder_0.8.6_mac/include/cinder/Perlin.h \
+  /Users/ichinosetomohiro/Desktop/Leap/include/Particle.h \
+  /Users/ichinosetomohiro/Desktop/Leap/include/Emitter.h
