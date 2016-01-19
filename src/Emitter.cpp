@@ -18,9 +18,9 @@ Emitter::Emitter()
 	vel = Vec3f::zero();
 }
 
-void Emitter::exist( Vec2i mouseLoc )
+void Emitter::exist( Vec2i fingerLoc )
 {
-	setVelToMouse( mouseLoc );
+	setVelToFinger( fingerLoc );
 	findVelocity();
 	setPosition();
 	iterateListExist();
@@ -31,9 +31,9 @@ void Emitter::exist( Vec2i mouseLoc )
 		iterateListRenderTrails();
 }
 
-void Emitter::setVelToMouse( Vec2i mouseLoc )
+void Emitter::setVelToFinger( Vec2i fingerLoc )
 {
-	velToFinger.set( mouseLoc.x - loc.x, mouseLoc.y - loc.y, 0 );
+	velToFinger.set( fingerLoc.x - loc.x, fingerLoc.y - loc.y, 0 );
 }
 
 void Emitter::findVelocity()

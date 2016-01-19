@@ -95,11 +95,12 @@ public:
         
         // 光源を追加する
         //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition);
-        //glEnable( GL_LIGHT0 );
+        glEnable( GL_LIGHT0 );
         //glEnable( GL_LIGHTING );//これをつけると影ができる
         
         // 表示フォントの設定
-        mFont = Font( "YuGothic", 20 );
+        mFont = Font( "YuGothic", 44 );//文字の形式、サイズ
+        mFontColor = ColorA(1.0,1.0,0);//文字の色
         
         // カメラ(視点)の設定
         
@@ -120,30 +121,8 @@ public:
         
         //backgroundImageの読み込み
         backgroundImage = gl::Texture(loadImage(loadResource(RES_BACKGROUND_IMAGE)));
-        
-        //メッセージ画像の読み込み
-        ok = gl::Texture(loadImage(loadResource(RES_OK_IMAGE)));
-        no = gl::Texture(loadImage(loadResource(RES_NO_IMAGE)));
-        again = gl::Texture(loadImage(loadResource(RES_AGAIN_IMAGE)));
-        cool = gl::Texture(loadImage(loadResource(RES_HE_IMAGE)));
-        fast = gl::Texture(loadImage(loadResource(RES_FAST_IMAGE)));
-        fight = gl::Texture(loadImage(loadResource(RES_QUESTION_IMAGE)));
-        large = gl::Texture(loadImage(loadResource(RES_LARGE_IMAGE)));
-        inter = gl::Texture(loadImage(loadResource(RES_INTER_IMAGE)));
-        wc = gl::Texture(loadImage(loadResource(RES_WC_IMAGE)));
-        
-        //メッセージ画像の読み込み
-        ok2 = gl::Texture(loadImage(loadResource(RES_OK2_IMAGE)));
-        no2 = gl::Texture(loadImage(loadResource(RES_NO2_IMAGE)));
-        again2 = gl::Texture(loadImage(loadResource(RES_AGAIN2_IMAGE)));
-        cool2 = gl::Texture(loadImage(loadResource(RES_HE2_IMAGE)));
-        fast2 = gl::Texture(loadImage(loadResource(RES_FAST2_IMAGE)));
-        fight2 = gl::Texture(loadImage(loadResource(RES_QUESTION2_IMAGE)));
-        large2 = gl::Texture(loadImage(loadResource(RES_LARGE2_IMAGE)));
-        inter2 = gl::Texture(loadImage(loadResource(RES_INTER2_IMAGE)));
-        wc2 = gl::Texture(loadImage(loadResource(RES_WC2_IMAGE)));
 
-        //マウスアクション
+        //フィンガーアクション
         particleImg = gl::Texture::create( loadImage( loadResource( RES_PARTICLE ) ) );
         emitterImg = gl::Texture::create( loadImage( loadResource( RES_EMITTER ) ) );
         
@@ -152,28 +131,27 @@ public:
 
 
         // 描画時に奥行きの考慮を有効にする
-        
+        //glEnable(GL_DEPTH_TEST);
         //gl::enableDepthRead();
-        gl::enableDepthWrite();
+        //gl::enableDepthWrite();
+        
+        //アニメーション
+        A = 100.0;    //振幅を設定
+        w = 1.0;    //角周波数を設定
+        p = 0.0;    //初期位相を設定
+        t = 0.0;    //経過時間を初期化
         
         // Leap Motion関連のセットアップ
         setupLeapObject();
         
     }
     
+    
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
     }
-    void mouseUp( MouseEvent event )
-    {
-        
-    }
     
-    void mouseMove( MouseEvent event )
-    {
-        
-    }
     // マウスのドラッグ
     void mouseDrag( MouseEvent event ){
         mMayaCam.mouseDrag( event.getPos(), event.isLeftDown(),
@@ -323,10 +301,12 @@ public:
         gl::clear();
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
         
+        
         gl::pushMatrices();
         drawInteractionBox();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
-        //drawListArea();//メッセージリストの表示
+        drawSendCircle();
+        drawListArea();//メッセージリストの表示
         //drawImage();
         //drawLeapObject();//手の描写
         gl::popMatrices();
@@ -335,124 +315,70 @@ public:
         //mEmitter.exist( mMousePos );
         
     }
-    //枠としてのBoxを描く
-    void drawBox(){
-        gl::pushMatrices();
-        // 上面
-        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mRight, mTop, mBackSide ) );//手前
-        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mTop, mFrontSide ) );//右
-        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mLeft, mTop, mFrontSide ) );//奥
-        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mTop, mBackSide ) );//左
-        
-        // 中面
-        gl::drawLine( Vec3f( mLeft, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mBackSide ) );//手前
-        gl::drawLine( Vec3f( mRight, mTop/2, mBackSide ),Vec3f( mRight, mTop/2, mFrontSide ) );//右
-        gl::drawLine( Vec3f( mRight, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mFrontSide ) );//奥
-        gl::drawLine( Vec3f( mLeft, mTop/2, mFrontSide ),Vec3f( mLeft, mTop/2, mBackSide ) );//左
-        
-        
-        //中心線
-        gl::drawLine( Vec3f( mLeft, mTop/2, 0 ),Vec3f( mRight, mTop/2, 0 ) );//横線
-        gl::drawLine( Vec3f( mRight/2, 0, 0 ),Vec3f( mRight/2, mTop, 0 ) );//縦線
-        //        gl::drawLine( Vec3f( mRight/2, mTop/2, mBackSide ),Vec3f( mRight/2, mTop/2, mFrontSide ) );//手前から奥
-        
-        // 下面
-        gl::drawLine( Vec3f( mLeft, mBottom, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
-        gl::drawLine( Vec3f( mRight, mBottom, mBackSide ),Vec3f( mRight, mBottom, mFrontSide ) );
-        gl::drawLine( Vec3f( mRight, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
-        gl::drawLine( Vec3f( mLeft, mBottom, mFrontSide ),Vec3f( mLeft, mBottom, mBackSide ) );
-        
-        // 側面
-        gl::drawLine( Vec3f( mLeft, mTop, mFrontSide ),Vec3f( mLeft, mBottom, mFrontSide ) );
-        gl::drawLine( Vec3f( mLeft, mTop, mBackSide ),Vec3f( mLeft, mBottom, mBackSide ) );
-        gl::drawLine( Vec3f( mRight, mTop, mFrontSide ),Vec3f( mRight, mBottom, mFrontSide ) );
-        gl::drawLine( Vec3f( mRight, mTop, mBackSide ),Vec3f( mRight, mBottom, mBackSide ) );
-        
-        gl::popMatrices();
-    }
     //メッセージリスト
     void drawListArea(){
-        //"大きな声で"画像
+        
+        //"大きな声で"描写
         gl::pushMatrices();
-        if( large ) {
-            gl::draw( large, Vec2d(97.5, 100));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(97.5, 100));//ロードする間にコメント
-        }
+        gl::drawString(messageList[0],Vec2f(97.5, 100), mFontColor, mFont);
+        gl::translate(Vec2f(97.5, 100));
+        drawBox();
         gl::popMatrices();
         
-        //"頑張れ"画像
+        //"頑張れ"描写
         gl::pushMatrices();
-        
-        if( fight ) {
-            gl::draw( fight, Vec2d(97.5, 270));//バックグラウンドイメージを追加
-            
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(97.5, 270));//ロードする間にコメント
-        }
+        gl::drawString(messageList[1],Vec2f(97.5, 270), mFontColor, mFont);
+        gl::translate(Vec2f(97.5, 270));
+        drawBox();
         gl::popMatrices();
         
-        //"もう一度説明して"画像
+        //"もう一度説明して"描写
         gl::pushMatrices();
-        if( again ) {
-            gl::draw( again, Vec2d(97.5, 440));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(97.5, 440));//ロードする間にコメント
-        }
+        gl::drawString(messageList[2],Vec2f(97.5, 440), mFontColor, mFont);
+        gl::translate(Vec2f(97.5, 440));
+        drawBox();
         gl::popMatrices();
         
-        //"面白い"画像
+        //"面白い"描写
         gl::pushMatrices();
-        if( inter ) {
-            gl::draw( inter, Vec2d(545, 100));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(545, 100));//ロードする間にコメント
-        }
+        gl::drawString(messageList[3],Vec2f(545, 100), mFontColor, mFont);
+        gl::translate(Vec2f(545, 100));
+        drawBox();
         gl::popMatrices();
         
-        //"トイレにいきたい"画像
+        //"トイレにいきたい"描写
         gl::pushMatrices();
-        if( wc ) {
-            gl::draw( wc, Vec2d(545, 270));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(545, 270));//ロードする間にコメント
-        }
+        gl::drawString(messageList[4],Vec2f(545, 270), mFontColor, mFont);
+        gl::translate(Vec2f(545, 270));
+        drawBox();
         gl::popMatrices();
         
-        //"わかった"画像
+        //"わかった"描写
         gl::pushMatrices();
-        if( ok ) {
-            gl::draw( ok, Vec2d(545, 440));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(545, 440));//ロードする間にコメント
-        }
+        gl::drawString(messageList[5],Vec2f(545, 440), mFontColor, mFont);
+        gl::translate(Vec2f(545, 440));
+        drawBox();
         gl::popMatrices();
         
-        //"かっこいい"画像
+        //"かっこいい"描写
         gl::pushMatrices();
-        if( cool ) {
-            gl::draw( cool, Vec2d(992.5, 100));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(992.5, 100));//ロードする間にコメント
-        }
+        gl::drawString(messageList[6],Vec2f(992.5, 100), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 100));
+        drawBox();
         gl::popMatrices();
         
         //"速い!"画像
         gl::pushMatrices();
-        if( fast ) {
-            gl::draw( fast, Vec2d(992.5, 270));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(992.5, 270));//ロードする間にコメント
-        }
+        gl::drawString(messageList[7],Vec2f(992.5, 270), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 270));
+        drawBox();
         gl::popMatrices();
         
-        //"わからない"画像
+        //"わからない"描写
         gl::pushMatrices();
-        if( no ) {
-            gl::draw( no, Vec2d(992.5, 440));//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",Vec2d(992.5, 440));//ロードする間にコメント
-        }
+        gl::drawString(messageList[8],Vec2f(992.5, 440), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 440));
+        drawBox();
         gl::popMatrices();
     }
     //背景画像の描写
@@ -467,6 +393,26 @@ public:
         gl::popMatrices();
         
     }
+    //枠としてのBoxを描く
+    void drawBox(){
+        gl::color(1.0, 1.0, 0);
+        gl::drawStrokedRect(Rectf(0,0,350,150));
+        setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
+    }
+    
+    //枠としてのBoxを描く
+    void drawSendCircle(){
+        float sendRadius;//円の半径
+        sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 100)*0.2;
+        gl::pushMatrices();
+        gl::color(1.0, 0, 0);
+        gl::drawStrokedCircle(Vec2f(1000.0, 750.0), sendRadius);
+        gl::popMatrices();
+        t += speed1;    //時間を進める
+        if(t > 360.0) t = 0.0;
+        setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
+    }
+    
     // Leap Motion関連のセットアップ
     void setupLeapObject(){
         
@@ -822,7 +768,7 @@ public:
     
     //フォント
     Font mFont;
-    
+    Color mFontColor;
     // Leap Motion
     Leap::Controller mLeap;//ジェスチャーの有効化など...
     Leap::Frame mCurrentFrame;//現在
@@ -941,6 +887,14 @@ public:
     Emitter		mEmitter;
     bool		fingerIsDown;
     Vec2i		mFingerPos;
+    
+    float A;  //振幅
+    float w;  //角周波数
+    float p;  //初期位相
+    float t;  //経過時間
+    float speed1 = 1.0;    //アニメーションの基準となるスピード
+    float speed2 = 1.0;
+    float eSize = 0.0;
 };
 CINDER_APP_BASIC( LeapApp, RendererGl )
 

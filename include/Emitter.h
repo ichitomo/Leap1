@@ -17,7 +17,7 @@ class Emitter {
  public:
 	Emitter();  
 	void exist( ci::Vec2i fingerLoc );
-	void setVelToMouse( ci::Vec2i fingerLoc );
+	void setVelToFinger( ci::Vec2i fingerLoc );
 	void findVelocity();
 	void setPosition();
 	void iterateListExist();
