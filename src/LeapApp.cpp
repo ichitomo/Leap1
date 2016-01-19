@@ -99,7 +99,7 @@ public:
         //glEnable( GL_LIGHTING );//これをつけると影ができる
         
         // 表示フォントの設定
-        mFont = Font( "YuGothic", 44 );//文字の形式、サイズ
+        mFont = Font( "YuGothic", 32 );//文字の形式、サイズ
         mFontColor = ColorA(0.65, 0.83, 0.58);//文字の色
         
         // カメラ(視点)の設定
@@ -145,7 +145,6 @@ public:
         setupLeapObject();
         
     }
-    
     
     // マウスのクリック
     void mouseDown( MouseEvent event ){
@@ -310,74 +309,70 @@ public:
         //drawImage();
         //drawLeapObject();//手の描写
         gl::popMatrices();
-        
-        //floorLevel = 2 / 3.0f * getWindowHeight();
-        //mEmitter.exist( mMousePos );
-        
     }
     //メッセージリスト
     void drawListArea(){
         
         //"大きな声で"描写
         gl::pushMatrices();
-        gl::drawString(messageList[0],Vec2f(97.5, 100), mFontColor, mFont);
-        gl::translate(Vec2f(97.5, 100));
+        gl::drawString(messageList[0],Vec2f(992.5, 145), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 145));
         drawBox();
         gl::popMatrices();
         
         //"頑張れ"描写
         gl::pushMatrices();
-        gl::drawString(messageList[1],Vec2f(97.5, 270), mFontColor, mFont);
-        gl::translate(Vec2f(97.5, 270));
+        gl::drawString(messageList[1],Vec2f(992.5, 215), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 215));
         drawBox();
         gl::popMatrices();
         
         //"もう一度説明して"描写
         gl::pushMatrices();
-        gl::drawString(messageList[2],Vec2f(97.5, 440), mFontColor, mFont);
-        gl::translate(Vec2f(97.5, 440));
+        gl::drawString(messageList[2],Vec2f(992.5, 285), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 285));
         drawBox();
         gl::popMatrices();
         
         //"面白い"描写
         gl::pushMatrices();
-        gl::drawString(messageList[3],Vec2f(545, 100), mFontColor, mFont);
-        gl::translate(Vec2f(545, 100));
+        gl::drawString(messageList[3],Vec2f(992.5, 355), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 355));
         drawBox();
         gl::popMatrices();
         
         //"トイレにいきたい"描写
         gl::pushMatrices();
-        gl::drawString(messageList[4],Vec2f(545, 270), mFontColor, mFont);
-        gl::translate(Vec2f(545, 270));
+        gl::drawString(messageList[4],Vec2f(992.5, 425), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 425));
         drawBox();
         gl::popMatrices();
         
         //"わかった"描写
         gl::pushMatrices();
-        gl::drawString(messageList[5],Vec2f(545, 440), mFontColor, mFont);
-        gl::translate(Vec2f(545, 440));
+        gl::drawString(messageList[5],Vec2f(992.5, 495), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 495));
         drawBox();
         gl::popMatrices();
         
         //"かっこいい"描写
         gl::pushMatrices();
-        gl::drawString(messageList[6],Vec2f(992.5, 100), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 100));
+        gl::drawString(messageList[6],Vec2f(992.5, 565), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 565));
         drawBox();
         gl::popMatrices();
         
         //"速い!"画像
         gl::pushMatrices();
-        gl::drawString(messageList[7],Vec2f(992.5, 270), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 270));
+        gl::drawString(messageList[7],Vec2f(992.5, 635), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 635));
         drawBox();
         gl::popMatrices();
         
         //"わからない"描写
         gl::pushMatrices();
-        gl::drawString(messageList[8],Vec2f(992.5, 440), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 440));
+        gl::drawString(messageList[8],Vec2f(992.5, 705), mFontColor, mFont);
+        gl::translate(Vec2f(992.5, 705));
         drawBox();
         gl::popMatrices();
     }
@@ -396,7 +391,7 @@ public:
     //枠としてのBoxを描く
     void drawBox(){
         gl::color(0.65, 0.83, 0.58);
-        gl::drawStrokedRect(Rectf(0,0,350,150));
+        gl::drawStrokedRoundedRect(Rectf(0,0,270,50), 5);//角の丸い四角
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
     
