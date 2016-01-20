@@ -359,9 +359,6 @@ public:
     // Leap Motion関連のセットアップ
     void setupLeapObject(){
         
-        mRotationMatrix = Leap::Matrix::identity();
-        mTotalMotionTranslation = Leap::Vector::zero();
-        
         //ジェスチャーを有効にする
         mLeap.enableGesture(Leap::Gesture::Type::TYPE_CIRCLE);//サークル
         mLeap.enableGesture(Leap::Gesture::Type::TYPE_KEY_TAP);//キータップ
@@ -676,11 +673,6 @@ public:
     //バックグラウンド
     gl::Texture backgroundImage;
     
-    //メッセージテクスチャ
-    gl::Texture ok,  no, again, large, cool, fight, fast, inter, wc;
-    gl::Texture ok2, no2, again2, large2, cool2, fight2, fast2, inter2, wc2;
-    
-    
     //フォント
     Font mFont;
     Color mFontColor;
@@ -688,16 +680,6 @@ public:
     Leap::Controller mLeap;//ジェスチャーの有効化など...
     Leap::Frame mCurrentFrame;//現在
     Leap::Frame mLastFrame;//最新
-    
-    Leap::Matrix mRotationMatrix;//回転
-    Leap::Vector mTotalMotionTranslation;//移動
-    
-    
-    float mRotateMatrix0;//親指（向かって右足）の回転
-    float mRotateMatrix2;//人さし指（向かって右腕）の回転
-    float mRotateMatrix3;//中指（頭）の回転
-    float mRotateMatrix4;//薬指（向かって左腕）の回転
-    float mRotateMatrix5;//小指（向かって左足）の回転
     
     //ジェスチャーのための変数追加
     Leap::Frame lastFrame;//最後
