@@ -315,69 +315,13 @@ public:
     }
     //メッセージリスト
     void drawListArea(){
-
-        //"大きな声で"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[0],Vec2f(992.5, 145), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 145));
-        drawBox();
-        gl::popMatrices();
-        
-        //"頑張れ"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[1],Vec2f(992.5, 215), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 215));
-        drawBox();
-        gl::popMatrices();
-        
-        //"もう一度説明して"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[2],Vec2f(992.5, 285), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 285));
-        drawBox();
-        gl::popMatrices();
-        
-        //"面白い"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[3],Vec2f(992.5, 355), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 355));
-        drawBox();
-        gl::popMatrices();
-        
-        //"トイレにいきたい"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[4],Vec2f(992.5, 425), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 425));
-        drawBox();
-        gl::popMatrices();
-        
-        //"わかった"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[5],Vec2f(992.5, 495), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 495));
-        drawBox();
-        gl::popMatrices();
-        
-        //"かっこいい"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[6],Vec2f(992.5, 565), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 565));
-        drawBox();
-        gl::popMatrices();
-        
-        //"速い!"画像
-        gl::pushMatrices();
-        gl::drawString(messageList[7],Vec2f(992.5, 635), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 635));
-        drawBox();
-        gl::popMatrices();
-        
-        //"わからない"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[8],Vec2f(992.5, 705), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 705));
-        drawBox();
-        gl::popMatrices();
+        for(int i = 0; i < 9; i++){
+            gl::pushMatrices();
+            gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor, mFont);
+            gl::translate(Vec2f(992.5, 145 + ( i * 70 )));
+            drawBox();
+            gl::popMatrices();
+        }
     }
     //背景画像の描写
     void drawImage(){
