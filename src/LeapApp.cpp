@@ -446,7 +446,7 @@ public:
             
             //EMITTER
             fingerIsDown = true;
-            
+            tapCount = 1;
             //１列目
             if (x >= 992.5 && x <= 1262.5){
                 if (y >= 145 && y <= 195 ) {
