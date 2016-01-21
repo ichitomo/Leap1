@@ -302,7 +302,7 @@ public:
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
         //"title"描写
         gl::pushMatrices();
-        gl::drawString("Client Program", Vec2f(100,100),mFontColor, mFont);
+        gl::drawString("Client Program", Vec2f(100,50),mFontColor, mFont);
         gl::popMatrices();
         
         gl::pushMatrices();
