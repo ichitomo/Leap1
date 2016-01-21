@@ -101,6 +101,7 @@ public:
         // 表示フォントの設定
         mFont = Font( "YuGothic", 32 );//文字の形式、サイズ
         mFontColor = ColorA(0.65, 0.83, 0.58);//文字の色
+        mFontColor2 = ColorA(0.83, 0.62, 0.53);//文字の色
         
         // カメラ(視点)の設定
         
@@ -307,7 +308,7 @@ public:
         gl::pushMatrices();
         drawInteractionBox();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
-        drawSendCircle();
+        drawHelpCircle();
         drawListArea();//メッセージリストの表示
         //drawImage();
         //drawLeapObject();//手の描写
@@ -317,7 +318,11 @@ public:
     void drawListArea(){
         for(int i = 0; i < 9; i++){
             gl::pushMatrices();
+            if (messageNumber == i) {
+                gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor2, mFont);
+            }else{
             gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor, mFont);
+            }
             gl::translate(Vec2f(992.5, 145 + ( i * 70 )));
             drawBox();
             gl::popMatrices();
@@ -343,12 +348,12 @@ public:
     }
     
     //枠としてのcircleを描く
-    void drawSendCircle(){
+    void drawHelpCircle(){
         float sendRadius;//円の半径
         sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 200);
         gl::pushMatrices();
         gl::color(0.65, 0.83, 0.58);
-        gl::drawString("Send Message", Vec2f(465.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
+        gl::drawString("接続中です", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         gl::drawStrokedCircle(Vec2f(545.0, 450.0), sendRadius);
         gl::popMatrices();
         t += speed1;    //時間を進める
@@ -675,7 +680,7 @@ public:
     
     //フォント
     Font mFont;
-    Color mFontColor;
+    Color mFontColor, mFontColor2;
     // Leap Motion
     Leap::Controller mLeap;//ジェスチャーの有効化など...
     Leap::Frame mCurrentFrame;//現在
