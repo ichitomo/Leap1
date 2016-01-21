@@ -353,6 +353,9 @@ public:
         sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 200);
         gl::pushMatrices();
         gl::color(0.65, 0.83, 0.58);
+        if (messageNumber != -1) {
+            gl::drawString("発信中です", Vec2f(485.0, 450.0),mFontColor2, Font( "YuGothic", 24 ));
+        }
         gl::drawString("接続中です", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         gl::drawStrokedCircle(Vec2f(545.0, 450.0), sendRadius);
         gl::popMatrices();
