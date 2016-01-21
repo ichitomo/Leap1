@@ -101,6 +101,7 @@ public:
         // 表示フォントの設定
         mFont = Font( "YuGothic", 32 );//文字の形式、サイズ
         mFontColor = ColorA(0.65, 0.83, 0.58);//文字の色
+        mFontColor2 = ColorA(0.83, 0.62, 0.53);//文字の色
         
         // カメラ(視点)の設定
         
@@ -296,18 +297,18 @@ public:
     //描写処理
     void draw(){
         
-        //socketCl();//ソケット通信（クライアント側）
+        socketCl();//ソケット通信（クライアント側）
         gl::clear();
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
         //"title"描写
         gl::pushMatrices();
-        gl::drawString("Client Program", Vec2f(100,100),mFontColor, mFont);
+        gl::drawString("Client Program", Vec2f(100,50),mFontColor, mFont);
         gl::popMatrices();
         
         gl::pushMatrices();
         drawInteractionBox();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
-        drawSendCircle();
+        drawHelpCircle();
         drawListArea();//メッセージリストの表示
         //drawImage();
         //drawLeapObject();//手の描写
@@ -315,69 +316,17 @@ public:
     }
     //メッセージリスト
     void drawListArea(){
-
-        //"大きな声で"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[0],Vec2f(992.5, 145), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 145));
-        drawBox();
-        gl::popMatrices();
-        
-        //"頑張れ"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[1],Vec2f(992.5, 215), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 215));
-        drawBox();
-        gl::popMatrices();
-        
-        //"もう一度説明して"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[2],Vec2f(992.5, 285), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 285));
-        drawBox();
-        gl::popMatrices();
-        
-        //"面白い"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[3],Vec2f(992.5, 355), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 355));
-        drawBox();
-        gl::popMatrices();
-        
-        //"トイレにいきたい"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[4],Vec2f(992.5, 425), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 425));
-        drawBox();
-        gl::popMatrices();
-        
-        //"わかった"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[5],Vec2f(992.5, 495), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 495));
-        drawBox();
-        gl::popMatrices();
-        
-        //"かっこいい"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[6],Vec2f(992.5, 565), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 565));
-        drawBox();
-        gl::popMatrices();
-        
-        //"速い!"画像
-        gl::pushMatrices();
-        gl::drawString(messageList[7],Vec2f(992.5, 635), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 635));
-        drawBox();
-        gl::popMatrices();
-        
-        //"わからない"描写
-        gl::pushMatrices();
-        gl::drawString(messageList[8],Vec2f(992.5, 705), mFontColor, mFont);
-        gl::translate(Vec2f(992.5, 705));
-        drawBox();
-        gl::popMatrices();
+        for(int i = 0; i < 9; i++){
+            gl::pushMatrices();
+            if (messageNumber == i) {
+                gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor2, mFont);
+            }else{
+            gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor, mFont);
+            }
+            gl::translate(Vec2f(992.5, 145 + ( i * 70 )));
+            drawBox();
+            gl::popMatrices();
+        }
     }
     //背景画像の描写
     void drawImage(){
@@ -399,12 +348,12 @@ public:
     }
     
     //枠としてのcircleを描く
-    void drawSendCircle(){
+    void drawHelpCircle(){
         float sendRadius;//円の半径
         sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 200);
         gl::pushMatrices();
         gl::color(0.65, 0.83, 0.58);
-        gl::drawString("Send Message", Vec2f(465.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
+        gl::drawString("接続中です", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         gl::drawStrokedCircle(Vec2f(545.0, 450.0), sendRadius);
         gl::popMatrices();
         t += speed1;    //時間を進める
@@ -414,10 +363,6 @@ public:
     
     // Leap Motion関連のセットアップ
     void setupLeapObject(){
-        
-        mRotationMatrix = Leap::Matrix::identity();
-        mTotalMotionTranslation = Leap::Vector::zero();
-        mTotalMotionScale = 1.0f;
         
         //ジェスチャーを有効にする
         mLeap.enableGesture(Leap::Gesture::Type::TYPE_CIRCLE);//サークル
@@ -440,25 +385,6 @@ public:
         mMinDownVelocity = mLeap.config().getFloat( "Gesture.ScreenTap.MinDownVelocity" );
         mHistorySeconds = mLeap.config().getFloat( "Gesture.ScreenTap.HistorySeconds" );
         mMinDistance = mLeap.config().getFloat( "Gesture.ScreenTap.MinDistance" );
-        
-        //各ジェスチャーのパラメーター表示内容
-//        //スワイプ
-//        mParams =  params::InterfaceGl("GestureParameters", Vec2i(0,200));//パネル作成（引数：パネル名、サイズ）
-//        mParams.setPosition(Vec2f(0,200));//場所指定
-//        mParams.addParam( "Min Lenagth", &mMinLenagth );//スワイプの長さ
-//        mParams.addParam( "Min Velocity", &mMinVelocity );//スワイプの速さ
-//        //サークル
-//        mParams.addParam( "Min Radius", &mMinRadius );//サークルの半径
-//        mParams.addParam( "Min Arc", &mMinArc );//孤の長さ
-//        //キータップ
-//        mParams.addParam( "MinDownVelocity", &mMinDownVelocity );//キータップの速さ
-//        mParams.addParam( "HistorySeconds", &mHistorySeconds );//秒数
-//        mParams.addParam( "MinDistance", &mMinDistance );//距離
-//        //スクリーンタップ
-//        mParams.addParam( "MinDownVelocity", &mMinDownVelocity );//スクリーンタップの速さ
-//        mParams.addParam( "HistorySeconds", &mHistorySeconds );//秒数
-//        mParams.addParam( "MinDistance", &mMinDistance );//距離
-        
     }
     
     // Leap Motion関連の描画
@@ -525,9 +451,9 @@ public:
             
             //EMITTER
             fingerIsDown = true;
-            
+            tapCount = 1;
             //１列目
-            if (x >= 992.5 && x <= 270){
+            if (x >= 992.5 && x <= 1262.5){
                 if (y >= 145 && y <= 195 ) {
                     //大きな声で
                     messageNumber = 0;
@@ -604,15 +530,13 @@ public:
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
-    
-    
-    /*void socketCl(){
+    void socketCl(){
         //ソケット通信クライアント側
         sockfd = ::socket(AF_INET, SOCK_STREAM, 0);//ソケットの生成
         if (sockfd < 0)//socketが作られていない
             error("ERROR opening socket");
-        server = gethostbyname("mima.c.fun.ac.jp");//サーバーの作成
-        //server = gethostbyname("10.70.87.215");//サーバーの作成
+        //server = gethostbyname("mima.c.fun.ac.jp");//サーバーの作成
+        server = gethostbyname("10.70.85.188");//サーバーの作成
         if (server == NULL) {
             //サーバーにアクセスできない
             fprintf(stderr,"ERROR, no such host\n");
@@ -668,7 +592,7 @@ public:
         close(sockfd);
         cirCount = 0;//初期値に戻す
         tapCount = 0;//初期値に戻す
-    }*/
+    }
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
         return Vec3f( vec.x, vec.y, vec.z );
@@ -754,28 +678,13 @@ public:
     //バックグラウンド
     gl::Texture backgroundImage;
     
-    //メッセージテクスチャ
-    gl::Texture ok,  no, again, large, cool, fight, fast, inter, wc;
-    gl::Texture ok2, no2, again2, large2, cool2, fight2, fast2, inter2, wc2;
-    
-    
     //フォント
     Font mFont;
-    Color mFontColor;
+    Color mFontColor, mFontColor2;
     // Leap Motion
     Leap::Controller mLeap;//ジェスチャーの有効化など...
     Leap::Frame mCurrentFrame;//現在
     Leap::Frame mLastFrame;//最新
-    
-    Leap::Matrix mRotationMatrix;//回転
-    Leap::Vector mTotalMotionTranslation;//移動
-    
-    
-    float mRotateMatrix0;//親指（向かって右足）の回転
-    float mRotateMatrix2;//人さし指（向かって右腕）の回転
-    float mRotateMatrix3;//中指（頭）の回転
-    float mRotateMatrix4;//薬指（向かって左腕）の回転
-    float mRotateMatrix5;//小指（向かって左足）の回転
     
     //ジェスチャーのための変数追加
     Leap::Frame lastFrame;//最後
@@ -805,33 +714,6 @@ public:
     float mMinDownVelocity;//速さ
     float mHistorySeconds;//秒数
     float mMinDistance;//距離
-    
-    //マリオネットのための変数
-    float mTotalMotionScale = 1.0f;//拡大縮小（顔）
-    float mTotalMotionScale2 = 1.0f;//拡大縮小（表情）
-    
-    //ci::Vec3f defFaceTrans(new Point3D(0.0, 120.0, 50.0));
-    float defFaceTransX = 1080.0;//顔のx座標の位置
-    float defFaceTransY = 675+110.0;//顔のy座標の位置
-    float defFaceTransZ = 0.0;//顔のz座標の位置
-    
-    float defBodyTransX = 1080.0;//体のx座標の位置
-    float defBodyTransY = 675.0;//体のy座標の位置
-    float defBodyTransZ = 0.0;//体のz座標の位置
-    
-    float defLeftArmTransX=1080.0+75.0;
-    float defRightArmTransX=1080.0-75.0;
-    float defArmTransY=675+20.0;
-    float defArmTransZ=0.0;
-    
-    float rightEyeAngle = 0.0;//右目の角度
-    float leftEyeAngle = 0.0;//左目の角度
-    float defEyeTransX = 20.0;//右目のx座標の位置
-    float defEyeTransY = 120.0;//右目のy座標の位置
-    float defEyeTransZ = 0.0;//左目のz座標の位置
-    
-    float defMouseTransZ = 0.0;//口のz座標の位置
-    //ci::Vec3f mTotalMotionTranslation;//移動
     
     //InteractionBoxの実装
     Leap::InteractionBox iBox;
