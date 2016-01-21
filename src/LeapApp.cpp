@@ -117,19 +117,14 @@ public:
         //nNearは奥行きの範囲：手前（全方面）
         //zFarは奥行きの範囲：後方（後方面）
         mCam.setPerspective( 45.0f, getWindowAspectRatio(), 300.0f, 3000.0f );//カメラから見える視界の設定
-        
         mMayaCam.setCurrentCam(mCam);
         
-        //backgroundImageの読み込み
-        backgroundImage = gl::Texture(loadImage(loadResource(RES_BACKGROUND_IMAGE)));
-
         //フィンガーアクション
         particleImg = gl::Texture::create( loadImage( loadResource( RES_PARTICLE ) ) );
         emitterImg = gl::Texture::create( loadImage( loadResource( RES_EMITTER ) ) );
         
         fingerIsDown = false;
         mFingerPos = getWindowCenter();
-
 
         // 描画時に奥行きの考慮を有効にする
         //glEnable(GL_DEPTH_TEST);
@@ -183,7 +178,6 @@ public:
         auto gestures = mLastFrame.isValid() ? mCurrentFrame.gestures( mLastFrame ) :
         mCurrentFrame.gestures();
         
-        
         //----- 検出したジェスチャーを保存（Leap::Gestureクラスのジェスチャー判定） -----
         for(auto gesture : gestures){
             //IDによってジェスチャーを登録する
@@ -199,29 +193,30 @@ public:
             }else{
                 mGestureList.push_back( gesture );
             }
+            
             // 各ジェスチャー固有のパラメーターを取得する
             if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
                 Leap::SwipeGesture swpie( gesture );
-                
+                swipeCount++;
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
                 Leap::CircleGesture circle( gesture );
-                cirCount = 1;
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
                 Leap::KeyTapGesture keytap( gesture );
             }
             else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
                 Leap::ScreenTapGesture screentap( gesture );
-                tapCount = 1;
             }
             
             //スワイプ
             if ( it_swipe != swipe.end() ) {
                 *it_swipe = gesture;
+                
             }
             else {
                 swipe.push_back( gesture );
+                swipeNum++;
             }
             //サークル
             if ( it_circle != circle.end() ) {
@@ -229,6 +224,7 @@ public:
             }
             else {
                 circle.push_back( gesture );
+                cirNum++;
             }
             //キータップ
             if ( it_keytap != keytap.end() ) {
@@ -236,6 +232,7 @@ public:
             }
             else {
                 keytap.push_back( gesture );
+                ktapNum++;
             }
             //スクリーンタップ
             if ( it_screentap != screentap.end() ) {
@@ -243,8 +240,10 @@ public:
             }
             else {
                 screentap.push_back( gesture );
+                stapNum++;
             }
         }
+        
         
         // 最後の更新から1秒たったジェスチャーを削除する(タイムスタンプはマイクロ秒単位)
         mGestureList.remove_if( [&]( Leap::Gesture g ){
@@ -294,10 +293,29 @@ public:
         }
         
     }
+    void jestureCount(){
+        //カウントする
+        if(cirNum > 0){
+            cirCount++;
+            cirNum = 0;
+        }
+        if(swipeNum > 0){
+            swipeCount++;
+            swipeNum = 0;
+        }
+        if(ktapNum){
+            ktapCount++;
+            ktapNum=0;
+        }
+        if(stapNum){
+            stapCount++;
+            stapNum=0;
+        }
+    }
     //描写処理
     void draw(){
         
-        socketCl();//ソケット通信（クライアント側）
+        //socketCl();//ソケット通信（クライアント側）
         gl::clear();
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
         //"title"描写
@@ -308,10 +326,9 @@ public:
         gl::pushMatrices();
         drawInteractionBox();//インタラクションボックス
         //drawBox();//枠と軸になる線を描写する
-        drawHelpCircle();
+        //drawHelpCircle();
         drawListArea();//メッセージリストの表示
-        //drawImage();
-        //drawLeapObject();//手の描写
+        drawSwipeMessage();
         gl::popMatrices();
     }
     //メッセージリスト
@@ -328,18 +345,6 @@ public:
             gl::popMatrices();
         }
     }
-    //背景画像の描写
-    void drawImage(){
-        //背景画像
-        gl::pushMatrices();
-        if( backgroundImage ) {
-            gl::draw( backgroundImage, getWindowBounds());//バックグラウンドイメージを追加
-        }else{
-            gl::drawString("Loading image please wait..",getWindowCenter());//ロードする間にコメント
-        }
-        gl::popMatrices();
-        
-    }
     //枠としてのBoxを描く
     void drawBox(){
         gl::color(0.65, 0.83, 0.58);
@@ -348,6 +353,7 @@ public:
     }
     
     //枠としてのcircleを描く
+    /*
     void drawHelpCircle(){
         float sendRadius;//円の半径
         sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 200);
@@ -359,6 +365,35 @@ public:
         t += speed1;    //時間を進める
         if(t > 360.0) t = 0.0;
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
+    }
+    */
+    
+    void drawSwipeMessage(){
+
+        gl::pushMatrices();
+        if(swipeCount == 0){
+            gl::drawString("スワイプをするとメッセージが選べます",Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 1){
+            gl::drawString(messageList[0],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 2){
+            gl::drawString(messageList[1],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 3){
+            gl::drawString(messageList[2],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 4){
+            gl::drawString(messageList[3],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 5){
+            gl::drawString(messageList[4],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 6){
+            gl::drawString(messageList[5],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 7){
+            gl::drawString(messageList[6],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 8){
+            gl::drawString(messageList[7],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount == 9){
+            gl::drawString(messageList[8],Vec2f(485.0, 450.0), mFontColor, mFont);
+        }else if(swipeCount > 10){
+            swipeCount = 0;
+        }
     }
     
     // Leap Motion関連のセットアップ
@@ -451,7 +486,6 @@ public:
             
             //EMITTER
             fingerIsDown = true;
-            tapCount = 1;
             //１列目
             if (x >= 992.5 && x <= 1262.5){
                 if (y >= 145 && y <= 195 ) {
@@ -530,6 +564,19 @@ public:
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
+    void drawSwipeGesture(){
+        gl::pushMatrices();
+        //スワイプ動作を行った時の処理
+        for ( auto gesture : swipe ) {
+            gl::lineWidth( 10 );
+            gl::begin( GL_LINES );
+            gl::vertex( toVec3f( gesture.startPosition() ) );
+            gl::vertex( toVec3f( gesture.position() ) );
+            gl::end();
+        }
+        gl::popMatrices();
+    }
+    
     void socketCl(){
         //ソケット通信クライアント側
         sockfd = ::socket(AF_INET, SOCK_STREAM, 0);//ソケットの生成
@@ -557,7 +604,7 @@ public:
         std::string clientNumber = "0";//0. 一ノ瀬、1. 佐々木、2. 佐藤あ、3. 佐藤ま、4. 菅崎、5. 田中、6.先生
         std::string hansCount = std::to_string(mLastFrame.hands().count());//string型に変換
         std::string cirCountLength = std::to_string(cirCount);//string型に変換
-        std::string tapCountLength = std::to_string(tapCount);//string型に変換
+        std::string tapCountLength = std::to_string(stapCount);//string型に変換
         std::string sendMessage = std::to_string(messageNumber);//string型に変換
         std::string dammyMessage = "1";
         
@@ -591,7 +638,7 @@ public:
         
         close(sockfd);
         cirCount = 0;//初期値に戻す
-        tapCount = 0;//初期値に戻す
+        stapCount = 0;//初期値に戻す
     }
     // Leap SDKのVectorをCinderのVec3fに変換する
     Vec3f toVec3f( Leap::Vector vec ){
@@ -675,19 +722,14 @@ public:
     //メッセージリスト表示
     gl::Texture tbox0;//大黒柱
     
-    //バックグラウンド
-    gl::Texture backgroundImage;
-    
     //フォント
     Font mFont;
     Color mFontColor, mFontColor2;
+    
     // Leap Motion
     Leap::Controller mLeap;//ジェスチャーの有効化など...
     Leap::Frame mCurrentFrame;//現在
     Leap::Frame mLastFrame;//最新
-    
-    //ジェスチャーのための変数追加
-    Leap::Frame lastFrame;//最後
     
     //ジェスチャーを取得するための変数
     std::list<Leap::Gesture> mGestureList;
@@ -702,8 +744,9 @@ public:
     //パラメーター表示する時に使う
     params::InterfaceGl mParams;
     
-    //ジェスチャーをするときに取得できる変数
+    //ジェスチャーをするときに取得できる値
     //スワイプ
+    
     float mMinLenagth;//長さ
     float mMinVelocity;//速さ
     //サークル
@@ -735,8 +778,14 @@ public:
     char buffer[256];
     char buffer2[256];
     char buffer3[256];
+    int cirNum = 0;
+    int stapNum = 0;
+    int ktapNum = 0;
+    int swipeNum = 0;
     int cirCount = 0;
-    int tapCount = 0;
+    int stapCount = 0;
+    int ktapCount = 0;
+    int swipeCount = 0;
     
     //カメラをコントロールする
     gl::Texture		imgTexture;
@@ -749,14 +798,6 @@ public:
     int pastSec = 0;
     //グラフを描写するための座標
     Vec2i pointt;
-    
-    //Boxのための変数
-    float mLeft = 0.0;//左角のx座標
-    float mRight = 1440.0;//右角のx座標
-    float mTop = 900.0;//上面のy座標
-    float mBottom = 0.0;//下面のy座標
-    float mBackSide = 500.0;//前面のz座標
-    float mFrontSide = -500.0;//後面のz座標
     
     //マウスアクション
     Emitter		mEmitter;
