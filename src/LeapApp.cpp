@@ -328,7 +328,7 @@ public:
         //drawBox();//枠と軸になる線を描写する
         //drawHelpCircle();
         drawListArea();//メッセージリストの表示
-        drawSwipeMessage();
+        //drawSwipeMessage();
         gl::popMatrices();
         
         swipeAction();
@@ -354,8 +354,47 @@ public:
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
     
+    //スワイプがどの方向へ動かしたかを調べる
+    void swipeAction(){
+        const auto threshold = 0.5f;
+        gl::pushMatrices();
+        for ( auto gesture : swipe ) {
+            // 左右
+            if ( gesture.direction().x < -threshold ) {
+                //左に動かした
+                gl::drawString("左に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                drawSwipeMessage();
+            }
+            else if ( gesture.direction().x > threshold ) {
+                //右に動かした
+                gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            
+            // 上下
+            if ( gesture.direction().y < -threshold ) {
+                //下に動かした
+                gl::drawString("下に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            else if ( gesture.direction().y > threshold ) {
+                //上に動かした
+                gl::drawString("上に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            
+            // 前後
+            if ( gesture.direction().z < -threshold ) {
+                //後ろに動かした
+                drawHelpCircle();
+                gl::drawString("前に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            else if ( gesture.direction().z > threshold ) {
+                //前に動かした
+                
+                gl::drawString("後ろに動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+        }
+        gl::popMatrices();
+    }
     //枠としてのcircleを描く
-    /*
     void drawHelpCircle(){
         float sendRadius;//円の半径
         sendRadius = (A*sin(w*(t * PI / 180.0) - p) + 200);
@@ -368,10 +407,9 @@ public:
         if(t > 360.0) t = 0.0;
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
-    */
     
     void drawSwipeMessage(){
-
+        
         gl::pushMatrices();
         if(swipeCount == 0){
             gl::drawString("スワイプをするとメッセージが選べます",Vec2f(485.0, 450.0), mFontColor, mFont);
@@ -396,44 +434,6 @@ public:
         }else if(swipeCount > 10){
             swipeCount = 0;
         }
-    }
-    //スワイプがどの方向へ動かしたかを調べる
-    void swipeAction(){
-        const auto threshold = 0.5f;
-        gl::pushMatrices();
-        for ( auto gesture : swipe ) {
-            // 左右
-            if ( gesture.direction().x < -threshold ) {
-                //左に動かした
-                gl::drawString("左に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-
-            }
-            else if ( gesture.direction().x > threshold ) {
-                //右に動かした
-                gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-            }
-            
-            // 上下
-            if ( gesture.direction().y < -threshold ) {
-                //下に動かした
-                gl::drawString("下に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-            }
-            else if ( gesture.direction().y > threshold ) {
-                //上に動かした
-                gl::drawString("上に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-            }
-            
-            // 前後
-            if ( gesture.direction().z < -threshold ) {
-                //後ろに動かした
-                gl::drawString("前に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-            }
-            else if ( gesture.direction().z > threshold ) {
-                //前に動かした
-                gl::drawString("後ろに動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-            }
-        }
-        gl::popMatrices();
     }
     
     // Leap Motion関連のセットアップ
