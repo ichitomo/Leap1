@@ -330,6 +330,8 @@ public:
         drawListArea();//メッセージリストの表示
         drawSwipeMessage();
         gl::popMatrices();
+        
+        swipeAction();
     }
     //メッセージリスト
     void drawListArea(){
@@ -394,6 +396,44 @@ public:
         }else if(swipeCount > 10){
             swipeCount = 0;
         }
+    }
+    //スワイプがどの方向へ動かしたかを調べる
+    void swipeAction(){
+        const auto threshold = 0.5f;
+        gl::pushMatrices();
+        for ( auto gesture : swipe ) {
+            // 左右
+            if ( gesture.direction().x < -threshold ) {
+                //左に動かした
+                gl::drawString("左に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+
+            }
+            else if ( gesture.direction().x > threshold ) {
+                //右に動かした
+                gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            
+            // 上下
+            if ( gesture.direction().y < -threshold ) {
+                //下に動かした
+                gl::drawString("下に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            else if ( gesture.direction().y > threshold ) {
+                //上に動かした
+                gl::drawString("上に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            
+            // 前後
+            if ( gesture.direction().z < -threshold ) {
+                //後ろに動かした
+                gl::drawString("前に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            else if ( gesture.direction().z > threshold ) {
+                //前に動かした
+                gl::drawString("後ろに動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+        }
+        gl::popMatrices();
     }
     
     // Leap Motion関連のセットアップ
