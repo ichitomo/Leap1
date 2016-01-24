@@ -52,7 +52,7 @@ bool		ALLOWTRAILS = false;
 Vec3f		gravity( 0, 0.35f, 0 );
 const int	CINDER_FACTOR = 10; // how many times more particles than the Java version
 
-int lank = 0;
+int winRank = 0;
 
 string messageList[] = {
     
@@ -243,15 +243,15 @@ public:
                 
             }
             
-            //ジェスチャーの終割った時の状態
+            //ジェスチャーが終わった時の状態
             if(gesture.state() == Leap::Gesture::STATE_STOP){
                 // 各ジェスチャー固有のパラメーターを取得する
                 if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
                     swipeCount++;//カウントを増やす
-                    lank = lank + 1;
-                    lank = lank % 5;
+                    winRank = winRank + 1;
+                    winRank = winRank % 5;
                     /////コンソールアウト
-                    cout << "lank" << lank << "\n" << endl;
+                    cout << "lank" << winRank << "\n" << endl;
                     cout << "swipeCount" << swipeCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
@@ -343,7 +343,7 @@ public:
     }
     
     void switchWindow(){
-        switch (lank) {
+        switch (winRank) {
             case 0:
                 reflag = swipeAction();
                 if (reflag == 1) {
@@ -413,39 +413,35 @@ public:
     
     }
     void drawWindow(){
-        Timer tm;
-        tm.start();
         gl::clear();
         gl::drawString("ここはウインドウ０です", Vec2f(WindowWidth/2,WindowHeight/2+100));
         drawInteractionBox();//インタラクションボックス
+        drawTime();
     }
     void drawWindow1(){
-        Timer tm;
-        tm.start();
         gl::clear();
-        gl::drawString("ここはウインドウ１です", Vec2f(WindowWidth/2,WindowHeight/2+100));
+        gl::drawString("ここはウインドウ１です", Vec2f(WindowWidth/2,WindowHeight/2+110));
         drawInteractionBox();//インタラクションボックス
+        drawTime();
+        
     }
     void drawWindow2(){
-        Timer tm;
-        tm.start();
         gl::clear();
-        gl::drawString("ここはウインドウ２です", Vec2f(WindowWidth/2,WindowHeight/2+200));
+        gl::drawString("ここはウインドウ２です", Vec2f(WindowWidth/2,WindowHeight/2+120));
         drawInteractionBox();//インタラクションボックス
+        drawTime();
     }
     void drawWindow3(){
-        Timer tm;
-        tm.start();
         gl::clear();
-        gl::drawString("ここはウインドウ3です", Vec2f(WindowWidth/2,WindowHeight/2+300));
+        gl::drawString("ここはウインドウ3です", Vec2f(WindowWidth/2,WindowHeight/2+130));
         drawInteractionBox();//インタラクションボックス
+        drawTime();
     }
     void drawWindow4(){
-        Timer tm;
-        tm.start();
         gl::clear();
-        gl::drawString("ここはウインドウ4です", Vec2f(WindowWidth/2,WindowHeight/2+400));
+        gl::drawString("ここはウインドウ4です", Vec2f(WindowWidth/2,WindowHeight/2+140));
         drawInteractionBox();//インタラクションボックス
+        drawTime();
     }
     
     
@@ -480,6 +476,36 @@ public:
         gl::drawString("ジェスチャーをした時の指の本数によって選択が飛びます", Vec2f(200,820));
         gl::popMatrices();
     };
+    
+    void drawTime(){
+        //時間経過を計算する関数
+        
+        if (time(&next) != last){
+            //時間を１秒進める
+            last = next;
+            pastSec++;
+            timeleft = timelimit - pastSec;
+        }else if(pastSec == 30){
+            //３０秒経過するとリセットする
+            pastSec = 0;
+            timelimit = 30;//時間をリセットする
+            
+        }
+        //スワイプジェスチャーの検知を行い
+        for (auto gesture : swipe) {
+            //もしスワイプが行われ、終わった時
+            if(gesture.state() == Leap::Gesture::STATE_STOP){
+                pastSec = 0;//経過時間をリセットする
+                timelimit = 30;//時間をリセットする
+            }
+        }
+        //描写処理
+        gl::pushMatrices();
+        gl::drawString("経過時間（秒）："+to_string(pastSec), Vec2f(200,790));//経過時間を表示
+        gl::drawString("残り時間（秒）："+to_string(timeleft+1), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
+        //printf("%d 秒経過\n", pastSec);//デバック
+        gl::popMatrices();
+    }
     
     //スワイプがどの方向へ動かしたかを調べる
    
@@ -725,19 +751,6 @@ public:
         gl::popMatrices();
      }
 
-    //時間ごとに座標を記録する関数
-    void graphUpdate(){
-        //時間が１秒経つごとに座標を配列に記録していく
-        if (time(&next) != last){
-            last = next;
-            pastSec++;
-            printf("%d 秒経過\n", pastSec);
-            point[pastSec][0]=pastSec;
-            point[pastSec][1]=mCurrentFrame.hands().count();
-            pointt.x=pastSec;
-            pointt.y=mCurrentFrame.hands().count();
-        }
-    }
     // テクスチャの描画
     void drawTexture(){
         if( mTextTexture ) {
@@ -980,10 +993,6 @@ public:
     float				mCameraDistance;
     Vec3f				mEye, mCenter, mUp;
     
-    //タイマー
-    time_t last = time(0);
-    time_t next;
-    int pastSec = 0;
     //グラフを描写するための座標
     Vec2i pointt;
     
@@ -991,6 +1000,13 @@ public:
     Emitter		mEmitter;
     bool		fingerIsDown;
     Vec2i		mFingerPos;
+    
+    //タイマー
+    time_t last = time(0);
+    time_t next;
+    int pastSec = 0;
+    int timelimit = 30;
+    int timeleft;
     
     float A;  //振幅
     float w;  //角周波数
