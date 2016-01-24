@@ -53,6 +53,9 @@ Vec3f		gravity( 0, 0.35f, 0 );
 const int	CINDER_FACTOR = 10; // how many times more particles than the Java version
 
 int winRank = 0;
+int bWinRank;
+int stockFlag;
+int stockCount;
 
 string messageList[] = {
     
@@ -247,27 +250,29 @@ public:
             if(gesture.state() == Leap::Gesture::STATE_STOP){
                 // 各ジェスチャー固有のパラメーターを取得する
                 if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
+                    stockCount = swipeCount;
                     swipeCount++;//カウントを増やす
-                    winRank = winRank + 1;
-                    winRank = winRank % 5;
+//                    winRank++;
+//                    winRank = winRank % 5;
+                    
                     /////コンソールアウト
-                    cout << "lank" << winRank << "\n" << endl;
-                    cout << "swipeCount" << swipeCount << "\n" << endl;
+                    //cout << "lank" << winRank << "\n" << endl;
+                    //cout << "swipeCount" << swipeCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
                     cirCount++;//カウントを増やす
                     /////コンソールアウト
-                    cout << "cirCount" << cirCount << "\n" << endl;
+                    //cout << "cirCount" << cirCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
                     ktapCount++;//カウントを増やす
                     /////コンソールアウト
-                    cout << "keytapCount" << ktapCount << "\n" << endl;
+                    //cout << "keytapCount" << ktapCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
                     stapCount++;//カウントを増やす
                     /////コンソールアウト
-                    cout << "stapCount" << stapCount << "\n" << endl;
+                    //cout << "stapCount" << stapCount << "\n" << endl;
                 }
             }
         }
@@ -321,6 +326,53 @@ public:
         }
         
     }
+    
+    //スワイプがどの方向へ動かしたかを調べる
+    int swipeAction(){
+        //スワイプが行われてた時に行う関数
+        const auto threshold = 0.5f;
+        gl::pushMatrices();
+        for ( auto swipeGesture : swipe ) {
+            // 左右
+            if ( swipeGesture.direction().x < -threshold ) {
+                //左に動かした
+                gl::drawString("左に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                flag = 1;
+            }
+            else if ( swipeGesture.direction().x > threshold ) {
+                //右に動かした
+                gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                flag = 2;
+            }else{
+                flag = -1;
+            }
+            
+            // 上下
+            if ( swipeGesture.direction().y < -threshold ) {
+                //下に動かした
+                gl::drawString("下に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            else if ( swipeGesture.direction().y > threshold ) {
+                //上に動かした
+                gl::drawString("上に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            
+            // 前後
+            if ( swipeGesture.direction().z < -threshold ) {
+                //後ろに動かした
+                //drawHelpCircle();
+                gl::drawString("前に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+            else if ( swipeGesture.direction().z > threshold ) {
+                //前に動かした
+                gl::drawString("後ろに動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+            }
+        }
+        gl::popMatrices();
+        cout << flag << "\n" << endl;
+        return flag;
+    }
+    
     //描写処理
     void draw(){
         
@@ -333,84 +385,97 @@ public:
         gl::popMatrices();
         
         gl::pushMatrices();
-        drawSwipeMessage();
+        //drawSwipeMessage();
         drawInteractionBox();//インタラクションボックス
         //drawHelpCircle();
         drawListArea();//メッセージリストの表示
         drawHelp();
         gl::popMatrices();
+        stockFlag = reflag;
+        reflag = swipeAction();
+        
+        if((reflag == stockFlag)&&(stockCount != swipeCount)){
+            resultSwipeFlag = reflag;
+            winRank--;
+            winRank = winRank % 5;
+        }else if(reflag - stockFlag == 1){
+            resultSwipeFlag = -1;
+            winRank++;
+            winRank = winRank % 5;
+        }
+        cout << "resultSwipeFlag" << resultSwipeFlag << "\n" << endl;
+        
         switchWindow();
     }
     
     void switchWindow(){
         switch (winRank) {
             case 0:
-                reflag = swipeAction();
-                if (reflag == 1) {
+                if (resultSwipeFlag == 1) {
                     drawWindow1();
-                    //lank = 1;
-                    reflag = -1;
-                }else if(reflag == 2){
+                    resultSwipeFlag = -1;
+//                    winRank = 1;
+                }else if(resultSwipeFlag == 2){
                     drawWindow4();
-                    //lank = 4;
-                    reflag = -1;
+                    resultSwipeFlag = -1;
+//                    winRank = 4;
                 }
                 break;
                 
             case 1:
-                reflag = swipeAction();
-                if (reflag == 1) {
+                //reflag = swipeAction();
+                if (resultSwipeFlag == 1) {
                     drawWindow2();
-                    //lank = 2;
-                    reflag = -1;
-                }else if(reflag == 2){
+                    resultSwipeFlag = -1;
+//                    winRank = 2;
+                }else if(resultSwipeFlag == 2){
                     drawWindow();
-                    //lank = 0;
-                    //reflag = -1;
+                    resultSwipeFlag = -1;
+//                    winRank = 0;
                 }
                 
                 break;
             case 2:
-                reflag = swipeAction();
-                if (reflag == 1) {
+                //reflag = swipeAction();
+                if (resultSwipeFlag == 1) {
                     drawWindow3();
-                    //lank = 3;
-                    reflag = -1;
-                }else if(reflag == 2){
+                    resultSwipeFlag = -1;
+//                    winRank = 3;
+                }else if(resultSwipeFlag == 2){
                     drawWindow1();
-                    //lank = 1;
-                    reflag = -1;
+                    resultSwipeFlag = -1;
+//                    winRank = 1;
                 }
                 break;
             case 3:
-                reflag = swipeAction();
-                if (reflag == 1) {
+//                reflag = swipeAction();
+                if (resultSwipeFlag == 1) {
                     drawWindow4();
-                    //lank = 4;
-                    reflag = -1;
-                }else if(reflag == 2){
+                    resultSwipeFlag = -1;
+//                    winRank = 4;
+                }else if(resultSwipeFlag == 2){
                     drawWindow2();
-                    //lank = 2;
-                    reflag = -1;
+                    resultSwipeFlag = -1;
+//                    winRank = 2;
                 }
                 break;
             case 4:
-                reflag = swipeAction();
-                if (reflag == 1) {
+//                reflag = swipeAction();
+                if (resultSwipeFlag == 1) {
                     drawWindow();
-                    //lank = 0;
-                    reflag = -1;
-                }else if(reflag == 2){
+                    resultSwipeFlag = -1;
+//                    winRank = 0;
+                }else if(resultSwipeFlag == 2){
                     drawWindow3();
-                    //lank = 3;
-                    reflag = -1;
+                    resultSwipeFlag = -1;
+//                    winRank = 3;
                 }
                 break;
             default:
                 gl::drawString("def", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
                 break;
         }
-    
+        
     }
     void drawWindow(){
         gl::clear();
@@ -501,68 +566,10 @@ public:
         }
         //描写処理
         gl::pushMatrices();
-        gl::drawString("経過時間（秒）："+to_string(pastSec), Vec2f(200,790));//経過時間を表示
         gl::drawString("残り時間（秒）："+to_string(timeleft+1), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
         //printf("%d 秒経過\n", pastSec);//デバック
         gl::popMatrices();
     }
-    
-    //スワイプがどの方向へ動かしたかを調べる
-   
-    int swipeAction(){
-        const auto threshold = 0.5f;
-        gl::pushMatrices();
-        
-        int before_flag;
-        before_flag = flag;
-        
-        
-        for ( auto gesture : swipe ) {
-            if(gesture.STATE_STOP){
-                
-                // 左右
-                if ( gesture.direction().x < -threshold ) {
-                    //左に動かした
-                    gl::drawString("左に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                    //drawSwipeMessage();
-                    flag = 1;
-                }
-                else if ( gesture.direction().x > threshold ) {
-                    //右に動かした
-                    gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                    flag = 2;
-                }
-                // 上下
-                if ( gesture.direction().y < -threshold ) {
-                    //下に動かした
-                    gl::drawString("下に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                    //flag = 2;
-                }
-                else if ( gesture.direction().y > threshold ) {
-                    //上に動かした
-                    gl::drawString("上に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                    //flag = 2;
-                }
-                
-                // 前後
-                if ( gesture.direction().z < -threshold ) {
-                    //後ろに動かした
-                    //drawHelpCircle();
-                    gl::drawString("前に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                    //flag = 3;
-                    
-                }
-                else if ( gesture.direction().z > threshold ) {
-                    //前に動かした
-                    gl::drawString("後ろに動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                    //flag = 3;
-                }
-            }
-        }
-        gl::popMatrices();
-        return flag;
-    }
-    
     
     //枠としてのcircleを描く
     void drawHelpCircle(){
@@ -580,6 +587,9 @@ public:
         //if(swipeCount > 360.0) swipeCount = 0.0;
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
+    
+    
+    
     
     void drawSwipeMessage(){
         
@@ -873,7 +883,7 @@ public:
         else if ( direction.z > threshold ) {
             text += "Front";
         }
-        
+
         return text;
     }
     // ジェスチャー種別を文字列にする
@@ -986,7 +996,7 @@ public:
     int swipeCount = 0;
     int flag = -1;
     int reflag = -1;
-    //int lank = 0;
+    int resultSwipeFlag;
     
     //カメラをコントロールする
     gl::Texture		imgTexture;
