@@ -52,7 +52,7 @@ bool		ALLOWTRAILS = false;
 Vec3f		gravity( 0, 0.35f, 0 );
 const int	CINDER_FACTOR = 10; // how many times more particles than the Java version
 
-int winRank = 0;
+int winRank = -1;
 int bWinRank;
 int stockFlag;
 int stockCount = 0;
@@ -254,26 +254,57 @@ public:
             if(gesture.state() == Leap::Gesture::STATE_STOP){
                 // 各ジェスチャー固有のパラメーターを取得する
                 if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
-                    swipeCount++;//カウントを増やす
-//                    winRank++;
-//                    winRank = winRank % 5;
-                    
-                    /////コンソールアウト
-                    //cout << "lank" << winRank << "\n" << endl;
+                    if ((swipeCount == 0 )&&(cirCount < 1 && stapCount < 1 && ktapCount < 1)){
+                        swipeCount++;//カウントを増やす
+                        winRank = 0;
+                        cirCount = -1;
+                        stapCount = -1;
+                        ktapCount = -1;
+                    }
+                    if(swipeCount > 0){
+                        swipeCount++;
+                    }
                     cout << "swipeCount" << swipeCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
-                    cirCount++;//カウントを増やす
+                    if ((cirCount == 0 )&&(swipeCount < 1 && stapCount < 1 && ktapCount < 1)){
+                        cirCount++;//カウントを増やす
+                        winRank = 0;
+                        swipeCount = -1;
+                        stapCount = -1;
+                        ktapCount = -1;
+                    }
+                    if(cirCount > 0){
+                        cirCount++;
+                    }
                     /////コンソールアウト
                     cout << "cirCount" << cirCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
-                    ktapCount++;//カウントを増やす
+                    if ((ktapCount == 0 )&&(cirCount < 1 && stapCount < 1 && swipeCount < 1)){
+                        ktapCount++;//カウントを増やす
+                        winRank = 0;
+                        swipeCount = -1;
+                        stapCount = -1;
+                        cirCount = -1;
+                    }
+                    if(ktapCount > 0){
+                        ktapCount++;
+                    }
                     /////コンソールアウト
                     cout << "keytapCount" << ktapCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
-                    stapCount++;//カウントを増やす
+                    if ((stapCount == 0 )&&(cirCount < 1 && swipeCount < 1 && ktapCount < 1)){
+                        stapCount++;//カウントを増やす
+                    }
+                    if(stapCount > 0){
+                        stapCount++;
+                        winRank = 0;
+                        swipeCount = -1;
+                        stapCount = -1;
+                        ktapCount = -1;
+                    }
                     /////コンソールアウト
                     cout << "stapCount" << stapCount << "\n" << endl;
                 }
@@ -390,102 +421,34 @@ public:
         drawListArea();//メッセージリストの表示
         drawHelp();
         gl::popMatrices();
-        winRank = rankchange();
-        switchWindow(winRank);
-    }
-    int rankchange(){
-        stockFlag = reflag;//flagを保存する
-        reflag = swipeAction();//帰ってきたflagをreflagに代入
-        if((reflag == stockFlag == 1)&&(stockCount != swipeCount)){
-            //flagの値は同じだけど、カウントの値が違う （1->1）とき
-        //    resultSwipeFlag = reflag;
-            winRank++;
-            winRank = winRank % 5;
-        }else if((reflag == stockFlag == 2)&&(stockCount != swipeCount)){
-            //flagの値は同じだけど、カウントの値が違う （2->2）とき
-          //  resultSwipeFlag = reflag;
-            winRank--;
-            if(winRank == -1) winRank = 4;
-            winRank = winRank % 5;
-        }else if (reflag > stockFlag){
-            //flagが増えた時
-            //resultSwipeFlag = reflag;
-            winRank--;
-            if(winRank == -1) winRank = 4;
-            winRank = winRank % 5;
-        }else if(reflag < stockFlag){
-            //flagが減った時
-            //resultSwipeFlag = reflag;
-            winRank++;
-            winRank = winRank % 5;
-        }
-        cout << "resultSwipeFlag" << resultSwipeFlag << "\n" << endl;
-        return winRank;
+        switchWindow();
     }
     
-    void switchWindow(int WinRank){
+    void switchWindow(){
+        
         switch (winRank) {
             case 0:
-                reflag = swipeAction();
-                if (reflag == 1) {
-                    drawWindow1();
-                    reflag = -1;
-                    //winRank = 1;
-                }else if(reflag == 2){
-                    drawWindow4();
-                    reflag = -1;
-                    //winRank = 4;
-                }
+                drawWindow();
                 break;
                 
             case 1:
-                reflag = swipeAction();
-                if (reflag == 1) {
-                    drawWindow2();
-                    reflag = -1;
-                    //winRank = 2;
-                }else if(reflag == 2){
-                    drawWindow();
-                    reflag = -1;
-                }
-                
+                drawWindow1();
                 break;
             case 2:
-                reflag = swipeAction();
-                if (reflag == 1) {
-                    drawWindow3();
-                    reflag = -1;
-                }else if(reflag == 2){
-                    drawWindow1();
-                    reflag = -1;
-                }
+                drawWindow2();
                 break;
             case 3:
-                reflag = swipeAction();
-                if (reflag == 1) {
-                    drawWindow4();
-                    reflag = -1;
-                }else if(reflag == 2){
-                    drawWindow2();
-                    reflag = -1;
-                }
+                drawWindow3();
                 break;
             case 4:
-                reflag = swipeAction();
-                if (reflag == 1) {
-                    drawWindow();
-                    reflag = -1;
-                }else if(reflag == 2){
-                    drawWindow3();
-                    reflag = -1;
-                }
+                drawWindow4();
                 break;
             default:
                 gl::drawString("def", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
                 break;
         }
-        
     }
+    
     void drawWindow(){
         gl::clear();
         gl::drawString("ここはウインドウ０です", Vec2f(WindowWidth/2,WindowHeight/2+100));
@@ -559,23 +522,19 @@ public:
             last = next;
             pastSec++;
             timeleft = timelimit - pastSec;
-        }else if(pastSec == 30){
+        }else if(pastSec == 31){
             //３０秒経過するとリセットする
             pastSec = 0;
-            timelimit = 30;//時間をリセットする
-            
+            timelimit = 31;//時間をリセットする
+//            winRank++;
+//            winRank = winRank % 5;
+            winRank++;
+            //winRank = -1;
         }
-        //スワイプジェスチャーの検知を行い
-        for (auto gesture : swipe) {
-            //もしスワイプが行われ、終わった時
-            if(gesture.state() == Leap::Gesture::STATE_STOP){
-                pastSec = 0;//経過時間をリセットする
-                timelimit = 30;//時間をリセットする
-            }
-        }
+
         //描写処理
         gl::pushMatrices();
-        gl::drawString("残り時間（秒）："+to_string(timeleft+1), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
+        gl::drawString("残り時間（秒）："+to_string(timeleft), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
         //printf("%d 秒経過\n", pastSec);//デバック
         gl::popMatrices();
     }
