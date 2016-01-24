@@ -415,10 +415,8 @@ public:
         gl::popMatrices();
         
         gl::pushMatrices();
-        //drawSwipeMessage();
         drawInteractionBox();//インタラクションボックス
         //drawHelpCircle();
-        drawListArea();//メッセージリストの表示
         drawHelp();
         gl::popMatrices();
         switchWindow();
@@ -428,21 +426,15 @@ public:
         
         switch (winRank) {
             case 0:
+                //メッセージを選択する画面に遷移
                 drawWindow();
                 break;
                 
             case 1:
+                //決定したメッセージの質量を決める画面に遷移
                 drawWindow1();
                 break;
-            case 2:
-                drawWindow2();
-                break;
-            case 3:
-                drawWindow3();
-                break;
-            case 4:
-                drawWindow4();
-                break;
+
             default:
                 gl::drawString("def", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
                 break;
@@ -450,37 +442,39 @@ public:
     }
     
     void drawWindow(){
+        //メッセージ選択をする画面
         gl::clear();
-        gl::drawString("ここはウインドウ０です", Vec2f(WindowWidth/2,WindowHeight/2+100));
+        gl::drawString("ここはウインドウ０です\nメッセージ選択をする画面です\n", Vec2f(WindowWidth/2,WindowHeight/2+100));
         drawInteractionBox();//インタラクションボックス
         drawTime();
+        if(swipeCount > 0){
+            drawSwipeMessage();
+            drawListArea();//メッセージリストの表示
+        }else if (cirCount > 0){
+            drawListArea();//メッセージリストの表示
+        }else if (ktapCount > 0){
+            drawListArea();//メッセージリストの表示
+        }else if (stapCount > 0){
+            drawListArea();//メッセージリストの表示
+        }
     }
     void drawWindow1(){
+        //選択したメッセージの質量を決める画面
         gl::clear();
-        gl::drawString("ここはウインドウ１です", Vec2f(WindowWidth/2,WindowHeight/2+110));
+        gl::drawString("ここはウインドウ１です\n選択したメッセージの質量を決める画面です\n", Vec2f(WindowWidth/2,WindowHeight/2+110));
         drawInteractionBox();//インタラクションボックス
         drawTime();
-        
+        if(swipeCount > 0){
+            drawHelpCircle();
+        }else if (cirCount > 0){
+            drawHelpCircle();
+        }else if (ktapCount > 0){
+            drawHelpCircle();
+        }else if (stapCount > 0){
+            drawHelpCircle();
+        }
     }
-    void drawWindow2(){
-        gl::clear();
-        gl::drawString("ここはウインドウ２です", Vec2f(WindowWidth/2,WindowHeight/2+120));
-        drawInteractionBox();//インタラクションボックス
-        drawTime();
-    }
-    void drawWindow3(){
-        gl::clear();
-        gl::drawString("ここはウインドウ3です", Vec2f(WindowWidth/2,WindowHeight/2+130));
-        drawInteractionBox();//インタラクションボックス
-        drawTime();
-    }
-    void drawWindow4(){
-        gl::clear();
-        gl::drawString("ここはウインドウ4です", Vec2f(WindowWidth/2,WindowHeight/2+140));
-        drawInteractionBox();//インタラクションボックス
-        drawTime();
-    }
-    
+
     
     //メッセージリスト
     void drawListArea(){
@@ -522,19 +516,23 @@ public:
             last = next;
             pastSec++;
             timeleft = timelimit - pastSec;
-        }else if(pastSec == 31){
+        }else if(pastSec == 30){
             //３０秒経過するとリセットする
             pastSec = 0;
-            timelimit = 31;//時間をリセットする
-//            winRank++;
-//            winRank = winRank % 5;
+            timelimit = 30;//時間をリセットする
             winRank++;
-            //winRank = -1;
+            if(winRank > 2){
+                winRank = -1;
+                swipeCount = 0;
+                cirCount = 0;
+                stapCount = 0;
+                ktapCount = 0;
+            }
         }
 
         //描写処理
         gl::pushMatrices();
-        gl::drawString("残り時間（秒）："+to_string(timeleft), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
+        gl::drawString("残り時間（秒）："+to_string(timeleft+1), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
         //printf("%d 秒経過\n", pastSec);//デバック
         gl::popMatrices();
     }
@@ -563,24 +561,33 @@ public:
             gl::drawString("スワイプをするとメッセージが選べます",Vec2f(485.0, 450.0), mFontColor, mFont);
         }else if(swipeCount == 1){
             gl::drawString(messageList[0],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 0;
         }else if(swipeCount == 2){
             gl::drawString(messageList[1],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 1;
         }else if(swipeCount == 3){
             gl::drawString(messageList[2],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 2;
         }else if(swipeCount == 4){
             gl::drawString(messageList[3],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 3;
         }else if(swipeCount == 5){
             gl::drawString(messageList[4],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 4;
         }else if(swipeCount == 6){
             gl::drawString(messageList[5],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 5;
         }else if(swipeCount == 7){
             gl::drawString(messageList[6],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 6;
         }else if(swipeCount == 8){
             gl::drawString(messageList[7],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 7;
         }else if(swipeCount == 9){
             gl::drawString(messageList[8],Vec2f(485.0, 450.0), mFontColor, mFont);
+            messageNumber = 8;
         }else if(swipeCount > 10){
-            swipeCount = 0;
+            swipeCount = 1;
         }
     }
     
