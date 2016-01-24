@@ -418,8 +418,8 @@ public:
         drawInteractionBox();//インタラクションボックス
         //drawHelpCircle();
         drawHelp();
-        gl::popMatrices();
         switchWindow();
+        gl::popMatrices();
     }
     
     void switchWindow(){
@@ -428,15 +428,18 @@ public:
             case 0:
                 //メッセージを選択する画面に遷移
                 drawWindow();
+                drawHelp();
                 break;
                 
             case 1:
                 //決定したメッセージの質量を決める画面に遷移
                 drawWindow1();
+                drawHelp();
                 break;
             case 2:
                 //決定したメッセージの質量を決める画面に遷移
                 drawWindow2();
+                drawHelp();
                 break;
 
             default:
@@ -448,6 +451,7 @@ public:
                 //"title"描写
                 gl::pushMatrices();
                 gl::drawString("Client Program", Vec2f(100,50),mFontColor, mFont);
+                drawHelp();
                 gl::popMatrices();
                 break;
         }
@@ -490,7 +494,9 @@ public:
     void drawWindow2(){
         //選択したメッセージの質量を決める画面
         gl::clear();
-        gl::drawString("ここはウインドウ2です\nメッセージを送信しました\n", Vec2f(WindowWidth/2,WindowHeight/2+110));
+        gl::drawString("ここはウインドウ2です", Vec2f(WindowWidth/2,WindowHeight/2+110));
+        gl::drawString("メッセージを送信しました", Vec2f(WindowWidth/2,WindowHeight/2+140));
+        gl::drawString("5秒後に最初の画面に戻ります", Vec2f(WindowWidth/2,WindowHeight/2+160));
         drawInteractionBox();//インタラクションボックス
         drawTime();
         
@@ -523,38 +529,46 @@ public:
     void drawHelp(){
         gl::pushMatrices();
         if(winRank == -1){
-            gl::drawString("ジェスチャーで操作方法を決定します", Vec2f(200, 800));
-            gl::drawString("サークルジェスチャー：Leap Motion上で画面に向かって円を描くジェスチャー", Vec2f(200, 810));
-            gl::drawString("スワイプジェスチャー：Leap Motion上で手を仰ぐジェスチャー", Vec2f(200, 800));
-            gl::drawString("スクリーンタップジェスチャー：Leap Motion上で画面に向かってタップするジェスチャー", Vec2f(200, 820));
-            gl::drawString("キータップジェスチャー：Leap Motion上で地の方向にタップするジェスチャー", Vec2f(200, 830));
+            gl::drawString("ジェスチャーで操作方法を決定します", Vec2f(200, 700));
+            gl::drawString("サークルジェスチャー：Leap Motion上で画面に向かって円を描くジェスチャー", Vec2f(200, 710));
+            gl::drawString("スワイプジェスチャー：Leap Motion上で手を仰ぐジェスチャー", Vec2f(200, 720));
+            gl::drawString("スクリーンタップジェスチャー：Leap Motion上で画面に向かってタップするジェスチャー", Vec2f(200, 730));
+            gl::drawString("キータップジェスチャー：Leap Motion上で地の方向にタップするジェスチャー", Vec2f(200, 740));
         }else if(winRank == 0){
             if(swipeCount > 0){
-                gl::drawString("スワイプジェスチャーでメッセージを選択できます", Vec2f(200, 840));
-                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+                gl::drawString("スワイプジェスチャーを選択しました", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("スワイプジェスチャーでメッセージを選択できます", Vec2f(200, 700));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,720));
             }else if (cirCount > 0){
-                gl::drawString("サークルジェスチャーでメッセージを選択できます", Vec2f(200,800));
-                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+                gl::drawString("サークルジェスチャーを選択しました", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("サークルジェスチャーでメッセージを選択できます", Vec2f(200,700));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,720));
             }else if (ktapCount > 0){
-                gl::drawString("キータップジェスチャーでメッセージを選択できます", Vec2f(200,800));
-                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+                gl::drawString("キータップジェスチャーを選択しました", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("キータップジェスチャーでメッセージを選択できます", Vec2f(200,700));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,720));
             }else if (stapCount > 0){
-                gl::drawString("スクリーンタップジェスチャーでメッセージを選択できます", Vec2f(200,800));
-                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+                gl::drawString("スクリーンタップジェスチャーを選択しました", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("スクリーンタップジェスチャーでメッセージを選択できます", Vec2f(200,700));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,720));
             }
         }else if(winRank == 1){
             if(swipeCount > 0){
-                gl::drawString("スワイプジェスチャーでメッセージに重みをつけます", Vec2f(200, 840));
-                gl::drawString("ジェスチャーをした時の指の本数が多いほど増加します", Vec2f(200,820));
+                gl::drawString("スワイプジェスチャーを選択しています", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("スワイプジェスチャーでメッセージに重みをつけます", Vec2f(200, 700));
+                gl::drawString("ジェスチャーをした時の指の本数が多いほど増加します", Vec2f(200,720));
             }else if (cirCount > 0){
-                gl::drawString("サークルジェスチャーでメッセージに重みをつけます", Vec2f(200,800));
-                gl::drawString("ジェスチャーをした時の指の本数が多いほど増加します", Vec2f(200,820));
+                gl::drawString("サークルジェスチャーを選択しています", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("サークルジェスチャーでメッセージに重みをつけます", Vec2f(200,700));
+                gl::drawString("ジェスチャーをした時の指の本数が多いほど増加します", Vec2f(200,720));
             }else if (ktapCount > 0){
-                gl::drawString("キータップジェスチャーでメッセージに重みをつけます", Vec2f(200,800));
-                gl::drawString("ジェスチャーをした時の指の本数によってが多いほど増加します", Vec2f(200,820));
+                gl::drawString("キータップジェスチャーを選択しています", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("キータップジェスチャーでメッセージに重みをつけます", Vec2f(200,700));
+                gl::drawString("ジェスチャーをした時の指の本数によってが多いほど増加します", Vec2f(200,720));
             }else if (stapCount > 0){
-                gl::drawString("スクリーンタップジェスチャーでメッセージに重みをつけます", Vec2f(200,800));
-                gl::drawString("ジェスチャーをした時の指の本数によってが多いほど増加します", Vec2f(200,820));
+                gl::drawString("スクリーンタップジェスチャーを選択しています", Vec2f(100,100),mFontColor, mFont);
+                gl::drawString("スクリーンタップジェスチャーでメッセージに重みをつけます", Vec2f(200,700));
+                gl::drawString("ジェスチャーをした時の指の本数によってが多いほど増加します", Vec2f(200,720));
             }
         
         }
