@@ -434,9 +434,21 @@ public:
                 //決定したメッセージの質量を決める画面に遷移
                 drawWindow1();
                 break;
+            case 2:
+                //決定したメッセージの質量を決める画面に遷移
+                drawWindow2();
+                break;
 
             default:
-                gl::drawString("def", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
+                gl::drawString("入力操作を選んでください", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
+                swipeCount = 0;
+                cirCount = 0;
+                stapCount = 0;
+                ktapCount = 0;
+                //"title"描写
+                gl::pushMatrices();
+                gl::drawString("Client Program", Vec2f(100,50),mFontColor, mFont);
+                gl::popMatrices();
                 break;
         }
     }
@@ -475,6 +487,14 @@ public:
         }
     }
 
+    void drawWindow2(){
+        //選択したメッセージの質量を決める画面
+        gl::clear();
+        gl::drawString("ここはウインドウ2です\nメッセージを送信しました\n", Vec2f(WindowWidth/2,WindowHeight/2+110));
+        drawInteractionBox();//インタラクションボックス
+        drawTime();
+        
+    }
     
     //メッセージリスト
     void drawListArea(){
@@ -502,38 +522,80 @@ public:
     
     void drawHelp(){
         gl::pushMatrices();
-        gl::drawString("スワイプをするとウィンドウが切り替わります", Vec2f(200, 800));
-        gl::drawString("スクリーンタップでメッセージを選択できます", Vec2f(200,810));
-        gl::drawString("ジェスチャーをした時の指の本数によって選択が飛びます", Vec2f(200,820));
+        if(winRank == -1){
+            gl::drawString("ジェスチャーで操作方法を決定します", Vec2f(200, 800));
+            gl::drawString("サークルジェスチャー：Leap Motion上で画面に向かって円を描くジェスチャー", Vec2f(200, 810));
+            gl::drawString("スワイプジェスチャー：Leap Motion上で手を仰ぐジェスチャー", Vec2f(200, 800));
+            gl::drawString("スクリーンタップジェスチャー：Leap Motion上で画面に向かってタップするジェスチャー", Vec2f(200, 820));
+            gl::drawString("キータップジェスチャー：Leap Motion上で地の方向にタップするジェスチャー", Vec2f(200, 830));
+        }else if(winRank == 0){
+            if(swipeCount > 0){
+                gl::drawString("スワイプジェスチャーでメッセージを選択できます", Vec2f(200, 840));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+            }else if (cirCount > 0){
+                gl::drawString("サークルジェスチャーでメッセージを選択できます", Vec2f(200,800));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+            }else if (ktapCount > 0){
+                gl::drawString("キータップジェスチャーでメッセージを選択できます", Vec2f(200,800));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+            }else if (stapCount > 0){
+                gl::drawString("スクリーンタップジェスチャーでメッセージを選択できます", Vec2f(200,800));
+                gl::drawString("ジェスチャーをした時の指の本数によって選択が変化します", Vec2f(200,820));
+            }
+        }else if(winRank == 1){
+            if(swipeCount > 0){
+                gl::drawString("スワイプジェスチャーでメッセージに重みをつけます", Vec2f(200, 840));
+                gl::drawString("ジェスチャーをした時の指の本数が多いほど増加します", Vec2f(200,820));
+            }else if (cirCount > 0){
+                gl::drawString("サークルジェスチャーでメッセージに重みをつけます", Vec2f(200,800));
+                gl::drawString("ジェスチャーをした時の指の本数が多いほど増加します", Vec2f(200,820));
+            }else if (ktapCount > 0){
+                gl::drawString("キータップジェスチャーでメッセージに重みをつけます", Vec2f(200,800));
+                gl::drawString("ジェスチャーをした時の指の本数によってが多いほど増加します", Vec2f(200,820));
+            }else if (stapCount > 0){
+                gl::drawString("スクリーンタップジェスチャーでメッセージに重みをつけます", Vec2f(200,800));
+                gl::drawString("ジェスチャーをした時の指の本数によってが多いほど増加します", Vec2f(200,820));
+            }
+        
+        }
+        
+        
         gl::popMatrices();
     };
     
     void drawTime(){
         //時間経過を計算する関数
+        if((winRank >= 0)&&(winRank < 2)){timelimit = 30;}
+        else if (winRank == 2){timelimit = 5;}
         
         if (time(&next) != last){
             //時間を１秒進める
             last = next;
             pastSec++;
             timeleft = timelimit - pastSec;
-        }else if(pastSec == 30){
+        }else if(((winRank >= 0)&&(winRank < 2))&&(pastSec == 30)){
             //３０秒経過するとリセットする
             pastSec = 0;
             timelimit = 30;//時間をリセットする
             winRank++;
+            
+        }else if((winRank == 2)&&(pastSec == 5)){
+            pastSec = 0;
+            timelimit = 5;//時間をリセットする
+            winRank++;//戻す
+            //リセット
             if(winRank > 2){
-                winRank = -1;
+                winRank = -1;//戻す
                 swipeCount = 0;
                 cirCount = 0;
                 stapCount = 0;
                 ktapCount = 0;
             }
+           
         }
-
         //描写処理
         gl::pushMatrices();
-        gl::drawString("残り時間（秒）："+to_string(timeleft+1), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
-        //printf("%d 秒経過\n", pastSec);//デバック
+        gl::drawString("残り時間（秒）："+to_string(timeleft), Vec2f(200,800));//経過時間を表示（１秒間表示を補正）
         gl::popMatrices();
     }
     
@@ -560,32 +622,32 @@ public:
         if(swipeCount == 0){
             gl::drawString("スワイプをするとメッセージが選べます",Vec2f(485.0, 450.0), mFontColor, mFont);
         }else if(swipeCount == 1){
-            gl::drawString(messageList[0],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 0;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 2){
-            gl::drawString(messageList[1],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 1;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 3){
-            gl::drawString(messageList[2],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 2;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 4){
-            gl::drawString(messageList[3],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 3;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 5){
-            gl::drawString(messageList[4],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 4;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 6){
-            gl::drawString(messageList[5],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 5;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 7){
-            gl::drawString(messageList[6],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 6;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 8){
-            gl::drawString(messageList[7],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 7;
+            gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount == 9){
-            gl::drawString(messageList[8],Vec2f(485.0, 450.0), mFontColor, mFont);
             messageNumber = 8;
+                        gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount > 10){
             swipeCount = 1;
         }
@@ -722,7 +784,7 @@ public:
         }
         // タッチ対象外
         else {
-            messageNumber = -1;
+            //messageNumber = -1;
             //EMITTER
             fingerIsDown = false;
             mFingerPos = Vec2f(index.tipPosition().x,index.tipPosition().y);
@@ -987,7 +1049,7 @@ public:
     time_t last = time(0);
     time_t next;
     int pastSec = 0;
-    int timelimit = 30;
+    int timelimit;
     int timeleft;
     
     float A;  //振幅
