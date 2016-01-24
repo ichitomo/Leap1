@@ -55,7 +55,11 @@ const int	CINDER_FACTOR = 10; // how many times more particles than the Java ver
 int winRank = 0;
 int bWinRank;
 int stockFlag;
-int stockCount;
+int stockCount = 0;
+int resultSwipeFlag = 0;
+
+
+
 
 string messageList[] = {
     
@@ -250,29 +254,28 @@ public:
             if(gesture.state() == Leap::Gesture::STATE_STOP){
                 // 各ジェスチャー固有のパラメーターを取得する
                 if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
-                    stockCount = swipeCount;
                     swipeCount++;//カウントを増やす
 //                    winRank++;
 //                    winRank = winRank % 5;
                     
                     /////コンソールアウト
                     //cout << "lank" << winRank << "\n" << endl;
-                    //cout << "swipeCount" << swipeCount << "\n" << endl;
+                    cout << "swipeCount" << swipeCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
                     cirCount++;//カウントを増やす
                     /////コンソールアウト
-                    //cout << "cirCount" << cirCount << "\n" << endl;
+                    cout << "cirCount" << cirCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
                     ktapCount++;//カウントを増やす
                     /////コンソールアウト
-                    //cout << "keytapCount" << ktapCount << "\n" << endl;
+                    cout << "keytapCount" << ktapCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
                     stapCount++;//カウントを増やす
                     /////コンソールアウト
-                    //cout << "stapCount" << stapCount << "\n" << endl;
+                    cout << "stapCount" << stapCount << "\n" << endl;
                 }
             }
         }
@@ -343,10 +346,7 @@ public:
                 //右に動かした
                 gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
                 flag = 2;
-            }else{
-                flag = -1;
             }
-            
             // 上下
             if ( swipeGesture.direction().y < -threshold ) {
                 //下に動かした
@@ -369,7 +369,6 @@ public:
             }
         }
         gl::popMatrices();
-        cout << flag << "\n" << endl;
         return flag;
     }
     
@@ -391,84 +390,94 @@ public:
         drawListArea();//メッセージリストの表示
         drawHelp();
         gl::popMatrices();
-        stockFlag = reflag;
-        reflag = swipeAction();
-        
-        if((reflag == stockFlag)&&(stockCount != swipeCount)){
-            resultSwipeFlag = reflag;
-            winRank--;
+        winRank = rankchange();
+        switchWindow(winRank);
+    }
+    int rankchange(){
+        stockFlag = reflag;//flagを保存する
+        reflag = swipeAction();//帰ってきたflagをreflagに代入
+        if((reflag == stockFlag == 1)&&(stockCount != swipeCount)){
+            //flagの値は同じだけど、カウントの値が違う （1->1）とき
+        //    resultSwipeFlag = reflag;
+            winRank++;
             winRank = winRank % 5;
-        }else if(reflag - stockFlag == 1){
-            resultSwipeFlag = -1;
+        }else if((reflag == stockFlag == 2)&&(stockCount != swipeCount)){
+            //flagの値は同じだけど、カウントの値が違う （2->2）とき
+          //  resultSwipeFlag = reflag;
+            winRank--;
+            if(winRank == -1) winRank = 4;
+            winRank = winRank % 5;
+        }else if (reflag > stockFlag){
+            //flagが増えた時
+            //resultSwipeFlag = reflag;
+            winRank--;
+            if(winRank == -1) winRank = 4;
+            winRank = winRank % 5;
+        }else if(reflag < stockFlag){
+            //flagが減った時
+            //resultSwipeFlag = reflag;
             winRank++;
             winRank = winRank % 5;
         }
         cout << "resultSwipeFlag" << resultSwipeFlag << "\n" << endl;
-        
-        switchWindow();
+        return winRank;
     }
     
-    void switchWindow(){
+    void switchWindow(int WinRank){
         switch (winRank) {
             case 0:
-                if (resultSwipeFlag == 1) {
+                reflag = swipeAction();
+                if (reflag == 1) {
                     drawWindow1();
-                    resultSwipeFlag = -1;
-//                    winRank = 1;
-                }else if(resultSwipeFlag == 2){
+                    reflag = -1;
+                    //winRank = 1;
+                }else if(reflag == 2){
                     drawWindow4();
-                    resultSwipeFlag = -1;
-//                    winRank = 4;
+                    reflag = -1;
+                    //winRank = 4;
                 }
                 break;
                 
             case 1:
-                //reflag = swipeAction();
-                if (resultSwipeFlag == 1) {
+                reflag = swipeAction();
+                if (reflag == 1) {
                     drawWindow2();
-                    resultSwipeFlag = -1;
-//                    winRank = 2;
-                }else if(resultSwipeFlag == 2){
+                    reflag = -1;
+                    //winRank = 2;
+                }else if(reflag == 2){
                     drawWindow();
-                    resultSwipeFlag = -1;
-//                    winRank = 0;
+                    reflag = -1;
                 }
                 
                 break;
             case 2:
-                //reflag = swipeAction();
-                if (resultSwipeFlag == 1) {
+                reflag = swipeAction();
+                if (reflag == 1) {
                     drawWindow3();
-                    resultSwipeFlag = -1;
-//                    winRank = 3;
-                }else if(resultSwipeFlag == 2){
+                    reflag = -1;
+                }else if(reflag == 2){
                     drawWindow1();
-                    resultSwipeFlag = -1;
-//                    winRank = 1;
+                    reflag = -1;
                 }
                 break;
             case 3:
-//                reflag = swipeAction();
-                if (resultSwipeFlag == 1) {
+                reflag = swipeAction();
+                if (reflag == 1) {
                     drawWindow4();
-                    resultSwipeFlag = -1;
-//                    winRank = 4;
-                }else if(resultSwipeFlag == 2){
+                    reflag = -1;
+                }else if(reflag == 2){
                     drawWindow2();
-                    resultSwipeFlag = -1;
-//                    winRank = 2;
+                    reflag = -1;
                 }
                 break;
             case 4:
-//                reflag = swipeAction();
-                if (resultSwipeFlag == 1) {
+                reflag = swipeAction();
+                if (reflag == 1) {
                     drawWindow();
-                    resultSwipeFlag = -1;
-//                    winRank = 0;
-                }else if(resultSwipeFlag == 2){
+                    reflag = -1;
+                }else if(reflag == 2){
                     drawWindow3();
-                    resultSwipeFlag = -1;
-//                    winRank = 3;
+                    reflag = -1;
                 }
                 break;
             default:
@@ -587,9 +596,6 @@ public:
         //if(swipeCount > 360.0) swipeCount = 0.0;
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
-    
-    
-    
     
     void drawSwipeMessage(){
         
@@ -883,7 +889,7 @@ public:
         else if ( direction.z > threshold ) {
             text += "Front";
         }
-
+        
         return text;
     }
     // ジェスチャー種別を文字列にする
@@ -996,7 +1002,7 @@ public:
     int swipeCount = 0;
     int flag = -1;
     int reflag = -1;
-    int resultSwipeFlag;
+    //int lank = 0;
     
     //カメラをコントロールする
     gl::Texture		imgTexture;
