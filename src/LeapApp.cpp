@@ -415,29 +415,37 @@ public:
     void drawWindow(){
         Timer tm;
         tm.start();
+        gl::clear();
         gl::drawString("ここはウインドウ０です", Vec2f(WindowWidth/2,WindowHeight/2+100));
+        drawInteractionBox();//インタラクションボックス
     }
     void drawWindow1(){
         Timer tm;
         tm.start();
+        gl::clear();
         gl::drawString("ここはウインドウ１です", Vec2f(WindowWidth/2,WindowHeight/2+100));
+        drawInteractionBox();//インタラクションボックス
     }
     void drawWindow2(){
         Timer tm;
         tm.start();
+        gl::clear();
         gl::drawString("ここはウインドウ２です", Vec2f(WindowWidth/2,WindowHeight/2+200));
-        
+        drawInteractionBox();//インタラクションボックス
     }
     void drawWindow3(){
         Timer tm;
         tm.start();
+        gl::clear();
         gl::drawString("ここはウインドウ3です", Vec2f(WindowWidth/2,WindowHeight/2+300));
-        
+        drawInteractionBox();//インタラクションボックス
     }
     void drawWindow4(){
         Timer tm;
         tm.start();
+        gl::clear();
         gl::drawString("ここはウインドウ4です", Vec2f(WindowWidth/2,WindowHeight/2+400));
+        drawInteractionBox();//インタラクションボックス
     }
     
     
