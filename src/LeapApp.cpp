@@ -243,26 +243,30 @@ public:
                 
             }
             
-            //ジェスチャーの状態
+            //ジェスチャーの終割った時の状態
             if(gesture.state() == Leap::Gesture::STATE_STOP){
                 // 各ジェスチャー固有のパラメーターを取得する
                 if ( gesture.type() == Leap::Gesture::Type::TYPE_SWIPE ){//検出したジェスチャーがスワイプ
-                    swipeCount++;
+                    swipeCount++;//カウントを増やす
                     lank = lank + 1;
                     lank = lank % 5;
+                    /////コンソールアウト
                     cout << "lank" << lank << "\n" << endl;
                     cout << "swipeCount" << swipeCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_CIRCLE ){//検出したジェスチャーがサークル
-                    cirCount++;
+                    cirCount++;//カウントを増やす
+                    /////コンソールアウト
                     cout << "cirCount" << cirCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_KEY_TAP ){//検出したジェスチャーがキータップ
-                    ktapCount++;
+                    ktapCount++;//カウントを増やす
+                    /////コンソールアウト
                     cout << "keytapCount" << ktapCount << "\n" << endl;
                 }
                 else if ( gesture.type() == Leap::Gesture::Type::TYPE_SCREEN_TAP ){//検出したジェスチャーがスクリーンタップ
-                    stapCount++;
+                    stapCount++;//カウントを増やす
+                    /////コンソールアウト
                     cout << "stapCount" << stapCount << "\n" << endl;
                 }
             }
@@ -304,7 +308,7 @@ public:
         mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
         //socketCl();//ソケット通信（クライアント側）
         
-        //フィンガーアクション
+        //フィンガーアクション（スクリーンタップが行われた時のエフェクト）
         counter++;
         
         if( fingerIsDown ) {
@@ -331,12 +335,11 @@ public:
         gl::pushMatrices();
         drawSwipeMessage();
         drawInteractionBox();//インタラクションボックス
-        //drawBox();//枠と軸になる線を描写する
         //drawHelpCircle();
-        //drawListArea();//メッセージリストの表示
-        //drawSwipeMessage();
+        drawListArea();//メッセージリストの表示
+        drawHelp();
         gl::popMatrices();
-//        switchWindow();
+        switchWindow();
     }
     
     void switchWindow(){
@@ -345,11 +348,9 @@ public:
                 reflag = swipeAction();
                 if (reflag == 1) {
                     drawWindow1();
-                    //cout << "ドロー１" << "\n" << endl;
                     //lank = 1;
                     reflag = -1;
                 }else if(reflag == 2){
-                    //cout << "ドロー2" << "\n" << endl;
                     drawWindow4();
                     //lank = 4;
                     reflag = -1;
@@ -359,12 +360,10 @@ public:
             case 1:
                 reflag = swipeAction();
                 if (reflag == 1) {
-                    //cout << "ドロー3" << "\n" << endl;
                     drawWindow2();
                     //lank = 2;
                     reflag = -1;
                 }else if(reflag == 2){
-                    //cout << "ドロー4" << "\n" << endl;
                     drawWindow();
                     //lank = 0;
                     //reflag = -1;
@@ -374,12 +373,10 @@ public:
             case 2:
                 reflag = swipeAction();
                 if (reflag == 1) {
-                    //cout << "ドロー5" << "\n" << endl;
                     drawWindow3();
                     //lank = 3;
                     reflag = -1;
                 }else if(reflag == 2){
-                    //cout << "ドロー6" << "\n" << endl;
                     drawWindow1();
                     //lank = 1;
                     reflag = -1;
@@ -388,12 +385,10 @@ public:
             case 3:
                 reflag = swipeAction();
                 if (reflag == 1) {
-//                    cout << "ドロー7" << "\n" << endl;
                     drawWindow4();
                     //lank = 4;
                     reflag = -1;
                 }else if(reflag == 2){
-//                    cout << "ドロー8" << "\n" << endl;
                     drawWindow2();
                     //lank = 2;
                     reflag = -1;
@@ -402,12 +397,10 @@ public:
             case 4:
                 reflag = swipeAction();
                 if (reflag == 1) {
-//                    cout << "ドロー9" << "\n" << endl;
                     drawWindow();
                     //lank = 0;
                     reflag = -1;
                 }else if(reflag == 2){
-//                    cout << "ドロー１0" << "\n" << endl;
                     drawWindow3();
                     //lank = 3;
                     reflag = -1;
@@ -419,26 +412,22 @@ public:
         }
     
     }
-    
     void drawWindow(){
         Timer tm;
         tm.start();
         gl::drawString("ここはウインドウ０です", Vec2f(WindowWidth/2,WindowHeight/2+100));
     }
-    
     void drawWindow1(){
         Timer tm;
         tm.start();
         gl::drawString("ここはウインドウ１です", Vec2f(WindowWidth/2,WindowHeight/2+100));
     }
-    
     void drawWindow2(){
         Timer tm;
         tm.start();
         gl::drawString("ここはウインドウ２です", Vec2f(WindowWidth/2,WindowHeight/2+200));
         
     }
-    
     void drawWindow3(){
         Timer tm;
         tm.start();
@@ -457,12 +446,15 @@ public:
         for(int i = 0; i < 9; i++){
             gl::pushMatrices();
             if (messageNumber == i) {
-                gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor2, mFont);
+                //選ばれているメッセージの番号が同じ時
+                gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor2, mFont);//違う色でメッセージを描く
+                gl::drawSolidCircle(Vec2f(980, 145 + ( i * 70 )), 40);//横に円を描く
             }else{
+                //そうでない時
             gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor, mFont);
-            }
+            }//普通にメッセージを描く
             gl::translate(Vec2f(992.5, 145 + ( i * 70 )));
-            drawBox();
+            drawBox();//四角で囲む
             gl::popMatrices();
         }
     }
@@ -472,7 +464,15 @@ public:
         gl::drawStrokedRoundedRect(Rectf(0,0,270,50), 5);//角の丸い四角
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
-    int count=0;
+    
+    void drawHelp(){
+        gl::pushMatrices();
+        gl::drawString("スワイプをするとウィンドウが切り替わります", Vec2f(200, 800));
+        gl::drawString("スクリーンタップでメッセージを選択できます", Vec2f(200,810));
+        gl::drawString("ジェスチャーをした時の指の本数によって選択が飛びます", Vec2f(200,820));
+        gl::popMatrices();
+    };
+    
     //スワイプがどの方向へ動かしたかを調べる
    
     int swipeAction(){
@@ -484,61 +484,48 @@ public:
         
         
         for ( auto gesture : swipe ) {
-            
-            // 左右
-            if ( gesture.direction().x < -threshold ) {
-                //左に動かした
-                gl::drawString("左に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                //drawSwipeMessage();
+            if(gesture.STATE_STOP){
                 
-                flag = 1;
-
-            }
-            else if ( gesture.direction().x > threshold ) {
-                //右に動かした
-                gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                // 左右
+                if ( gesture.direction().x < -threshold ) {
+                    //左に動かした
+                    gl::drawString("左に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                    //drawSwipeMessage();
+                    flag = 1;
+                }
+                else if ( gesture.direction().x > threshold ) {
+                    //右に動かした
+                    gl::drawString("右に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                    flag = 2;
+                }
+                // 上下
+                if ( gesture.direction().y < -threshold ) {
+                    //下に動かした
+                    gl::drawString("下に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                    //flag = 2;
+                }
+                else if ( gesture.direction().y > threshold ) {
+                    //上に動かした
+                    gl::drawString("上に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                    //flag = 2;
+                }
                 
-                flag = 2;
-
-            }
-            
-            
-            
-            // 上下
-            if ( gesture.direction().y < -threshold ) {
-                //下に動かした
-                gl::drawString("下に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                //flag = 2;
-            }
-            else if ( gesture.direction().y > threshold ) {
-                //上に動かした
-                gl::drawString("上に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                //flag = 2;
-            }
-            
-            // 前後
-            if ( gesture.direction().z < -threshold ) {
-                //後ろに動かした
-                //drawHelpCircle();
-                gl::drawString("前に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                //flag = 3;
-                
-            }
-            else if ( gesture.direction().z > threshold ) {
-                //前に動かした
-                gl::drawString("後ろに動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
-                //flag = 3;
+                // 前後
+                if ( gesture.direction().z < -threshold ) {
+                    //後ろに動かした
+                    //drawHelpCircle();
+                    gl::drawString("前に動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                    //flag = 3;
+                    
+                }
+                else if ( gesture.direction().z > threshold ) {
+                    //前に動かした
+                    gl::drawString("後ろに動かした\n",Vec2f(485.0, 700.0), mFontColor, mFont);
+                    //flag = 3;
+                }
             }
         }
-        
-//        if(before_flag != flag) {
-//            
-//            
-//            
-//        }
-        
         gl::popMatrices();
-//        cout << "flag：" << flag << "\n" << endl;
         return flag;
     }
     
@@ -553,8 +540,6 @@ public:
         if(messageNumber != -1){
             gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }
-        
-//        gl::drawString("接続中です", Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         gl::drawStrokedCircle(Vec2f(545.0, 450.0), sendRadius);
         gl::popMatrices();
         t += speed1;    //時間を進める
