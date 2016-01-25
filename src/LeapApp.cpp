@@ -517,13 +517,7 @@ public:
             pointt.y=mCurrentFrame.hands().count();
         }
     }
-    // テクスチャの描画
-    void drawTexture(){
-        if( mTextTexture ) {
-            gl::translate( 0, 100);//位置
-            gl::draw( mTextTexture );//描く
-        }
-    }
+    
     // GL_LIGHT0の色を変える
     void setDiffuseColor( ci::ColorA diffuseColor ){
         gl::color( diffuseColor );
