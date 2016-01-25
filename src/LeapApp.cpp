@@ -636,12 +636,16 @@ public:
                         gl::drawString("あなたのえらんだメッセージは" + messageList[messageNumber] , Vec2f(485.0, 450.0),mFontColor, Font( "YuGothic", 24 ));
         }else if(swipeCount > 10){
             swipeCount = 1;
+            messageNumber = -1;
         }else if(cirCount > 10){
             cirCount = 1;
+            messageNumber = -1;
         }else if(stapCount > 10){
             stapCount = 1;
+            messageNumber = -1;
         }else if(ktapCount > 10){
             ktapCount = 1;
+            messageNumber = -1;
         }
     }
     
