@@ -592,7 +592,7 @@ public:
         gl::drawStrokedCircle(Vec2f(545.0, 450.0), sendRadius);
         gl::popMatrices();
         t += speed1;    //時間を進める
-        if(sendRadius > 360.0) sendRadius = 0.0;
+        //if(sendRadius > 360.0) sendRadius = 0.0;
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
     
