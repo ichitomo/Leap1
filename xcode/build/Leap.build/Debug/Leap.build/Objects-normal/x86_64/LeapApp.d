@@ -1,9 +1,10 @@
-dependencies: /Users/ichinosetomohiro/Desktop/Leap/src/LeapApp.cpp \
+dependencies: \
+  /Users/ichinosetomohiro/Documents/leap/Leap1/src/LeapApp.cpp \
   ../../cinder_0.8.6_mac/include/cinder/gl/Texture.h \
   ../../cinder_0.8.6_mac/include/cinder/Text.h \
   ../../cinder_0.8.6_mac/include/cinder/MayaCamUI.h \
   ../../cinder_0.8.6_mac/include/cinder/Camera.h \
-  /Users/ichinosetomohiro/Desktop/Leap/include/Leap.h \
+  /Users/ichinosetomohiro/Documents/leap/Leap1/include/Leap.h \
   ../include/LeapMath.h \
   ../../cinder_0.8.6_mac/include/cinder/params/Params.h \
   ../../cinder_0.8.6_mac/include/cinder/ObjLoader.h \
@@ -17,8 +18,8 @@ dependencies: /Users/ichinosetomohiro/Desktop/Leap/src/LeapApp.cpp \
   ../../cinder_0.8.6_mac/boost/boost/type_traits/detail/template_arity_spec.hpp \
   ../../cinder_0.8.6_mac/boost/boost/type_traits/detail/type_trait_undef.hpp \
   ../../cinder_0.8.6_mac/boost/boost/type_traits/remove_volatile.hpp \
-  /Users/ichinosetomohiro/Desktop/Leap/include/Resources.h \
+  /Users/ichinosetomohiro/Documents/leap/Leap1/include/Resources.h \
   ../../cinder_0.8.6_mac/include/cinder/CinderResources.h \
   ../../cinder_0.8.6_mac/include/cinder/Perlin.h \
-  /Users/ichinosetomohiro/Desktop/Leap/include/Particle.h \
-  /Users/ichinosetomohiro/Desktop/Leap/include/Emitter.h
+  /Users/ichinosetomohiro/Documents/leap/Leap1/include/Particle.h \
+  /Users/ichinosetomohiro/Documents/leap/Leap1/include/Emitter.h

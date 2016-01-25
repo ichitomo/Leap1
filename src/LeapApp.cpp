@@ -108,7 +108,7 @@ public:
         mCameraDistance = 1500.0f;//カメラの距離（z座標）
         mEye			= Vec3f( WindowWidth/2, WindowHeight/2, mCameraDistance );//位置
         mCenter			= Vec3f( WindowWidth/2, WindowHeight/2, 0.0f);//カメラのみる先
-
+        
         mCam.setEyePoint( mEye );//カメラの位置
         mCam.setCenterOfInterestPoint(mCenter);//カメラのみる先
         //(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
@@ -122,15 +122,15 @@ public:
         
         //backgroundImageの読み込み
         backgroundImage = gl::Texture(loadImage(loadResource(RES_BACKGROUND_IMAGE)));
-
+        
         //フィンガーアクション
         particleImg = gl::Texture::create( loadImage( loadResource( RES_PARTICLE ) ) );
         emitterImg = gl::Texture::create( loadImage( loadResource( RES_EMITTER ) ) );
         
         fingerIsDown = false;
         mFingerPos = getWindowCenter();
-
-
+        
+        
         // 描画時に奥行きの考慮を有効にする
         //glEnable(GL_DEPTH_TEST);
         //gl::enableDepthRead();
@@ -276,7 +276,7 @@ public:
         
         //updateLeapObject();
         //renderFrameParameter();
-
+        
         //カメラのアップデート処理
         mEye = Vec3f( 0.0f, 0.0f, mCameraDistance );//距離を変える
         //socketCl();//ソケット通信（クライアント側）
@@ -321,7 +321,7 @@ public:
             if (messageNumber == i) {
                 gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor2, mFont);
             }else{
-            gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor, mFont);
+                gl::drawString(messageList[i],Vec2f(992.5, 145 + ( i * 70 )), mFontColor, mFont);
             }
             gl::translate(Vec2f(992.5, 145 + ( i * 70 )));
             drawBox();
@@ -422,8 +422,8 @@ public:
     
     //インタラクションボックスの作成
     void drawInteractionBox(){
-     
-     gl::pushMatrices();
+        
+        gl::pushMatrices();
         
         // 人差し指を取得する
         Leap::Finger index = mLeap.frame().fingers().fingerType( Leap::Finger::Type::TYPE_INDEX )[0];
@@ -433,18 +433,18 @@ public:
         // InteractionBoxの座標に変換する
         Leap::InteractionBox iBox = mLeap.frame().interactionBox();
         Leap::Vector normalizedPosition = iBox.normalizePoint( index.stabilizedTipPosition() );//指の先端の座標(normalizedPositionは0から1の値で表す)
-     
+        
         // ウィンドウの座標に変換する
         float x = normalizedPosition.x * WindowWidth;
         float y = WindowHeight - (normalizedPosition.y * WindowHeight);
-     
+        
         // ホバー状態
         if ( index.touchZone() == Leap::Pointable::Zone::ZONE_HOVERING ) {
             messageNumber = -1;
             //EMITTER(マウスアップ)
             fingerIsDown = false;
         }
-     
+        
         // タッチ状態
         else if( index.touchZone() == Leap::Pointable::Zone::ZONE_TOUCHING ) {
             gl::color(1, 0, 0);
@@ -502,8 +502,8 @@ public:
         mEmitter.exist(Vec2f( x, y ));
         floorLevel = 2 / 3.0f * getWindowHeight();
         gl::popMatrices();
-     }
-
+    }
+    
     //時間ごとに座標を記録する関数
     void graphUpdate(){
         //時間が１秒経つごとに座標を配列に記録していく
@@ -517,13 +517,7 @@ public:
             pointt.y=mCurrentFrame.hands().count();
         }
     }
-    // テクスチャの描画
-    void drawTexture(){
-        if( mTextTexture ) {
-            gl::translate( 0, 100);//位置
-            gl::draw( mTextTexture );//描く
-        }
-    }
+    
     // GL_LIGHT0の色を変える
     void setDiffuseColor( ci::ColorA diffuseColor ){
         gl::color( diffuseColor );
@@ -709,7 +703,7 @@ public:
     //サークル
     float mMinRadius;//半径
     float mMinArc;//弧
-
+    
     //キータップ、スクリーンタップ
     float mMinDownVelocity;//速さ
     float mHistorySeconds;//秒数
