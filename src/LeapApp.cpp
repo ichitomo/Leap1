@@ -334,14 +334,6 @@ public:
         
         iBox = mCurrentFrame.interactionBox();
         
-        iLeft = iBox.center().x - (iBox.width() / 2);
-        iRight = iBox.center().x + (iBox.width() / 2);
-        iTop = iBox.center().y + (iBox.height() / 2);
-        iBaottom = iBox.center().y - (iBox.height() / 2);
-        iBackSide = iBox.center().z - (iBox.depth() / 2);
-        iFrontSide = iBox.center().z + (iBox.depth() / 2);
-        
-        
         //updateLeapObject();
         //renderFrameParameter();
 
@@ -376,12 +368,11 @@ public:
         
         gl::pushMatrices();
         drawFingerPosition();//インタラクションボックス
-        //drawHelpCircle();
         drawHelp();
         switchWindow();
         gl::popMatrices();
     }
-    
+    //Windowの切り替え
     void switchWindow(){
         
         switch (winRank) {
@@ -416,7 +407,7 @@ public:
                 break;
         }
     }
-    
+    //メッセージを選択するウィンドウ
     void drawWindow(){
         //メッセージ選択をする画面
         gl::clear();
@@ -440,6 +431,7 @@ public:
             drawListArea();//メッセージリストの表示
         }
     }
+    //メッセージに重みを加えるウィンドウ
     void drawWindow1(){
         //選択したメッセージの質量を決める画面
         gl::clear();
@@ -459,6 +451,7 @@ public:
             drawMessageCircle();
         }
     }
+    //終了ウィンドウ
     void drawWindow2(){
         //選択したメッセージの質量を決める画面
         gl::clear();
@@ -494,6 +487,7 @@ public:
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
     
+    //説明を記述する
     void drawHelp(){
         gl::pushMatrices();
         if(winRank == -1){
@@ -544,7 +538,7 @@ public:
         
         gl::popMatrices();
     };
-    
+    //カウントダウン
     void drawTime(){
         //時間経過を計算する関数
         if((winRank >= 0)&&(winRank < 2)){timelimit = 30;}
@@ -602,6 +596,7 @@ public:
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
     
+    //メッセージを選択するための関数
     void drawChoiceMessage(){
         
         gl::pushMatrices();
@@ -711,19 +706,13 @@ public:
         gl::popMatrices();
      }
 
-    // テクスチャの描画
-    void drawTexture(){
-        if( mTextTexture ) {
-            gl::translate( 0, 100);//位置
-            gl::draw( mTextTexture );//描く
-        }
-    }
     // GL_LIGHT0の色を変える
     void setDiffuseColor( ci::ColorA diffuseColor ){
         gl::color( diffuseColor );
         glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor );
     }
     
+    //ソケット通信
     void socketCl(){
         //ソケット通信クライアント側
         sockfd = ::socket(AF_INET, SOCK_STREAM, 0);//ソケットの生成
@@ -907,12 +896,6 @@ public:
     
     //InteractionBoxの実装
     Leap::InteractionBox iBox;
-    float iLeft;//左の壁
-    float iRight;//右の壁
-    float iTop;//雲
-    float iBaottom;//底
-    float iBackSide;//背面
-    float iFrontSide;//正面
     
     //メッセージを取得する時に使う
     int messageNumber = -1;
@@ -933,15 +916,11 @@ public:
     int swipeCount = 0;
     int flag = -1;
     int reflag = -1;
-    //int lank = 0;
     
     //カメラをコントロールする
     gl::Texture		imgTexture;
     float				mCameraDistance;
     Vec3f				mEye, mCenter, mUp;
-    
-    //グラフを描写するための座標
-    Vec2i pointt;
     
     //マウスアクション
     Emitter		mEmitter;
