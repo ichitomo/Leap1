@@ -147,6 +147,33 @@ public:
         
     }
     
+    // Leap Motion関連のセットアップ
+    void setupLeapObject(){
+        
+        //ジェスチャーを有効にする
+        mLeap.enableGesture(Leap::Gesture::Type::TYPE_CIRCLE);//サークル
+        mLeap.enableGesture(Leap::Gesture::Type::TYPE_KEY_TAP);//キータップ
+        mLeap.enableGesture(Leap::Gesture::Type::TYPE_SCREEN_TAP);//スクリーンタップ
+        mLeap.enableGesture(Leap::Gesture::Type::TYPE_SWIPE);//スワイプ
+        
+        //設定を変える
+        //スワイプ
+        mMinLenagth = mLeap.config().getFloat( "Gesture.Swipe.MinLength" );
+        mMinVelocity = mLeap.config().getFloat( "Gesture.Swipe.MinVelocity" );
+        //サークル
+        mMinRadius = mLeap.config().getFloat( "Gesture.Circle.MinRadius" );
+        mMinArc = mLeap.config().getFloat( "Gesture.Circle.MinArc" );
+        //キータップ
+        mMinDownVelocity = mLeap.config().getFloat( "Gesture.KeyTap.MinDownVelocity" );
+        mHistorySeconds = mLeap.config().getFloat( "Gesture.KeyTap.HistorySeconds" );
+        mMinDistance = mLeap.config().getFloat( "Gesture.KeyTap.MinDistance" );
+        //スクリーンタップ
+        mMinDownVelocity = mLeap.config().getFloat( "Gesture.ScreenTap.MinDownVelocity" );
+        mHistorySeconds = mLeap.config().getFloat( "Gesture.ScreenTap.HistorySeconds" );
+        mMinDistance = mLeap.config().getFloat( "Gesture.ScreenTap.MinDistance" );
+    }
+
+    
     // マウスのクリック
     void mouseDown( MouseEvent event ){
         mMayaCam.mouseDown( event.getPos() );
@@ -297,7 +324,7 @@ public:
     //描写処理
     void draw(){
         
-        socketCl();//ソケット通信（クライアント側）
+        //socketCl();//ソケット通信（クライアント側）
         gl::clear();
         gl::enableAdditiveBlending();//PNG画像のエッジがなくす
         //"title"描写
@@ -361,31 +388,6 @@ public:
         setDiffuseColor( ci::ColorA( 0.8, 0.8, 0.8 ) );
     }
     
-    // Leap Motion関連のセットアップ
-    void setupLeapObject(){
-        
-        //ジェスチャーを有効にする
-        mLeap.enableGesture(Leap::Gesture::Type::TYPE_CIRCLE);//サークル
-        mLeap.enableGesture(Leap::Gesture::Type::TYPE_KEY_TAP);//キータップ
-        mLeap.enableGesture(Leap::Gesture::Type::TYPE_SCREEN_TAP);//スクリーンタップ
-        mLeap.enableGesture(Leap::Gesture::Type::TYPE_SWIPE);//スワイプ
-        
-        //設定を変える
-        //スワイプ
-        mMinLenagth = mLeap.config().getFloat( "Gesture.Swipe.MinLength" );
-        mMinVelocity = mLeap.config().getFloat( "Gesture.Swipe.MinVelocity" );
-        //サークル
-        mMinRadius = mLeap.config().getFloat( "Gesture.Circle.MinRadius" );
-        mMinArc = mLeap.config().getFloat( "Gesture.Circle.MinArc" );
-        //キータップ
-        mMinDownVelocity = mLeap.config().getFloat( "Gesture.KeyTap.MinDownVelocity" );
-        mHistorySeconds = mLeap.config().getFloat( "Gesture.KeyTap.HistorySeconds" );
-        mMinDistance = mLeap.config().getFloat( "Gesture.KeyTap.MinDistance" );
-        //スクリーンタップ
-        mMinDownVelocity = mLeap.config().getFloat( "Gesture.ScreenTap.MinDownVelocity" );
-        mHistorySeconds = mLeap.config().getFloat( "Gesture.ScreenTap.HistorySeconds" );
-        mMinDistance = mLeap.config().getFloat( "Gesture.ScreenTap.MinDistance" );
-    }
     
     // Leap Motion関連の描画
     void drawLeapObject(){
